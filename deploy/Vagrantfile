@@ -1,0 +1,43 @@
+require 'yaml'
+
+# Bugfix: https://github.com/mitchellh/vagrant-aws/issues/566
+class Hash
+    def slice(*keep_keys)
+      h = {}
+      keep_keys.each { |key| h[key] = fetch(key) if has_key?(key) }
+      h
+    end unless Hash.method_defined?(:slice)
+    def except(*less_keys)
+      slice(*keys - less_keys)
+    end unless Hash.method_defined?(:except)
+  end
+
+vault_dir = "#{Dir.home}/.vault"
+
+Vagrant.configure("2") do |config|
+
+    config.vm.box = 'dummy'
+
+    aws_credentials = YAML.load_file("#{vault_dir}/aws-credentials.yaml")
+
+    # Create EC2 instance
+    config.vm.provider :aws do |aws, override|
+        aws.access_key_id = aws_credentials['key_id']
+        aws.secret_access_key = aws_credentials['secret']
+        aws.keypair_name = aws_credentials['ssh_key']
+
+        # CentOS 7
+        aws.ami = 'ami-0be110ffd53859e30'
+        aws.region = 'eu-central-1'
+        aws.instance_type = 't3.micro'
+        aws.security_groups = ['eda-dev']
+
+        override.ssh.username = 'centos'
+        override.ssh.private_key_path = "#{vault_dir}/#{aws_credentials['ssh_key']}.pem"
+    end
+
+    # Execute Ansible playbook
+    config.vm.provision "ansible" do |ansible|
+        ansible.playbook = "playbook.yaml"
+      end
+end
