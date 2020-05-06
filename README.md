@@ -17,44 +17,31 @@ sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
 
-2. Install the AWS CLI (https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2-linux.html)
+2. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
 ```
-curl "https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip" -o "awscliv2.zip"
-unzip awscliv2.zip
-sudo ./aws/install
-```
-
-3. Install Vagrant (https://www.vagrantup.com/downloads.html) using the .deb package
-
-4. Install the Vagrant AWS plugin (https://github.com/mitchellh/vagrant-aws)
-```
-vagrant plugin install vagrant-aws
+wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip\
+unzip terraform_0.12.24_linux_amd64.zip
+mv terraform ~/.local/bin  # add this directory to PATH
+rm terraform_0.12.24_linux_amd64.zip
 ```
 
-If you get the error `ovirt-engine-sdk requires Ruby version >= 2.5`, try replacing Vagrant's Ruby with a newer version. (https://github.com/hashicorp/vagrant/issues/11518)
+3. Install terraform-inventory (https://github.com/adammck/terraform-inventory)
 ```
-cd /opt/vagrant/embedded/bin
-sudo mv ruby ruby.old
-sudo ln -s `which ruby` ruby
-vagrant plugin install vagrant-aws
-```
-
-5. Add a dummy box for the Vagrant AWS provider.
-```
-vagrant box add dummy https://github.com/mitchellh/vagrant-aws/raw/master/dummy.box
+wget https://github.com/adammck/terraform-inventory/releases/download/v0.9/terraform-inventory_0.9_linux_amd64.zip
+unzip terraform-inventory_0.9_linux_amd64.zip
+mv terraform-inventory ~/.local/bin
+rm terraform-inventory_0.9_linux_amd64.zip
 ```
 
-6. Create a vault directory.
+4. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 ```
-mkdir ~/.vault
-chmod 700 ~/.vault
-```
-
-7. Set up your AWS deployment user credentials in `~/.vault/aws-credentials.yaml`.
-```
-key_id: ACCESS_KEY_ID
-secret: SECRET_ACCESS_KEY
-ssh_key: SSH_KEY_NAME
+mkdir ~/.aws
+echo "[default]
+aws_access_key_id = ACCESS_KEY_ID
+aws_secret_access_key = SECRET_ACCESS_KEY" >> ~/.aws/credentials
 ```
 
-8. Run `vagrant up` and enjoy.
+5. Generate an SSH key to use for EC2 instances
+```
+ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
+```
