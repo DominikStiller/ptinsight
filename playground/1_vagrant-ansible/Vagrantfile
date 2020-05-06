@@ -1,6 +1,6 @@
 require 'yaml'
 
-# Bugfix: https://github.com/mitchellh/vagrant-aws/issues/566
+# Bugfix for https://github.com/mitchellh/vagrant-aws/issues/566
 class Hash
     def slice(*keep_keys)
       h = {}
