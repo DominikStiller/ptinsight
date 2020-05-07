@@ -4,64 +4,87 @@
   user:
     name: flink
 
-- name: download Java
-  get_url:
-    # Java 11: https://download.oracle.com/otn-pub/java/jdk/11.0.7%2B8/8c7daf89330c48f0b9e32f57169f7bac/jdk-11.0.7_linux-x64_bin.rpm
-    url: https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/server-jre-8u251-linux-x64.tar.gz
-    dest: /tmp/server-jre-8u251-linux-x64.tar.gz
-    headers:
-      Cookie: oraclelicense=accept-securebackup-cookie
+- name: check Java
+  command: java -version
+  failed_when: no
+  register: java_version
 
-- name: untar Java
-  unarchive:
-    src: /tmp/server-jre-8u251-linux-x64.tar.gz
-    dest: /opt
-    remote_src: yes
+- name: install Java
+  become: true
+  block:
+  - name: download Java
+    get_url:
+      # Java 11: https://download.oracle.com/otn-pub/java/jdk/11.0.7%2B8/8c7daf89330c48f0b9e32f57169f7bac/jdk-11.0.7_linux-x64_bin.rpm
+      url: https://download.oracle.com/otn-pub/java/jdk/8u251-b08/3d5a2bb8f8d4428bbe94aed7ec7ae784/server-jre-8u251-linux-x64.tar.gz
+      dest: /tmp/server-jre-8u251-linux-x64.tar.gz
+      headers:
+        Cookie: oraclelicense=accept-securebackup-cookie
 
-- name: remove tar
-  file:
-    path: /tmp/server-jre-8u251-linux-x64.tar.gz
-    state: absent
+  - name: untar Java
+    unarchive:
+      src: /tmp/server-jre-8u251-linux-x64.tar.gz
+      dest: /opt
+      remote_src: yes
 
-- name: add generic Java symlink
-  file:
-    src: /opt/jdk1.8.0_251
-    dest: /opt/java
-    state: link
+  - name: remove tar
+    file:
+      path: /tmp/server-jre-8u251-linux-x64.tar.gz
+      state: absent
 
-- name: add Java to bin
-  file:
-    src: /opt/java/bin/java
-    dest: /usr/bin/java
-    state: link
+  - name: add generic Java symlink
+    file:
+      src: /opt/jdk1.8.0_251
+      dest: /opt/java
+      state: link
 
-- name: set JAVA_HOME
-  copy:
-    dest: "/etc/profile.d/java_home.sh"
-    content: export JAVA_HOME=/opt/java
-    mode: 0644
+  - name: add Java to bin
+    file:
+      src: /opt/java/bin/java
+      dest: /usr/bin/java
+      state: link
 
-- name: download and untar Flink
-  unarchive:
-    src: https://mirror.dkd.de/apache/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz
-    dest: /opt
-    remote_src: yes
+  - name: set JAVA_HOME
+    copy:
+      dest: "/etc/profile.d/java_home.sh"
+      content: export JAVA_HOME=/opt/java
+      mode: 0644
+  when: java_version.rc != 0 or not java_version.stderr_lines[0] is match('java version "1.8.0_251"')
 
-- name: add generic Flink symlink
-  file:
-    src: /opt/flink-1.10.0
-    dest: /opt/flink
-    state: link
+- name: check Flink
+  become: true
+  command: /opt/flink/bin/flink -v
+  failed_when: no
+  register: flink_version
 
-- name: set Flink permissions
-  file:
-    path: /opt/flink
-    state: directory
-    recurse: yes
-    owner: flink
-    group: flink
+- name: install Flink
+  become: true
+  block:
+  - name: download and untar Flink
+    unarchive:
+      src: https://mirror.dkd.de/apache/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz
+      dest: /opt
+      remote_src: yes
+
+  - name: add generic Flink symlink
+    file:
+      src: /opt/flink-1.10.0
+      dest: /opt/flink
+      state: link
+
+  - name: set Flink permissions
+    file:
+      path: /opt/flink
+      state: directory
+      recurse: yes
+      owner: flink
+      group: flink
+  when: >
+    flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.10.0, Commit ID: aa4eb8f')
 
 - name: start Flink
-  become: yes
-  # Regular become does not work
-  command: su -c "/opt/flink/bin/start-cluster.sh" flink
+  become: true
+  become_user: flink
+  command:
+    argv:
+      - nohup
+      - /opt/flink/bin/start-cluster.sh
