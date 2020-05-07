@@ -24,4 +24,6 @@ terraform apply
 ./deploy_flink.sh
 ```
 
-4. Open the host name from 2. or the IP from 3. in your browser.
+The deployment of the application might show reflection warnings, which are harmless (https://ci.apache.org/projects/flink/flink-docs-stable/release-notes/flink-1.10.html#java-11-support-flink-10725).
+
+4. Get the host name from 2. or the IP from 3. and open the Flink Web UI under `http://host:8081/`.
