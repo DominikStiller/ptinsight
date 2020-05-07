@@ -1,0 +1,7 @@
+- name: Upload demo
+  copy:
+    src: "{{ deploy_jar }}"
+    dest: /home/flink/{{ deploy_jar | basename }}
+
+- name: Start demo job
+  command: /opt/flink/bin/flink run --detached ~/{{ deploy_jar | basename }} --port 9000

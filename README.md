@@ -45,3 +45,7 @@ aws_secret_access_key = SECRET_ACCESS_KEY" >> ~/.aws/credentials
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
+
+## Todo for actual application
+* Use Route 53/CloudMap for service discovery
+* Use remote backend for Terraform

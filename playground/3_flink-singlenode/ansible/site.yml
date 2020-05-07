@@ -1,0 +1,8 @@
+---
+- name: set up a Flink host
+  hosts: instance
+  vars:
+    - deploy_jar: "{{playbook_dir}}/../flink-playground/build/libs/flink-playground-1.0-all.jar"
+  roles:
+    - { role: ../../ansible/roles/flink }
+    - { role: jobmanager, become: true, become_user: flink }
