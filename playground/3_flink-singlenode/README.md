@@ -15,10 +15,9 @@ cd terraform
 terraform init
 ```
 
-2. Set up infrastructure using Terraform using either command
+2. Set up infrastructure using Terraform
 ```
-terraform/deploy.sh    # apply
-terraform/redeploy.sh  # destroy & apply
+terraform/apply.sh
 ```
 
 3. Deploy Flink + Application using Ansible, pulling the inventory from the Terraform state.
@@ -26,6 +25,19 @@ terraform/redeploy.sh  # destroy & apply
 ansible/deploy.sh
 ```
 
-The deployment of the application might show reflection warnings, which are harmless (https://ci.apache.org/projects/flink/flink-docs-stable/release-notes/flink-1.10.html#java-11-support-flink-10725).
-
 4. Get the host name from 2. or the IP from 3. and open the Flink Web UI under `http://host:8081/`.
+
+## Scripts
+
+### Terraform
+* `terraform/apply.sh`: Set up infrastructure
+* `terraform/destroy.sh`: Destroy infrastructure
+* `terraform/reapply.sh`: Destroy, then set up infrastructure
+
+### Ansible
+* `ansible/deploy.sh [tags]`: Run Ansible playbook
+    * `no tags`: Set up Flink and deploy application
+    * `setup,deploy`: Set up Flink and deploy application
+    * `setup`: Set up Flink
+    * `deploy`: Deploy application
+

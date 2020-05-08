@@ -4,7 +4,7 @@
   user:
     name: flink
 
-- name: check Java
+- name: check Java installation
   command: java -version
   failed_when: no
   register: java_version
@@ -49,7 +49,7 @@
       mode: 0644
   when: java_version.rc != 0 or not java_version.stderr_lines[0] is match('java version "11.0.7" 2020-04-14 LTS')
 
-- name: check Flink
+- name: check Flink installation
   become: true
   command: /opt/flink/bin/flink -v
   failed_when: no
@@ -80,10 +80,7 @@
   when: >
     flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.10.0, Commit ID: aa4eb8f')
 
-- name: start Flink
+- name: start Flink cluster
   become: true
-  become_user: flink
-  command:
-    argv:
-      - nohup
-      - /opt/flink/bin/start-cluster.sh
+  # su instead of become_user is necessary, otherwise cluster shuts down after Ansible is done, nohup does not work
+  command: su -c "/opt/flink/bin/start-cluster.sh" flink

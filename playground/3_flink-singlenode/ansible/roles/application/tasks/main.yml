@@ -1,4 +1,4 @@
-- name: build demo
+- name: build application
   command:
     argv: 
       - ./gradlew
@@ -14,7 +14,7 @@
     path: /home/flink/deploy
     state: directory
 
-- name: upload demo
+- name: upload application
   become: true
   become_user: flink
   copy:
@@ -24,7 +24,7 @@
     - "{{ application_source_path }}/build/libs/*.jar"
   register: uploaded_jars
 
-- name: start demo jobs
+- name: start application jobs
   become: true
   become_user: flink
   command: "/opt/flink/bin/flink run --detached {{ item.dest }}"

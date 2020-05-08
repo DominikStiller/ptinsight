@@ -4,5 +4,7 @@
   vars:
     - application_source_path: "{{playbook_dir}}/../application/"
   roles:
-    - { role: ../../ansible/roles/flink }
-    - role: jobmanager
+    - { role: ../../ansible/roles/flink,
+        tags: setup }
+    - { role: application,
+        tags: deploy }

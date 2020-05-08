@@ -19,7 +19,7 @@ sudo ln -s /opt/java/bin /usr/bin/*
 echo "JAVA_HOME=/opt/java" >> ~/.profile
 ```
 
-1. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+2. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 ```
 sudo apt update
 sudo apt install software-properties-common
@@ -27,7 +27,7 @@ sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
 
-2. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
+3. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
 ```
 wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip\
 unzip terraform_0.12.24_linux_amd64.zip
@@ -35,7 +35,7 @@ mv terraform ~/.local/bin  # add this directory to PATH
 rm terraform_0.12.24_linux_amd64.zip
 ```
 
-3. Install terraform-inventory (https://github.com/adammck/terraform-inventory)
+4. Install terraform-inventory (https://github.com/adammck/terraform-inventory)
 ```
 wget https://github.com/adammck/terraform-inventory/releases/download/v0.9/terraform-inventory_0.9_linux_amd64.zip
 unzip terraform-inventory_0.9_linux_amd64.zip
@@ -43,7 +43,7 @@ mv terraform-inventory ~/.local/bin
 rm terraform-inventory_0.9_linux_amd64.zip
 ```
 
-4. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+5. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 ```
 mkdir ~/.aws
 echo "[default]
@@ -51,7 +51,7 @@ aws_access_key_id = ACCESS_KEY_ID
 aws_secret_access_key = SECRET_ACCESS_KEY" >> ~/.aws/credentials
 ```
 
-5. Generate an SSH key to use for EC2 instances
+6. Generate an SSH key to use for EC2 instances
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
@@ -59,3 +59,4 @@ ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ## Todo for actual application
 * Use Route 53/CloudMap for service discovery
 * Use remote backend for Terraform
+* Use Zookeeper/YARN for high availability
