@@ -1,7 +1,31 @@
-- name: Upload demo
-  copy:
-    src: "{{ deploy_jar }}"
-    dest: /home/flink/{{ deploy_jar | basename }}
+- name: build demo
+  command:
+    argv: 
+      - ./gradlew
+      - clean
+      - shadowJar
+    chdir: "{{ application_source_path }}"
+  delegate_to: localhost
 
-- name: Start demo job
-  command: /opt/flink/bin/flink run --detached ~/{{ deploy_jar | basename }} --port 9000
+- name: create deploy directory
+  become: true
+  become_user: flink
+  file:
+    path: /home/flink/deploy
+    state: directory
+
+- name: upload demo
+  become: true
+  become_user: flink
+  copy:
+    src: "{{ item }}"
+    dest: "/home/flink/deploy/{{ item | basename }}"
+  with_fileglob:
+    - "{{ application_source_path }}/build/libs/*.jar"
+  register: uploaded_jars
+
+- name: start demo jobs
+  become: true
+  become_user: flink
+  command: "/opt/flink/bin/flink run --detached {{ item.dest }}"
+  loop: "{{ uploaded_jars.results }}"
