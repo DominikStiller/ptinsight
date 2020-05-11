@@ -15,29 +15,28 @@ cd terraform
 terraform init
 ```
 
-2. Set up infrastructure using Terraform
+2. Set up infrastructure using Terraform, you might need to wait a couple of seconds after this for the server to boot
 ```
-terraform/apply.sh
-```
-
-3. Deploy Flink + Application using Ansible, pulling the inventory from the Terraform state.
-```
-ansible/deploy.sh
+make apply
 ```
 
-4. Get the host name from 2. or the IP from 3. and open the Flink Web UI under `http://host:8081/`.
+3. Install Flink using Ansible, pulling the inventory from the Terraform state.
+```
+make setup
+```
 
-## Scripts
+4. Deploy Flink job using Ansible, pulling the inventory from the Terraform state.
+```
+make deploy
+```
 
-### Terraform
-* `terraform/apply.sh`: Set up infrastructure
-* `terraform/destroy.sh`: Destroy infrastructure
-* `terraform/reapply.sh`: Destroy, then set up infrastructure
+5. Get the host name from 2. or the IP from 3. and open the Flink Web UI under `http://host:8081/`.
 
-### Ansible
-* `ansible/deploy.sh [tags]`: Run Ansible playbook
-    * `no tags`: Set up Flink and deploy application
-    * `setup,deploy`: Set up Flink and deploy application
-    * `setup`: Set up Flink
-    * `deploy`: Deploy application
+## Makefile Targets
 
+* `all`: apply, setup, deploy
+* `apply`: Set up AWS infrastructure
+* `destroy`: Destroy AWS infrastructure
+* `reapply`: Destroy, then set up AWS infrastructure
+* `setup`: Install Flink
+* `deploy`: Deploy Flink job

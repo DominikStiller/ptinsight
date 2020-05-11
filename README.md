@@ -35,15 +35,7 @@ mv terraform ~/.local/bin  # add this directory to PATH
 rm terraform_0.12.24_linux_amd64.zip
 ```
 
-4. Install terraform-inventory (https://github.com/adammck/terraform-inventory)
-```
-wget https://github.com/adammck/terraform-inventory/releases/download/v0.9/terraform-inventory_0.9_linux_amd64.zip
-unzip terraform-inventory_0.9_linux_amd64.zip
-mv terraform-inventory ~/.local/bin
-rm terraform-inventory_0.9_linux_amd64.zip
-```
-
-5. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+4. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 ```
 mkdir ~/.aws
 echo "[default]
@@ -51,7 +43,7 @@ aws_access_key_id = ACCESS_KEY_ID
 aws_secret_access_key = SECRET_ACCESS_KEY" >> ~/.aws/credentials
 ```
 
-6. Generate an SSH key to use for EC2 instances
+5. Generate an SSH key to use for EC2 instances
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```

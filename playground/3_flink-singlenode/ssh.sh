@@ -1,4 +1,5 @@
 #!/bin/bash
 
-host=`TF_STATE=terraform terraform-inventory --inventory | sed -n 2p`
+root=`realpath "$(dirname "$0")"`
+host=`cd $root && $root/../../bin/terraform_inventory.py --ssh-host`
 ssh -i ~/.ssh/id_rsa_eda_deployer centos@$host
