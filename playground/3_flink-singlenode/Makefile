@@ -9,6 +9,9 @@ default:
 all: apply setup deploy
 
 # Terraform
+init:
+	cd ${ROOT}/terraform
+	terraform init
 apply:
 	cd ${ROOT}/terraform
 	TF_STATE=. terraform apply -auto-approve

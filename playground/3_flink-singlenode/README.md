@@ -2,18 +2,16 @@
 
 ## Use Case
 * Input: MQTT feed from HSL.fi (Helsinki Transport Agency)
-* Outputs:
-    * Time a bus needed between two stops (if possible, relative to estimated time)
-    * Number of bus stops in a 10 s window
-    * Trigger some other action for true EDA
+* Output: Number of bus/tram arrivals/departures in a 5 s window
 
 ## Deployment
 
 1. Initialize Terraform
 ```
-cd terraform
-terraform init
+make init
 ```
+
+_Note: Steps 2-4 can be executed in a single command using `make all`_
 
 2. Set up infrastructure using Terraform, you might need to wait a couple of seconds after this for the server to boot
 ```

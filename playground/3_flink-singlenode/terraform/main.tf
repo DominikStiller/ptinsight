@@ -12,7 +12,8 @@ variable "trusted_cidr" {
 
 
 provider "aws" {
-    region = "eu-central-1"
+    version = "~> 2.61"
+    region  = "eu-central-1"
 }
 
 
