@@ -9,25 +9,25 @@ default:
 all: apply setup deploy
 
 # Terraform
+define terraform_cmd =
+	cd ${ROOT}terraform
+	TF_STATE=. terraform $(1) -auto-approve --var deployment=${USER}
+endef
 init:
-	cd ${ROOT}/terraform
+	cd ${ROOT}terraform
 	terraform init
 apply:
-	cd ${ROOT}/terraform
-	TF_STATE=. terraform apply -auto-approve
+	$(call terraform_cmd, "apply")
 destroy:
-	cd ${ROOT}/terraform
-	TF_STATE=. terraform destroy -auto-approve
-reapply:
-	cd ${ROOT}/terraform
-	TF_STATE=. terraform destroy -auto-approve && terraform apply -auto-approve
+	$(call terraform_cmd, "destroy")
+reapply: destroy apply
 
 # Ansible
-define ansible =
-	TF_STATE=${ROOT}/terraform ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${ROOT}/../../bin/terraform_inventory.py\
-		-u centos --tags $(1) --private-key ~/.ssh/id_rsa_eda_deployer --timeout 60 ${ROOT}/ansible/site.yml
+define ansible_cmd =
+	TF_STATE=${ROOT}terraform ANSIBLE_HOST_KEY_CHECKING=False ansible-playbook -i ${ROOT}../../bin/terraform_inventory.py\
+		-u centos --tags $(1) --private-key ~/.ssh/id_rsa_eda_deployer --timeout 60 ${ROOT}ansible/site.yml
 endef
 setup:
-	$(call ansible, "setup")
+	$(call ansible_cmd, "setup")
 deploy:
-	$(call ansible, "deploy")
+	$(call ansible_cmd, "deploy")

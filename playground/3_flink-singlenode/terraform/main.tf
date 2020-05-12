@@ -1,16 +1,3 @@
-# --------------------------------------------
-#      Input Variables
-# --------------------------------------------
-
-variable "ssh_key" {
-    description = "SSH key for EC2 instances"
-}
-
-variable "trusted_cidr" {
-    description = "CIDRs which are allowed to access security groups"
-}
-
-
 provider "aws" {
     version = "~> 2.61"
     region  = "eu-central-1"
@@ -22,19 +9,21 @@ provider "aws" {
 #      EC2 instances
 # --------------------------------------------
 
-resource "aws_instance" "instance" {
+resource "aws_instance" "flink" {
+
     ami                    = "ami-0be110ffd53859e30"
     instance_type          = "t3.micro"
-    vpc_security_group_ids = [aws_security_group.security_group.id]
-    key_name               = aws_key_pair.key.key_name
+    vpc_security_group_ids = [aws_security_group.basic_security.id]
+    key_name               = aws_key_pair.deploy.key_name
 
     root_block_device {
         delete_on_termination = true
     }
 
     tags = {
-        Name = "eda_flink"
-        project = "eda"
+        Name = "${local.name_prefix}flink"
+        Project = "eda"
+        AnsibleGroup = "flink"
     }
 }
 
@@ -44,9 +33,9 @@ resource "aws_instance" "instance" {
 #      Security
 # --------------------------------------------
 
-resource "aws_security_group" "security_group" {
+resource "aws_security_group" "basic_security" {
 
-    name = "eda_dev"
+    name = "${local.name_prefix}basic_security"
 
     ingress {
         description = "SSH from trusted CIDRs"
@@ -72,25 +61,26 @@ resource "aws_security_group" "security_group" {
     }
 
     tags = {
-        project = "eda"
+        Project = "eda"
     }
 }
 
-resource "aws_key_pair" "key" {
+resource "aws_key_pair" "deploy" {
 
-    key_name   = "eda_deploy"
+    key_name   = "${local.name_prefix}deploy"
     public_key = file("${var.ssh_key}.pub")
 
     tags = {
-        project = "eda"
+        Project = "eda"
     }
 }
+
+
 
 # --------------------------------------------
 #      Output Values
 # --------------------------------------------
 
-
 output "flink_host" {
-    value = aws_instance.instance.public_dns
+    value = aws_instance.flink.public_dns
 }

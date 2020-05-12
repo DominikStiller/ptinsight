@@ -1,6 +1,6 @@
 ---
 - name: set up a Flink host
-  hosts: all
+  hosts: flink
   vars:
     - application_source_path: "{{playbook_dir}}/../application/"
   roles:
