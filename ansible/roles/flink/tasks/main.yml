@@ -4,51 +4,6 @@
   user:
     name: flink
 
-- name: check Java installation
-  command: java -version
-  failed_when: no
-  register: java_version
-
-- name: install Java
-  become: true
-  block:
-  - name: download Java
-    get_url:
-      url: https://download.oracle.com/otn-pub/java/jdk/11.0.7%2B8/8c7daf89330c48f0b9e32f57169f7bac/jdk-11.0.7_linux-x64_bin.tar.gz
-      dest: /tmp/jdk-11.0.7_linux-x64_bin.tar.gz
-      headers:
-        Cookie: oraclelicense=accept-securebackup-cookie
-
-  - name: untar Java
-    unarchive:
-      src: /tmp/jdk-11.0.7_linux-x64_bin.tar.gz
-      dest: /opt
-      remote_src: yes
-
-  - name: remove tar
-    file:
-      path: /tmp/jdk-11.0.7_linux-x64_bin.tar.gz
-      state: absent
-
-  - name: add generic Java symlink
-    file:
-      src: /opt/jdk-11.0.7
-      dest: /opt/java
-      state: link
-
-  - name: add Java to bin
-    file:
-      src: /opt/java/bin/java
-      dest: /usr/bin/java
-      state: link
-
-  - name: set JAVA_HOME
-    copy:
-      dest: "/etc/profile.d/java_home.sh"
-      content: export JAVA_HOME=/opt/java
-      mode: 0644
-  when: java_version.rc != 0 or not java_version.stderr_lines[0] is match('java version "11.0.7" 2020-04-14 LTS')
-
 - name: check Flink installation
   become: true
   command: /opt/flink/bin/flink -v
@@ -58,27 +13,27 @@
 - name: install Flink
   become: true
   block:
-  - name: download and untar Flink
-    unarchive:
-      src: https://mirror.dkd.de/apache/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz
-      dest: /opt
-      remote_src: yes
+    - name: download and untar Flink
+      unarchive:
+        src: https://mirror.dkd.de/apache/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz
+        dest: /opt
+        remote_src: yes
 
-  - name: add generic Flink symlink
-    file:
-      src: /opt/flink-1.10.0
-      dest: /opt/flink
-      state: link
+    - name: add generic Flink symlink
+      file:
+        src: /opt/flink-1.10.0
+        dest: /opt/flink
+        state: link
 
-  - name: set Flink permissions
-    file:
-      path: /opt/flink
-      state: directory
-      recurse: yes
-      owner: flink
-      group: flink
+    - name: set Flink permissions
+      file:
+        path: /opt/flink
+        state: directory
+        recurse: yes
+        owner: flink
+        group: flink
   when: >
-    flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.10.0, Commit ID: aa4eb8f')
+    flink_version.rc != 0 or not flink_version.stdout == 'Version: 1.10.0, Commit ID: aa4eb8f'
 
 - name: start Flink cluster
   become: true

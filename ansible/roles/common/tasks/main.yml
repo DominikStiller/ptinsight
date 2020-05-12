@@ -1,0 +1,12 @@
+---
+- name: install htop
+  become: true
+  package:
+    name: htop
+    state: present
+
+- name: install wget
+  become: true
+  package:
+    name: wget
+    state: present

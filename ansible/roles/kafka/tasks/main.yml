@@ -1,0 +1,44 @@
+---
+- name: add Kafka user
+  become: true
+  user:
+    name: kafka
+
+- name: check Kafka installation
+  become: true
+  command: /opt/kafka/bin/kafka-topics.sh --version
+  failed_when: no
+  register: kafka_version
+
+- name: install Kafka
+  become: true
+  block:
+    - name: download and untar Kafka
+      unarchive:
+        src: https://mirror.dkd.de/apache/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+        dest: /opt
+        remote_src: yes
+
+    - name: add generic Kafka symlink
+      file:
+        src: /opt/kafka_2.12-2.5.0
+        dest: /opt/kafka
+        state: link
+
+    - name: set Kafka permissions
+      file:
+        path: /opt/kafka
+        state: directory
+        recurse: yes
+        owner: kafka
+        group: kafka
+  when: >
+    kafka_version.rc != 0 or not kafka_version.stdout == '2.5.0 (Commit:66563e712b0b9f84)'
+
+- name: start Zookeeper
+  become: true
+  command: su -c "/opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties" kafka
+
+- name: start Kafka
+  become: true
+  command: su -c "/opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties" kafka

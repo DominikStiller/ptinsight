@@ -18,7 +18,7 @@ _Note: Steps 2-4 can be executed in a single command using `make all`_
 make apply
 ```
 
-3. Install Flink using Ansible, pulling the inventory from the Terraform state.
+3. Install Flink and Kafka using Ansible, pulling the inventory from the Terraform state.
 ```
 make setup
 ```
@@ -36,5 +36,5 @@ make deploy
 * `apply`: Set up AWS infrastructure
 * `destroy`: Destroy AWS infrastructure
 * `reapply`: Destroy, then set up AWS infrastructure
-* `setup`: Install Flink
+* `setup`: Install Flink and Kafka
 * `deploy`: Deploy Flink job

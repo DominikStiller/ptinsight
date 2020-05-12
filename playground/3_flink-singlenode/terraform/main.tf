@@ -12,7 +12,7 @@ provider "aws" {
 resource "aws_instance" "flink" {
 
     ami                    = "ami-0be110ffd53859e30"
-    instance_type          = "t3.micro"
+    instance_type          = "t3.small"
     vpc_security_group_ids = [aws_security_group.basic_security.id]
     key_name               = aws_key_pair.deploy.key_name
 
