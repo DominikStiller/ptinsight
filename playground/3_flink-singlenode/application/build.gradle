@@ -70,7 +70,8 @@ dependencies {
     // Dependencies that should be part of the shadow jar, e.g.
     // connectors. These must be in the flinkShadowJar configuration!
     // --------------------------------------------------------------
-    flinkShadowJar "org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.4"
+    flinkShadowJar "org.apache.flink:flink-connector-kafka_2.11:${flinkVersion}"
+    flinkShadowJar 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.4'
     flinkShadowJar 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
 
     implementation "log4j:log4j:1.2.17"

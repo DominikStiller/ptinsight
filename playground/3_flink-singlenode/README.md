@@ -28,7 +28,13 @@ make setup
 make deploy
 ```
 
-5. Get the host name from 2. or the IP from 3. and open the Flink Web UI under `http://host:8081/`.
+5. Get the host name from 2. or the IP from 3. and open the Flink Web UI under `http://host:8081/`. You can view the job output in the task manager's stdout tab.
+
+6. View the Kafka topic.
+```
+./ssh.sh
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic events
+```
 
 ## Makefile Targets
 
