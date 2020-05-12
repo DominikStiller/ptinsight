@@ -30,6 +30,45 @@ resource "aws_instance" "flink" {
 
 
 # --------------------------------------------
+#      Lambda
+# --------------------------------------------
+
+locals {
+    lambda_deploy_src = "${path.module}/../lambda/lambda_function.py"
+    lambda_deploy_zip = "${path.module}/../lambda/deploy.zip"
+}
+
+resource "null_resource" "build_lambda" {
+
+    triggers = {
+        hash = filebase64sha256(local.lambda_deploy_src)
+    }
+
+    provisioner "local-exec" {
+        command = "${path.module}/../lambda/pack.sh"
+    }
+}
+
+resource "aws_lambda_function" "event_handler" {
+    filename = local.lambda_deploy_zip
+    function_name = "${local.name_prefix}handle_event"
+    role = aws_iam_role.lambda.arn
+    handler = "lambda_function.handle_event"
+
+    # With zip, updates are only triggered on the next apply
+    # source_code_hash = fileexists(local.lambda_deploy_zip) ? filebase64sha256(local.lambda_deploy_zip) : ""
+    source_code_hash = filebase64sha256(local.lambda_deploy_src)
+
+    runtime = "python3.8"
+
+    depends_on = [
+        null_resource.build_lambda
+    ]
+}
+
+
+
+# --------------------------------------------
 #      Security
 # --------------------------------------------
 
@@ -73,6 +112,32 @@ resource "aws_key_pair" "deploy" {
     tags = {
         Project = "eda"
     }
+}
+
+resource "aws_iam_role" "lambda" {
+
+    name = "${local.name_prefix}lambda"
+
+    assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {
+    role = aws_iam_role.lambda.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 
 

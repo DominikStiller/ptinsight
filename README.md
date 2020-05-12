@@ -43,6 +43,11 @@ aws_access_key_id = ACCESS_KEY_ID
 aws_secret_access_key = SECRET_ACCESS_KEY" >> ~/.aws/credentials
 ```
 
+The user needs following policies attached:
+* `AmazonEC2FullAccess`
+* `IAMFullAccess`
+* `AWSLambdaFullAccess`
+
 5. Generate an SSH key to use for EC2 instances
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
