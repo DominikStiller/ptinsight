@@ -33,7 +33,7 @@
         owner: kafka
         group: kafka
   when: >
-    kafka_version.rc != 0 or not kafka_version.stdout == '2.5.0 (Commit:66563e712b0b9f84)'
+    kafka_version.rc != 0 or not kafka_version.stdout is match('2.5.0')
 
 - name: start Zookeeper
   become: true

@@ -15,13 +15,13 @@
   block:
     - name: download and untar Flink
       unarchive:
-        src: https://mirror.dkd.de/apache/flink/flink-1.10.0/flink-1.10.0-bin-scala_2.11.tgz
+        src: https://mirror.dkd.de/apache/flink/flink-1.10.1/flink-1.10.1-bin-scala_2.11.tgz
         dest: /opt
         remote_src: yes
 
     - name: add generic Flink symlink
       file:
-        src: /opt/flink-1.10.0
+        src: /opt/flink-1.10.1
         dest: /opt/flink
         state: link
 
@@ -33,7 +33,7 @@
         owner: flink
         group: flink
   when: >
-    flink_version.rc != 0 or not flink_version.stdout == 'Version: 1.10.0, Commit ID: aa4eb8f'
+    flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.10.1')
 
 - name: start Flink cluster
   become: true

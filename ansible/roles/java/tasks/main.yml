@@ -42,4 +42,4 @@
       dest: "/etc/profile.d/java_home.sh"
       content: export JAVA_HOME=/opt/java
       mode: 0644
-  when: java_version.rc != 0 or not java_version.stderr_lines[0] == 'java version "11.0.7" 2020-04-14 LTS'
+  when: java_version.rc != 0 or not java_version.stderr_lines[0] is match('java version "11.0.7"')
