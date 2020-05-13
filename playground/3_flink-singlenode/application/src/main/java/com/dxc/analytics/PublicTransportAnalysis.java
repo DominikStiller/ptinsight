@@ -21,16 +21,11 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.util.Collector;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class PublicTransportAnalysis {
 
-    private static Logger log = LoggerFactory.getLogger(PublicTransportAnalysis.class);
-
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
-//        final StreamExecutionEnvironment env = StreamExecutionEnvironment.createLocalEnvironment();
         env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
 
         var stream = env.addSource(new HSLMQTTSource(List.of("arr", "dep"), List.of("bus", "tram")))
@@ -48,14 +43,17 @@ public class PublicTransportAnalysis {
                         });
 
         var countKafka = count(stream, Time.seconds(5));
-        var kafkaProducer = new FlinkKafkaProducer<String>(
+        var kafkaProducer = new FlinkKafkaProducer<>(
                 "localhost:9092",
                 "events",
                 new SimpleStringSchema()
         );
         countKafka.addSink(kafkaProducer);
 
-        var countLocal = count(stream, Time.seconds(5));
+        var countLambda = count(stream, Time.seconds(30));
+        countLambda.addSink(new LambdaSink("dominik-eda-handle_event"));
+
+        var countLocal = count(stream, Time.seconds(10));
         countLocal.print();
 
         env.execute("Public Transport Analysis");
@@ -78,8 +76,8 @@ public class PublicTransportAnalysis {
                      .map(new MapFunction<Tuple5<String, String, Integer, Long, Long>, String>() {
                          @Override
                          public String map(Tuple5<String, String, Integer, Long, Long> value) {
-                             var windowEnd = Instant.ofEpochMilli(value.f3);
-                             var windowStart = Instant.ofEpochMilli(value.f4);
+                             var windowStart = Instant.ofEpochMilli(value.f3);
+                             var windowEnd = Instant.ofEpochMilli(value.f4);
 
                              var dateFormatter = DateTimeFormatter.ofPattern("HH:mm:ss")
                                                                   .withZone(ZoneId.of("Europe/Berlin"));

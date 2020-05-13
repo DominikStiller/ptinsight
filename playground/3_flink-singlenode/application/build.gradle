@@ -74,6 +74,10 @@ dependencies {
     flinkShadowJar 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.4'
     flinkShadowJar 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
 
+    flinkShadowJar platform('com.amazonaws:aws-java-sdk-bom:1.11.780')
+    flinkShadowJar 'com.amazonaws:aws-java-sdk-lambda'
+    flinkShadowJar 'com.amazonaws:aws-java-sdk-sts'
+
     implementation "log4j:log4j:1.2.17"
     implementation "org.slf4j:slf4j-log4j12:1.7.7"
 

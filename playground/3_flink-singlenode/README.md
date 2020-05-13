@@ -1,8 +1,11 @@
-# Apache Flink (non-clustered)
+# Apache Flink (single node)
 
 ## Use Case
 * Input: MQTT feed from HSL.fi (Helsinki Transport Agency)
-* Output: Number of bus/tram arrivals/departures in a 5 s window
+* Output: Number of bus/tram arrivals/departures
+    * To Kafka: in a 5 s window
+    * To stdout: in a 10 s window
+    * To Lambda: in a 30 s window
 
 ## Deployment
 
@@ -18,7 +21,7 @@ _Note: Steps 2-4 can be executed in a single command using `make all`_
 make apply
 ```
 
-3. Install Flink and Kafka using Ansible, pulling the inventory from the Terraform state.
+3. Install Flink and Kafka using Ansible, pulling the inventory from the Terraform state. If Ansible reports the server to be unreachable, the server is likely not yet ready. Try again a minute later.
 ```
 make setup
 ```
@@ -35,6 +38,8 @@ make deploy
 ./ssh.sh
 /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic events
 ```
+
+7. View the Lambda Cloudwatch log.
 
 ## Makefile Targets
 

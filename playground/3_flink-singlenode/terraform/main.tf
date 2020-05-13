@@ -15,6 +15,7 @@ resource "aws_instance" "flink" {
     instance_type          = "t3.small"
     vpc_security_group_ids = [aws_security_group.basic_security.id]
     key_name               = aws_key_pair.deploy.key_name
+    iam_instance_profile   = aws_iam_instance_profile.flink.name
 
     root_block_device {
         delete_on_termination = true
@@ -138,6 +139,52 @@ EOF
 resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {
     role = aws_iam_role.lambda.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+
+resource "aws_iam_instance_profile" "flink" {
+  name = "${local.name_prefix}flink"
+  role = aws_iam_role.flink.name
+}
+
+resource "aws_iam_role" "flink" {
+  name = "${local.name_prefix}flink"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "flink_lambda_invoke" {
+    
+    role = aws_iam_role.flink.name
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Invoke",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": "${aws_lambda_function.event_handler.arn}"
+        }
+    ]
+}
+EOF
 }
 
 
