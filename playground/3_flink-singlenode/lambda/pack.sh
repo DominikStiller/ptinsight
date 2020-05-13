@@ -1,5 +1,7 @@
 #!/bin/bash
 
+# Pack deployment zip in /tmp because VirtualBox does not allow chmod 644 in mounted folder
+
 dir=`realpath "$(dirname "$0")"`
 (
     cd $dir
