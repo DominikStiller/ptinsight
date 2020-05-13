@@ -9,6 +9,7 @@ provider "aws" {
 #      EC2 instances
 # --------------------------------------------
 
+# ---- >> Flink ------------------------------
 resource "aws_instance" "flink" {
 
     ami                    = "ami-0be110ffd53859e30"
@@ -28,12 +29,60 @@ resource "aws_instance" "flink" {
     }
 }
 
+resource "aws_iam_instance_profile" "flink" {
+  name = "${local.name_prefix}flink"
+  role = aws_iam_role.flink.name
+}
+
+resource "aws_iam_role" "flink" {
+  name = "${local.name_prefix}flink"
+
+  assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+               "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow",
+            "Sid": ""
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "flink_lambda_invoke" {
+    
+    role = aws_iam_role.flink.name
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Sid": "Invoke",
+            "Effect": "Allow",
+            "Action": [
+                "lambda:InvokeFunction"
+            ],
+            "Resource": "${aws_lambda_function.event_handler.arn}"
+        }
+    ]
+}
+EOF
+}
+# ---- << Flink ------------------------------
+
 
 
 # --------------------------------------------
 #      Lambda
 # --------------------------------------------
 
+# ---- >> Lambda -----------------------------
 locals {
     lambda_deploy_src = "${path.module}/../lambda/lambda_function.py"
     lambda_deploy_zip = "${path.module}/../lambda/deploy.zip"
@@ -66,6 +115,33 @@ resource "aws_lambda_function" "event_handler" {
         null_resource.build_lambda
     ]
 }
+
+resource "aws_iam_role" "lambda" {
+
+    name = "${local.name_prefix}lambda"
+
+    assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "lambda.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {
+    role = aws_iam_role.lambda.name
+    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
+}
+# ---- << Lambda -----------------------------
 
 
 
@@ -113,78 +189,6 @@ resource "aws_key_pair" "deploy" {
     tags = {
         Project = "eda"
     }
-}
-
-resource "aws_iam_role" "lambda" {
-
-    name = "${local.name_prefix}lambda"
-
-    assume_role_policy = <<EOF
-{
-  "Version": "2012-10-17",
-  "Statement": [
-    {
-      "Action": "sts:AssumeRole",
-      "Principal": {
-        "Service": "lambda.amazonaws.com"
-      },
-      "Effect": "Allow",
-      "Sid": ""
-    }
-  ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {
-    role = aws_iam_role.lambda.name
-    policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
-}
-
-resource "aws_iam_instance_profile" "flink" {
-  name = "${local.name_prefix}flink"
-  role = aws_iam_role.flink.name
-}
-
-resource "aws_iam_role" "flink" {
-  name = "${local.name_prefix}flink"
-
-  assume_role_policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Action": "sts:AssumeRole",
-            "Principal": {
-               "Service": "ec2.amazonaws.com"
-            },
-            "Effect": "Allow",
-            "Sid": ""
-        }
-    ]
-}
-EOF
-}
-
-resource "aws_iam_role_policy" "flink_lambda_invoke" {
-    
-    role = aws_iam_role.flink.name
-
-    policy = <<EOF
-{
-    "Version": "2012-10-17",
-    "Statement": [
-        {
-            "Sid": "Invoke",
-            "Effect": "Allow",
-            "Action": [
-                "lambda:InvokeFunction"
-            ],
-            "Resource": "${aws_lambda_function.event_handler.arn}"
-        }
-    ]
-}
-EOF
 }
 
 
