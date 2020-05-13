@@ -13,7 +13,7 @@ provider "aws" {
 resource "aws_instance" "flink" {
 
     ami                    = "ami-0be110ffd53859e30"
-    instance_type          = "t3.small"
+    instance_type          = "t3.medium"
     vpc_security_group_ids = [aws_security_group.basic_security.id]
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink.name
@@ -26,6 +26,8 @@ resource "aws_instance" "flink" {
         Name = "${local.name_prefix}flink"
         Project = "eda"
         AnsibleGroup = "flink"
+        AnsibleVar_ansible_user = "centos"
+        AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }
 }
 
@@ -35,6 +37,7 @@ resource "aws_iam_instance_profile" "flink" {
 }
 
 resource "aws_iam_role" "flink" {
+
   name = "${local.name_prefix}flink"
 
   assume_role_policy = <<EOF
@@ -100,20 +103,18 @@ resource "null_resource" "build_lambda" {
 }
 
 resource "aws_lambda_function" "event_handler" {
-    filename = local.lambda_deploy_zip
-    function_name = "${local.name_prefix}handle_event"
-    role = aws_iam_role.lambda.arn
-    handler = "lambda_function.handle_event"
 
+    function_name = "${local.name_prefix}handle_event"
+    role          = aws_iam_role.lambda.arn
+    handler       = "lambda_function.handle_event"
+    runtime       = "python3.8"
+
+    filename      = local.lambda_deploy_zip
+    source_code_hash = filebase64sha256(local.lambda_deploy_src)
     # With zip, updates are only triggered on the next apply
     # source_code_hash = fileexists(local.lambda_deploy_zip) ? filebase64sha256(local.lambda_deploy_zip) : ""
-    source_code_hash = filebase64sha256(local.lambda_deploy_src)
 
-    runtime = "python3.8"
-
-    depends_on = [
-        null_resource.build_lambda
-    ]
+    depends_on = [null_resource.build_lambda]
 }
 
 resource "aws_iam_role" "lambda" {
@@ -138,7 +139,7 @@ EOF
 }
 
 resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {
-    role = aws_iam_role.lambda.name
+    role       = aws_iam_role.lambda.name
     policy_arn = "arn:aws:iam::aws:policy/service-role/AWSLambdaBasicExecutionRole"
 }
 # ---- << Lambda -----------------------------

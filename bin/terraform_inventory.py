@@ -10,7 +10,6 @@ import json
 import sys
 
 tfstate_file = "terraform/terraform.tfstate"
-debug = False
 
 # load the tfstat file
 with open(tfstate_file, 'r') as fh:
@@ -21,82 +20,52 @@ instances = (instance for instance in tfstate['resources'] if instance['type'] =
 
 def ansible_list():
     inventory = {
-        "all": {
-            "hosts": []
-        },
         "_meta": {
             "hostvars": {}
         }
     }
 
+    def add_host(group, public_ip_addr, vars):
+        if group not in inventory:
+            inventory[group] = {"hosts": []}
+
+        inventory[group]['hosts'].append(public_ip_addr)
+        inventory['_meta']['hostvars'][public_ip_addr] = vars
+
     for instance in instances:
-        for num, sub_instance in enumerate(instance['instances']):
+        for sub_instance in instance['instances']:
             sub_instance_attributes = sub_instance['attributes']
-            try:
+            tags = sub_instance_attributes['tags']
+
+            # Only add public EC2 instances
+            if 'public_ip' in sub_instance_attributes:
                 public_ip_addr = sub_instance_attributes['public_ip']
+                vars = {
+                    tag[11:]: tags[tag] for tag in tags if tag.startswith("AnsibleVar_")
+                }
 
-                inventory['all']['hosts'].append(public_ip_addr)
+                add_host('all', public_ip_addr, vars)
 
-                try:
-                    group = sub_instance_attributes['tags']['AnsibleGroup']
+                if 'AnsibleGroup' in tags:
+                    group = tags['AnsibleGroup']
+                    add_host(group, public_ip_addr, vars)
 
-                    if group not in inventory:
-                        inventory[group] = {"hosts": []}
-
-                    inventory[group]['hosts'].append(public_ip_addr)
-
-                except KeyError:
-                    pass
-
-            except KeyError:
-                pass
-
-    if debug:
-        print(json.dumps(inventory, indent=2), file=sys.stderr)
     print(json.dumps(inventory, indent=2))
 
 
 def ssh_host():
     for instance in instances:
-        for num, sub_instance in enumerate(instance['instances']):
+        for sub_instance in instance['instances']:
             sub_instance_attributes = sub_instance['attributes']
-            try:
-                public_ip_addr = sub_instance_attributes['public_ip']
-                print(public_ip_addr)
+            if 'public_ip' in sub_instance_attributes:
+                print(sub_instance_attributes['public_ip'])
                 return
 
-            except KeyError:
-                pass
-
-
-def ansible_host(hostname):
-    host = {
-        "network": {
-            "ip": ""
-        }
-    }
-
-    for instance in instances:
-        if not instance['name'] == hostname:
-            continue
-        for num, sub_instance in enumerate(instance['instances']):
-            sub_instance_attributes = sub_instance['attributes']
-            if sub_instance_attributes['public_ip']:
-                host['network']['ip'] = sub_instance_attributes['public_ip']
-
-    if debug:
-        print(json.dumps(host, indent=2), file=sys.stderr)
-    print(json.dumps(host, indent=2))
-
-
-if debug:
-    print(sys.argv, file=sys.stderr)
 
 if sys.argv[1] == '--list':
     ansible_list()
 elif sys.argv[1] == '--ssh-host':
     ssh_host()
-elif sys.argv[1] == '--host':
-    ansible_host(sys.argv[2])
 
-sys.exit(0)
+# Implementing --host is not necessary because _meta is populated in --list
+# https://docs.ansible.com/ansible/latest/dev_guide/developing_inventory.html#tuning-the-external-inventory-script
