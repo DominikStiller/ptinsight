@@ -25,12 +25,10 @@ def ansible_list():
         }
     }
 
-    def add_host(group, public_ip_addr, vars):
+    def add_host(group, public_ip_addr):
         if group not in inventory:
-            inventory[group] = {"hosts": []}
-
+            inventory[group] = { "hosts": [] }
         inventory[group]['hosts'].append(public_ip_addr)
-        inventory['_meta']['hostvars'][public_ip_addr] = vars
 
     for instance in instances:
         for sub_instance in instance['instances']:
@@ -40,15 +38,16 @@ def ansible_list():
             # Only add public EC2 instances
             if 'public_ip' in sub_instance_attributes:
                 public_ip_addr = sub_instance_attributes['public_ip']
-                vars = {
+
+                # Extract Ansible variables from tags
+                inventory['_meta']['hostvars'][public_ip_addr] = {
                     tag[11:]: tags[tag] for tag in tags if tag.startswith("AnsibleVar_")
                 }
 
-                add_host('all', public_ip_addr, vars)
-
+                # Add to all group and group specified in tags
+                add_host('all', public_ip_addr)
                 if 'AnsibleGroup' in tags:
-                    group = tags['AnsibleGroup']
-                    add_host(group, public_ip_addr, vars)
+                    add_host(tags['AnsibleGroup'], public_ip_addr)
 
     print(json.dumps(inventory, indent=2))
 

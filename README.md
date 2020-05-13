@@ -29,7 +29,7 @@ sudo apt install ansible
 
 3. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
 ```
-wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip\
+wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
 unzip terraform_0.12.24_linux_amd64.zip
 mv terraform ~/.local/bin  # add this directory to PATH
 rm terraform_0.12.24_linux_amd64.zip
