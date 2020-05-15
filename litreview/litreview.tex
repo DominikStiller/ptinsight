@@ -1,7 +1,9 @@
 \documentclass[]{scrartcl}
 
-%opening
-\title{Research \\ Smart Cities and EDA/CPE}
+% --------------------------------------------
+%       Config
+% --------------------------------------------
+\title{Research \\ EDA/CPE for Smart Cities}
 \author{Dominik Stiller}
 
 \usepackage[USenglish]{babel}
@@ -28,9 +30,21 @@
 
 \maketitle
 
+% --------------------------------------------
+%       Content
+% --------------------------------------------
 
 \section{Applications and Stories}
-\citetitle{Morales.2015}~\cite[p.~2]{Morales.2015}:
+
+Common themes:
+\begin{itemize}
+	\item Traffic management
+	\item Parking
+	\item Intelligent buildings (security, lighting, energy efficiency)
+	\item Waste management
+\end{itemize}
+
+\cite[p.~2]{Morales.2015}:
 \begin{itemize}
 	\item Energy consumption profiles
 	\item Concentration and distribution of pollutants
@@ -47,9 +61,52 @@
 	\item Citizen health monitoring
 \end{itemize}
 
+\cite[p.~8~ff.]{Ahmed.2018}:
+\begin{itemize}
+	\item Structural health: monitor cracks in buildings
+	\item Smart parking: monitor free/taken parking spots
+	\item Waste management: monitor trash can status
+	\item Smart roads: guide citizens in traffic and detect traffic patterns
+	\item Smart surveillance and intrusion detection for homes where the local police deparment is automatically notified
+	\item Pollution monitoring
+	\item Smart lighting
+	\item Smart energy grid
+	\item Smart industry
+\end{itemize}
+
+\cite[p.~7~f.]{Petrolo.2017}
+\begin{itemize}
+	\item Transport: dynamic route calculation informed of accidents and congestion
+	\item Energy: reporting of failts
+	\item Emergency services: detection of accidents and crimes
+	\item Waste management: detection of full bins
+	\item Air and water: reporting of air and water pollution
+	\item Recreation: produce data on large events like concerts to inform public transport
+\end{itemize}
+
+\cite[p.~8~ff.]{Alavi.2018}:
+\begin{itemize}
+	\item Price calculation for EV parking lots based on energy market
+	\item Status monitoring of hospital patients
+	\item Monitoring and intelligent routing of ambulances
+	\item Congestion control, smart parking and traffic management
+	\item Smart streetlights for intelligent and weather-adaptive lighting
+	\item Noise pollution monitoring
+\end{itemize}
+
+\cite[p.~209~ff.]{Angelakis.2017}:
+\begin{itemize}
+	\item Traffic flow management: reduce emissions, noise and travel times by monitoring and actively controlling traffic
+	\item Smart grid: distributed generation and distribution (voltage stability, loss reduction), real-time energy pricing (demand response, electricity markets)
+	\item Intelligent buildings: increase security and energy efficiency, automate HVAC
+	\item Healthcare in residential environments:  monitor environment (temperature, humidity, luminosity...) and movements to analyze health and well-being
+\end{itemize}
+
+Anomaly detection in real-time for 100000+ connected cars, full solution is available on GitHub~\cite{Wahner.2019}.
+
 \section{Event Definitions}
 
-\enquote{An occurrence of a change of state associated to a phenomenon of interest ($\mathbb{D}_p$), and which is related to a geographic location ($\mathbb{D}_s$) and a specific time ($\mathbb{D}_t$).}~\cite[p.~3]{Morales.2015}
+\enquote{Geo-event: An occurrence of a change of state associated to a phenomenon of interest ($\mathbb{D}_p$), and which is related to a geographic location ($\mathbb{D}_s$) and a specific time ($\mathbb{D}_t$).}~\cite[p.~3]{Morales.2015}
 
 \begin{align*}
 	\mathbb{D}_p &= \{name: value, phenomena: [value_1, value_2, ..., value_n], condition: value\} \\
@@ -98,6 +155,22 @@ The CityPulse project described in \cite{Tsiatsis.2015}, \cite{Presser.2016}, \c
 
 \section{Challenges}
 \enquote{Geoprocessing of data streams inherits challenges from big data analysis: volume, velocity, variety, value, and veracity.}~\cite[p.~1]{Morales.2015}
+
+\cite[p.~2~ff.]{Ahmed.2018}:
+\begin{itemize}
+	\item High cost and long development tmie \textrightarrow private--public collaboration and common platform
+	\item Choice of communication paradigm (continuous, random, incremental) \textrightarrow hierarchical structure
+	\item Sustainability of network and compatibility of devices
+	\item No best pracices for IT platforms
+\end{itemize}
+
+\cite[p.~9~f.]{Petrolo.2017}:
+\begin{itemize}
+	\item Big data: efficient query and storage and extraction of meaning
+	\item Privacy
+	\item Security: threats from cyber-terrorism/-vandalism
+\end{itemize}
+
 
 \printbibliography
 
