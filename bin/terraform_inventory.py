@@ -52,19 +52,24 @@ def ansible_list():
     print(json.dumps(inventory, indent=2))
 
 
-def ssh_host():
+def ssh_login():
     for instance in instances:
         for sub_instance in instance['instances']:
             sub_instance_attributes = sub_instance['attributes']
             if 'public_ip' in sub_instance_attributes:
-                print(sub_instance_attributes['public_ip'])
+                host = sub_instance_attributes['public_ip']
+                if 'AnsibleVar_ansible_user' in sub_instance_attributes['tags']:
+                    user = sub_instance_attributes['tags']['AnsibleVar_ansible_user']
+                    print(f"{user}@{host}")
+                else:
+                    print(host)
                 return
 
 
 if sys.argv[1] == '--list':
     ansible_list()
-elif sys.argv[1] == '--ssh-host':
-    ssh_host()
+elif sys.argv[1] == '--ssh-login':
+    ssh_login()
 
 # Implementing --host is not necessary because _meta is populated in --list
 # https://docs.ansible.com/ansible/latest/dev_guide/developing_inventory.html#tuning-the-external-inventory-script
