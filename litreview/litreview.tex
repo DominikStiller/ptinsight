@@ -1,4 +1,4 @@
-\documentclass[]{scrartcl}
+\documentclass[parskip=half]{scrartcl}
 
 % --------------------------------------------
 %       Config
@@ -30,9 +30,12 @@
 
 \maketitle
 
+
 % --------------------------------------------
 %       Content
 % --------------------------------------------
+
+This document contains a non-exhaustive list of research for smart cities and how they use event-driven architectures and complex event processing.
 
 \section{Applications and Stories}
 
@@ -118,9 +121,19 @@ Common themes:
 	\item Real-time 3D maps of power consumption, public transport,... (real-live version of SimCity)
 	\item Neighbor vote for turning on/off nearby street lamps
 	\item Redirect cars or suggest public transport in case of high air pollution
+	\item 101 other scenarios which have been considered are listed in \cite{CityPulseConsortium.2020}
 \end{itemize}
 
-Anomaly detection in real-time for 100000+ connected cars, full solution is available on GitHub~\cite{Wahner.2019}.
+\cite[p.~1]{Garcia.2020}:
+\begin{itemize}
+	\item Precision irrigation for agriculture and city parks based on soil measurements and weather
+\end{itemize}
+
+\cite{Wahner.2019}:
+\begin{itemize}
+	\item Anomaly detection in real-time for 100,000+ connected cars, full solution is available on GitHub
+\end{itemize}
+
 
 \section{Event Definitions}
 
@@ -133,50 +146,34 @@ Anomaly detection in real-time for 100000+ connected cars, full solution is avai
 \end{align*}
 
 
-\section{Architectures}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{Morales_2015}
-	\caption{Event-driven geoprocessing system architecture~\cite[p.~3]{Morales.2015}}
-	\label{fig:morales-arch}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{Garcia_2019a}
-	\caption{Reference Architecture for Smart City Applications (RASCA)~\cite[p.~12]{GarciaAlvarez.2019}}
-	\label{fig:rasca}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{Garcia_2019b}
-	\caption{Implementation of RASCA~\cite[p.~13]{GarciaAlvarez.2019}}
-	\label{fig:rasca-impl}
-\end{figure}
-
-The architecture in Figures \ref{fig:rasca} and \ref{fig:rasca-impl} is an instantiation of Figure \ref{fig:morales-arch} and was used with data from SmartSantander project to detect geospatial events, e.g. temperature above \SI{0}{\celsius} in the city center. Mentions that Flink has good throughput but no geospatial matching capabilities. 
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{Tsiatsis_2015b}
-	\caption{Smart City Framework for CityPulse~\cite[p.~39]{Tsiatsis.2015}}
-	\label{fig:rasca-impl}
-\end{figure}
-
-\begin{figure}[h]
-	\centering
-	\includegraphics[width=\textwidth]{Tsiatsis_2015}
-	\caption{Large Scale Data Analysis Functional Group for CityPulse~\cite[p.~25]{Tsiatsis.2015}}
-	\label{fig:citypulse-streaming}
-\end{figure}
-
-The CityPulse project described in \cite{Tsiatsis.2015}, \cite{Presser.2016}, \cite{Puiu.2016} \cite{Puiu.2016b} uses AMQP for message transport. The stream processing is shown in Figure \ref{fig:citypulse-streaming}.
-
 \section{Available Data}
 
-\section{Visualization}
+\cite{CityPulse.2015} (historic):
+\begin{itemize}
+	\item Road Traffic
+	\item Pollution
+	\item Weather
+	\item Cultural/Social/Library Events
+	\item Parking
+\end{itemize}
+
+\cite{HelsinkiRegionalTransportAuthority.2020} (real-time):
+\begin{itemize}
+	\item Public transport vehicle position
+	\item Arrivals and departures
+	\item Driver changes
+\end{itemize}
+
+\cite{data.gov.sg.2020} (real-time):
+\begin{itemize}
+	\item Air quality
+	\item Carpark availability
+	\item Taxi availability
+	\item Weather measurements (temperature, humidity, precipitation, wind, UV radiation)
+	\item Weather forecast
+	\item Traffic images
+\end{itemize}
+
 
 \section{Challenges}
 \enquote{Geoprocessing of data streams inherits challenges from big data analysis: volume, velocity, variety, value, and veracity.}~\cite[p.~1]{Morales.2015}
@@ -186,7 +183,7 @@ The CityPulse project described in \cite{Tsiatsis.2015}, \cite{Presser.2016}, \c
 	\item High cost and long development tmie \textrightarrow private--public collaboration and common platform
 	\item Choice of communication paradigm (continuous, random, incremental) \textrightarrow hierarchical structure
 	\item Sustainability of network and compatibility of devices
-	\item No best pracices for IT platforms
+	\item No best practices for IT platforms
 \end{itemize}
 
 \cite[p.~9~f.]{Petrolo.2017}:
@@ -196,8 +193,50 @@ The CityPulse project described in \cite{Tsiatsis.2015}, \cite{Presser.2016}, \c
 	\item Security: threats from cyber-terrorism/-vandalism
 \end{itemize}
 
+
+\section{Architectures}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{Morales_2015}
+	\caption{Event-driven geoprocessing system architecture~\cite[p.~3]{Morales.2015}}
+	\label{fig:morales-arch}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{Garcia_2019a}
+	\caption{Reference Architecture for Smart City Applications (RASCA)~\cite[p.~12]{GarciaAlvarez.2019}}
+	\label{fig:rasca}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{Garcia_2019b}
+	\caption{Implementation of RASCA~\cite[p.~13]{GarciaAlvarez.2019}}
+	\label{fig:rasca-impl}
+\end{figure}
+
+The architecture in figures \ref{fig:rasca} and \ref{fig:rasca-impl} is an instantiation of the reference architecture in figure \ref{fig:morales-arch} and was used with data from SmartSantander project to detect geospatial events, e.g. temperature above \SI{0}{\celsius} in the city center. \cite{GarciaAlvarez.2019} mentions that Flink has good throughput but no geospatial matching capabilities. 
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{Tsiatsis_2015b}
+	\caption{Smart City Framework for CityPulse~\cite[p.~39]{Tsiatsis.2015}}
+	\label{fig:citypulse-framework}
+\end{figure}
+
+\begin{figure}
+	\centering
+	\includegraphics[width=\textwidth]{Tsiatsis_2015}
+	\caption{Large Scale Data Analysis Functional Group for CityPulse~\cite[p.~25]{Tsiatsis.2015}}
+	\label{fig:citypulse-streaming}
+\end{figure}
+
+The CityPulse project described in \cite{Tsiatsis.2015, Presser.2014, Presser.2016, Puiu.2016, Puiu.2016b} uses AMQP for message transport. The overall architecture is shown in figure \ref{fig:citypulse-framework} while the stream processing is shown in figure \ref{fig:citypulse-streaming}.
+
+
 \clearpage
 \printbibliography
-
 
 \end{document}
