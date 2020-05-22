@@ -1,0 +1,15 @@
+---
+- name: create deploy directory
+  file:
+    path: /home/centos/deploy
+    state: directory
+
+- name: upload application
+  copy:
+    src: "{{ simulation_source_path }}"
+    dest: /home/centos/deploy/
+
+- name: install dependencies
+  command: 
+    cmd: pipenv sync
+    chdir: "/home/centos/deploy/{{ simulation_source_path | basename }}"

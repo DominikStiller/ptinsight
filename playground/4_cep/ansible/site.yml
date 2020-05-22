@@ -1,0 +1,33 @@
+---
+- name: set up all hosts
+  hosts: all
+  roles:
+    - { role: ../../ansible/roles/common,
+        tags: setup }
+
+- name: set up mosquitto host
+  hosts: mosquitto
+  roles:
+    - { role: ../../ansible/roles/mosquitto,
+        tags: setup }
+
+- name: set up simulation host
+  hosts: simulation
+  vars:
+    - simulation_source_path: "{{playbook_dir}}/../simulation/"
+  roles:
+    - { role: ../../ansible/roles/python,
+        tags: setup }
+    - { role: simulation,
+        tags: deploy }
+
+
+# - name: set up a Flink host
+#   hosts: flink
+#   vars:
+#     - application_source_path: "{{playbook_dir}}/../application/"
+#   roles:
+#     - { role: ../../ansible/roles/flink,
+#         tags: setup }
+#     - { role: application,
+#         tags: deploy }
