@@ -10,3 +10,9 @@
   package:
     name: wget
     state: present
+
+- name: install epel-release
+  become: true
+  package:
+    name: epel-release
+    state: present

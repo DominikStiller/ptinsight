@@ -1,0 +1,45 @@
+---
+- name: install Python prerequisites
+  become: true
+  package:
+    name: gcc,openssl-devel,bzip2-devel,libffi-devel
+    state: present
+
+- name: check Python installation
+  become: true
+  command: /usr/local/bin/python3 --version
+  failed_when: no
+  register: python_version
+
+- name: install Python
+  become: true
+  block:
+    - name: download and untar Python source
+      become: true
+      unarchive:
+        src: https://www.python.org/ftp/python/3.8.3/Python-3.8.3.tgz
+        dest: /tmp
+        remote_src: yes
+
+    - name: configure Python build
+      become: true
+      command:
+        cmd: ./configure --enable-optimizations
+        chdir: /tmp/Python-3.8.3
+
+    - name: install Python build
+      become: true
+      command:
+        cmd: make install
+        chdir: /tmp/Python-3.8.3
+
+    - name: remove Python source
+      file:
+        path: /tmp/Python-3.8.3
+        state: absent
+  when: >
+    python_version.rc != 0 or not python_version.stdout == 'Python 3.8.3'
+
+- name: install Pipenv
+  become: true
+  command: /usr/local/bin/pip3 install pipenv

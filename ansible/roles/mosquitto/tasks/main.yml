@@ -1,0 +1,12 @@
+---
+- name: install mosquitto
+  become: true
+  package:
+    name: mosquitto
+    state: present
+
+- name: start mosquitto
+  become: true
+  systemd:
+    state: started
+    name: mosquitto
