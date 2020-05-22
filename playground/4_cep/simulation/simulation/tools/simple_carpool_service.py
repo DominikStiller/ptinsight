@@ -18,7 +18,7 @@ def on_message(client, userdata, msg):
 
 def handle_order(client, msg):
     time.sleep(random.randint(1, 3))
-    client.publish('carpool/arrive', msg.payload, qos=1)
+    client.publish('carpool/pickup', msg.payload, qos=1)
 
 
 if __name__ == '__main__':

@@ -43,19 +43,19 @@ class CarpoolService:
         self.client.loop_start()
 
     def _on_mqtt_connect(self, client, userdata, flags, rc):
-        self.client.subscribe('carpool/arrive', qos=1)
+        self.client.subscribe('carpool/pickup', qos=1)
 
     def _on_mqtt_message(self, client, userdata, msg):
         payload = json.loads(msg.payload)
-        if msg.topic == 'carpool/arrive':
+        if msg.topic == 'carpool/pickup':
             id = payload['id']
             if id in self.orders:
-                print(f'(t={env.now}) {id} arrived for {payload["name"]}')
+                print(f'(t={env.now}) {id} picking up {payload["name"]}')
                 self.orders[id].succeed()
                 del self.orders[id]
 
     def order(self, name, destination: Location):
-        id = str(uuid.uuid4())[:8]
+        id = str(uuid.uuid4())
         self.client.publish("carpool/order", json.dumps({
             'id': str(id),
             'destination': str(destination),
@@ -63,8 +63,7 @@ class CarpoolService:
         }), qos=1)
         print(f'(t={env.now}) {id} ordered by {name}')
 
-        car_arrives_event = self.env.event()
-        self.orders[id] = car_arrives_event
+        self.orders[id] = self.env.event()
         return self.orders[id]
 
 
