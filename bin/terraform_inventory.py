@@ -44,10 +44,11 @@ def ansible_list():
                     tag[11:]: tags[tag] for tag in tags if tag.startswith("AnsibleVar_")
                 }
 
-                # Add to all group and group specified in tags
+                # Add to all group and groups specified in tags
                 add_host('all', public_ip_addr)
                 if 'AnsibleGroup' in tags:
-                    add_host(tags['AnsibleGroup'], public_ip_addr)
+                    for group in tags['AnsibleGroup'].split(','):
+                        add_host(group, public_ip_addr)
 
     print(json.dumps(inventory, indent=2))
 
