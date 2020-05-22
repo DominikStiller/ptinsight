@@ -1,0 +1,32 @@
+---
+- name: build jobs
+  command:
+    argv: 
+      - ./gradlew
+      - clean
+      - shadowJar
+    chdir: "{{ job_source_path }}"
+  delegate_to: localhost
+
+- name: create deploy directory
+  become: true
+  become_user: flink
+  file:
+    path: /home/flink/deploy
+    state: directory
+
+- name: upload jobs
+  become: true
+  become_user: flink
+  copy:
+    src: "{{ item }}"
+    dest: "/home/flink/deploy/{{ item | basename }}"
+  with_fileglob:
+    - "{{ job_source_path }}/build/libs/*.jar"
+  register: uploaded_jars
+
+- name: start jobs
+  become: true
+  become_user: flink
+  command: "/opt/flink/bin/flink run --detached {{ item.dest }}"
+  loop: "{{ uploaded_jars.results }}"

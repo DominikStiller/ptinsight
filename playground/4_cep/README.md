@@ -1,12 +1,12 @@
-# Simple CEP
+# CEP with Flink
 
 ## Use Case: Pooled Ridesharing
 * The city Demotown has 5 locations and 10 people distributed across these locations
     * Locations: Restaurant, Bar, Beach, City Hall, Hotel
     * People: Anna, Brad, Clara, Dave, Emilia, Freddy, Gwen, Harry, Isabell, Jacob
-* At random times, people want to ride to another location
-* Once 3 people want to ride from one to another location, the pool car brings them tere
-* If a person needs to wait more than 10 minutes, the car drives with less than 3 people to avoid deadlocks
+* At random times, people want to ride to another location and therefore order a car
+* Once 3 people want to ride from one to another location, the pool car picks them up and drops them off at the destination
+* If a person needs to wait more than 10 minutes, the car rides with less than 3 people to avoid deadlocks
 * Simulation using simpy, event processing using Flink, communication using MQTT
 
 ## Deployment
@@ -43,12 +43,7 @@ make deploy
 * `deploy`: Deploy simulation and Flink job
 
 ## Running
-1. Run simple carpool service to answer order requests
-```
-./ssh.sh
-cd ~/deploy
-pipenv run python simulation/mock_carpool_service.py
-```
+1. Make sure the Flink job to answer orders is running by checking in the Web UI (`http://flink-host:8081/`)
 
 2. Run the simulation
 ```
