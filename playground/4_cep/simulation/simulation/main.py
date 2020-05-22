@@ -80,9 +80,9 @@ class Citizen:
     def run(self):
         while True:
             # Remain at the location for a random time
-            yield self.env.timeout(random.randint(1, 5))
+            yield self.env.timeout(random.randint(2, 7))
 
-            destination = yield self.carpool_service.order(self.name, Location.random())
+            destination = yield self.carpool_service.order(self.name, Location.random(self.location))
             print(f'(t={env.now}) -> {self.name} went from {self.location} to {destination}')
             self.location = destination
 
