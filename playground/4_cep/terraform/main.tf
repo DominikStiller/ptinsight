@@ -13,7 +13,7 @@ provider "aws" {
 resource "aws_instance" "instance" {
 
     ami                    = "ami-0be110ffd53859e30"
-    instance_type          = "t3.medium"
+    instance_type          = "t3.small"
     vpc_security_group_ids = [aws_security_group.basic_security.id]
     key_name               = aws_key_pair.deploy.key_name
 

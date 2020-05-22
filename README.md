@@ -9,14 +9,9 @@ Goal of the project is the setup of an example application based on an event-dri
 
 Follow these steps to set up your development environment. Ubuntu 18.04 was used, but it should work with any Linux distribution.
 
-1. Install the Java 11 JDK (https://docs.oracle.com/en/java/javase/11/install/overview-jdk-installation.html)
+1. Install the Java 11 JDK
 ```
-wget --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" -P /tmp \
-   https://download.oracle.com/otn-pub/java/jdk/11.0.7%2B8/8c7daf89330c48f0b9e32f57169f7bac/jdk-11.0.7_linux-x64_bin.tar.gz
-sudo tar xf /tmp/jdk-11.0.7_linux-x64_bin.tar.gz -C /opt
-sudo ln -s /opt/jdk-11.0.7/ /opt/java
-sudo ln -s /opt/java/bin /usr/bin/*
-echo "JAVA_HOME=/opt/java" >> ~/.profile
+sudo apt install openjdk-11-jdk
 ```
 
 2. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
