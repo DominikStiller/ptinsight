@@ -48,11 +48,12 @@ class CarpoolService:
     def _on_mqtt_message(self, client, userdata, msg):
         payload = json.loads(msg.payload)
         if msg.topic == 'carpool/pickup':
-            id = payload['id']
-            if id in self.orders:
-                print(f'(t={env.now}) {id} picking up {payload["name"]}')
-                self.orders[id].succeed()
-                del self.orders[id]
+            destination = payload["destination"]
+            rider_names = [order["name"] for order in payload["orders"]]
+            print(f'(t={env.now}) PICKUP: {", ".join(rider_names)} to {destination}')
+            for order in payload['orders']:
+                self.orders[order['id']].succeed(destination)
+                del self.orders[order['id']]
 
     def order(self, name, destination: Location):
         id = str(uuid.uuid4())
@@ -61,7 +62,7 @@ class CarpoolService:
             'destination': str(destination),
             'name': name
         }), qos=1)
-        print(f'(t={env.now}) {id} ordered by {name}')
+        print(f'(t={env.now}) ORDER: {name} to {destination}')
 
         self.orders[id] = self.env.event()
         return self.orders[id]
@@ -81,9 +82,8 @@ class Citizen:
             # Remain at the location for a random time
             yield self.env.timeout(random.randint(1, 5))
 
-            destination = Location.random()
-            yield self.carpool_service.order(self.name, destination)
-            print(f'(t={env.now}) {self.name} went from {self.location} to {destination}')
+            destination = yield self.carpool_service.order(self.name, Location.random())
+            print(f'(t={env.now}) -> {self.name} went from {self.location} to {destination}')
             self.location = destination
 
 
@@ -103,4 +103,4 @@ if __name__ == '__main__':
     carpool_service = CarpoolService(env)
     citizens = [Citizen(name, env, carpool_service) for name in citizen_names[:10]]
     env.process(clock(env))
-    env.run(until=20)
+    env.run(until=60)

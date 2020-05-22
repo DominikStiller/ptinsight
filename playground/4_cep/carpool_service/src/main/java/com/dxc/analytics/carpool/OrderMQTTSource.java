@@ -4,8 +4,10 @@ package com.dxc.analytics.carpool;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.apache.flink.streaming.api.functions.source.RichSourceFunction;
 import org.eclipse.paho.client.mqttv3.*;
+import org.eclipse.paho.client.mqttv3.persist.MemoryPersistence;
 
 import java.nio.charset.StandardCharsets;
+import java.util.UUID;
 
 public class OrderMQTTSource extends RichSourceFunction<OrderMessage> {
 
@@ -20,7 +22,9 @@ public class OrderMQTTSource extends RichSourceFunction<OrderMessage> {
         connectOptions.setCleanSession(true);
         connectOptions.setAutomaticReconnect(true);
 
-        client = new MqttClient("tcp://localhost:1883", "carpool-service-order");
+        client = new MqttClient("tcp://localhost:1883",
+                                "carpool-service-order" + UUID.randomUUID().toString(),
+                                new MemoryPersistence());
         client.connect(connectOptions);
 
         mapper = new ObjectMapper();

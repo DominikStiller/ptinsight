@@ -1,5 +1,6 @@
 """Drop-in replacement for Flink CEP to answer orders with random delay"""
 import concurrent.futures
+import json
 import random
 import time
 
@@ -17,8 +18,15 @@ def on_message(client, userdata, msg):
         executor.submit(handle_order, client, msg)
 
 def handle_order(client, msg):
+    order = json.loads(msg.payload)
     time.sleep(random.randint(1, 3))
-    client.publish('carpool/pickup', msg.payload, qos=1)
+    client.publish('carpool/pickup', json.dumps({
+        'destination': order['destination'],
+        'orders': [{
+            'id': order['id'],
+            'name': order['name']
+        }]
+    }), qos=1)
 
 
 if __name__ == '__main__':
