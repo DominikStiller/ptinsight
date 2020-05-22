@@ -35,7 +35,7 @@ public class CarpoolService {
 
 /**
  * Matches riders with the same destination
- * Match is complete when maxRiders are ready or maxWaitTime for the first rider has apssed
+ * Match is complete when maxRiders are ready or maxWaitTime for the first rider has passed
  */
 class CarpoolMatcher extends KeyedProcessFunction<String, OrderMessage, PickupMessage> {
 
@@ -51,11 +51,10 @@ class CarpoolMatcher extends KeyedProcessFunction<String, OrderMessage, PickupMe
     }
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(Configuration parameters) {
         var ordersDescriptor =
                 new ListStateDescriptor<PickupMessage.Order>("orders",
-                                                             TypeInformation.of(new TypeHint<PickupMessage.Order>() {
-                                                             }));
+                                                             TypeInformation.of(new TypeHint<PickupMessage.Order>() {}));
         orders = getRuntimeContext().getListState(ordersDescriptor);
 
         var timeoutDescriptor = new ValueStateDescriptor<>("timeout", Types.LONG);
@@ -74,13 +73,13 @@ class CarpoolMatcher extends KeyedProcessFunction<String, OrderMessage, PickupMe
             ctx.timerService().registerProcessingTimeTimer(nextTimeout);
             timeout.update(nextTimeout);
         } else if (count == this.maxRiders) {
-            collect(ctx, out);
+            pickupRiders(ctx, out);
         }
     }
 
     @Override
     public void onTimer(long timestamp, OnTimerContext ctx, Collector<PickupMessage> out) throws Exception {
-        collect(ctx, out);
+        pickupRiders(ctx, out);
     }
 
     private int countOrders() throws Exception {
@@ -89,11 +88,13 @@ class CarpoolMatcher extends KeyedProcessFunction<String, OrderMessage, PickupMe
         return count.intValue();
     }
 
-    private void collect(Context ctx, Collector<PickupMessage> out) throws Exception {
+    private void pickupRiders(Context ctx, Collector<PickupMessage> out) throws Exception {
+        // Aggregate orders and send pickup message
         var ordersList = new ArrayList<PickupMessage.Order>(countOrders());
         orders.get().forEach(ordersList::add);
         out.collect(new PickupMessage(ctx.getCurrentKey(), ordersList));
 
+        // Reset orders and timeout
         orders.clear();
         ctx.timerService().deleteProcessingTimeTimer(timeout.value());
         timeout.clear();
