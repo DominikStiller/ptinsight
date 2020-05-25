@@ -1,0 +1,39 @@
+---
+- hosts: all
+  roles:
+    - ../../ansible/roles/common
+    - ../../ansible/roles/python
+  vars:
+    - mqtt_host: mqtt.hsl.fi
+    - mqtt_port: 8883
+    - mqtt_topics: /hfp/v2/journey/#
+    - recording_duration: 24h
+  tasks:
+    - name: create deploy directory
+      file:
+        path: /home/centos/deploy
+        state: directory
+
+    - name: upload application
+      copy:
+        src: "{{ playbook_dir }}/../{{ item }}"
+        dest: /home/centos/deploy/
+      loop:
+        - Pipfile
+        - Pipfile.lock
+        - record.py
+        - replay.py
+
+    - name: install dependencies
+      command:
+        cmd: pipenv sync
+        chdir: "/home/centos/deploy"
+
+    - name: start recorder
+      shell:
+        cmd: >
+          nohup sh -c
+          "pipenv run python record.py {{ mqtt_host }} {{ mqtt_port }} {{ recording_duration }} {{ mqtt_topics}}
+          && aws s3 sync recordings s3://mqtt-recordings"
+          </dev/null >/dev/null 2>&1  &
+        chdir: "/home/centos/deploy"

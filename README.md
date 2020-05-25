@@ -14,7 +14,14 @@ Follow these steps to set up your development environment. Ubuntu 18.04 was used
 sudo apt install openjdk-11-jdk
 ```
 
-2. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+2. Install Python 3.8
+```
+sudo apt install -y software-properties-common
+sudo add-apt-repository -y ppa:deadsnakes/ppa
+sudo apt install -y python3.8
+```
+
+3. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 ```
 sudo apt update
 sudo apt install software-properties-common
@@ -22,7 +29,7 @@ sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
 
-3. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
+4. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
 ```
 wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
 unzip terraform_0.12.24_linux_amd64.zip
@@ -30,7 +37,7 @@ mv terraform ~/.local/bin  # add this directory to PATH
 rm terraform_0.12.24_linux_amd64.zip
 ```
 
-4. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+5. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 ```
 mkdir ~/.aws
 echo "[default]
@@ -43,7 +50,7 @@ The user needs following policies attached:
 * `IAMFullAccess`
 * `AWSLambdaFullAccess`
 
-5. Generate an SSH key to use for EC2 instances
+6. Generate an SSH key to use for EC2 instances
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```

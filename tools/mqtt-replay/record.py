@@ -25,8 +25,8 @@ class Recorder:
             self.client.tls_set()
 
         rec_id = datetime.now().replace(microsecond=0).isoformat().replace(":", "-")
-        os.makedirs('recordings', exist_ok=True)
-        self.file = open(f'recordings/{rec_id}.rec', 'w', encoding='utf-8')
+        os.makedirs(f'recordings/{host}', exist_ok=True)
+        self.file = open(f'recordings/{host}/{rec_id}.rec', 'w', encoding='utf-8')
 
         self.file.write(f"Broker: {host}:{port}\n")
         self.file.write(f"Topics: {','.join(topics)}\n")

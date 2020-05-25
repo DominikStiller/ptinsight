@@ -11,8 +11,45 @@
     name: wget
     state: present
 
+- name: install unzip
+  become: true
+  package:
+    name: unzip
+    state: present
+
+- name: install tmux
+  become: true
+  package:
+    name: tmux
+    state: present
+
 - name: install epel-release
   become: true
   package:
     name: epel-release
     state: present
+
+- name: check AWS CLI installation
+  become: true
+  command: /usr/local/bin/aws --version
+  failed_when: no
+  register: awscli_version
+
+- name: install AWS CLI
+  become: true
+  block:
+    - name: download and untar AWS CLI
+      unarchive:
+        src: https://awscli.amazonaws.com/awscli-exe-linux-x86_64.zip
+        dest: /tmp
+        remote_src: yes
+
+    - name: install AWS CLI
+      command: /tmp/aws/install
+
+    - name: remove AWS CLI installation folder
+      file:
+        path: /tmp/aws
+        state: absent
+  when: >
+    awscli_version.rc != 0 or not awscli_version.stdout is match('aws-cli')
