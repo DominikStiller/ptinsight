@@ -51,3 +51,10 @@ make deploy
 cd ~/deploy
 pipenv run python simulation/main.py
 ```
+
+3. View the MQTT messages (optional)
+```
+./ssh
+mosquitto_sub -t carpool/order
+mosquitto_sub -t carpool/pickup
+```
