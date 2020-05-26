@@ -37,7 +37,7 @@ class Replayer:
 
         scheduler = sched.scheduler(time.perf_counter, time.sleep)
         # Custom run method is necessary to prevent scheduler from exiting early because no events are scheduled yet
-        # Only returns when no events are in the queue but there were some earlier
+        # Only returns when no events are in the queue but there wes at least one earlier
         def run_scheduler():
             ran_once = False
             while True:
@@ -74,6 +74,7 @@ class Replayer:
             scheduler.enterabs(t_start + t_offset, 1, make_publish(t_offset, topic, payload, qos, retain))
 
         thread.join()
+        self.client.disconnect()
         self.file.close()
         print(f"\nReplayed {count} messages from {os.path.realpath(self.file.name)}")
 

@@ -20,7 +20,7 @@ Goal of the project is the setup of an example application based on an event-dri
 
 ## Development Environment Setup
 
-Follow these steps to set up your development environment. Ubuntu 18.04 was used, but it should work with any Linux distribution.
+Follow these steps to set up your development environment on Ubuntu 18.04. Adapt the `apt` commands to your package manager for other Linux distributions.
 
 1. Install the Java 11 JDK
 ```
@@ -70,8 +70,8 @@ ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 
 
 ## Abbreviations
-* `CPE`: Complex Event Processing.
-* `EDA`: Event-Driven Architecture
+* **CPE**: Complex Event Processing.
+* **EDA**: Event-Driven Architecture
 
 
 ## Todo for actual application

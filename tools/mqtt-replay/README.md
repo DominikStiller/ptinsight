@@ -3,7 +3,7 @@
 This tool can record MQTT messages from a broker and replay them at a later point.
 
 
-## Requirements
+## Prerequisites
 * Python 3.8
 * pipenv (`pip install pipenv`)
 
