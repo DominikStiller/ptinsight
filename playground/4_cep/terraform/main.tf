@@ -24,7 +24,7 @@ resource "aws_instance" "instance" {
     tags = {
         Name = "${local.name_prefix}instance"
         Project = "eda"
-        AnsibleGroup = "mosquitto,flink,simulation"
+        AnsibleGroups = "mosquitto,flink,simulation"
         AnsibleVar_ansible_user = "centos"
         AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }

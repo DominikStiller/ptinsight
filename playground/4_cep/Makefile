@@ -24,8 +24,8 @@ reapply: destroy apply
 
 # Ansible
 define ansible_cmd =
-	TF_STATE=${ROOT}terraform ANSIBLE_HOST_KEY_CHECKING=False\
-	ansible-playbook -i ${ROOT}../../bin/terraform_inventory.py --tags $(1) --timeout 60 ${ROOT}ansible/site.yml
+	ANSIBLE_HOST_KEY_CHECKING=False\
+	ansible-playbook -i ${ROOT}../../tools/terraform-inventory/terraform_inventory.py --tags $(1) --timeout 60 ${ROOT}ansible/site.yml
 endef
 setup:
 	$(call ansible_cmd, "setup")

@@ -25,7 +25,7 @@ resource "aws_instance" "flink" {
     tags = {
         Name = "${local.name_prefix}flink"
         Project = "eda"
-        AnsibleGroup = "flink"
+        AnsibleGroups = "flink"
         AnsibleVar_ansible_user = "centos"
         AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }
