@@ -1,8 +1,21 @@
 # Event-Driven Architecture
 
-This is the repository for the bachelor's thesis project of Dominik Stiller (dominik.stiller@hpe.com).
+This is the repository for the bachelor's thesis project of Dominik Stiller (dominik.stiller@hpe.com). Meeting notes, presentations and formalia can be found in [this repo](https://github.dxc.com/bgloss/dhbw-eda).
 
 Goal of the project is the setup of an example application based on an event-driven architecture to gain experience with this technology.
+
+
+## Repository Structure
+* `ansible`: Ansible roles for common platforms and applications (e.g., Java, Python, Flink)
+* `litreview`: A review of literature for EDA and CPE in smart cities
+* `playground`: Testing ground for different platforms and applications
+    * `1_vagrant-ansible`: Setup of an EC2 instance with an httpd using Vagrant and Ansible
+    * `2_terraform-ansible`: Setup of an EC2 instance with an httpd using Terraform and Ansible
+    * `3_flink-singlenode`: Flink application with input from MQTT and output to Kafka and AWS Lambda
+    * `4_cep`: Simulation and Flink application with CEP that communicate via MQTT
+* `tools`: Useful scripts
+    * `mqtt-replay`: Recording and replay of MQTT messages
+    * `terraform-inventory`: Dynamically generate Ansible inventory from Terraform state
 
 
 ## Development Environment Setup
@@ -54,6 +67,12 @@ The user needs following policies attached:
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
+
+
+## Abbreviations
+* `CPE`: Complex Event Processing.
+* `EDA`: Event-Driven Architecture
+
 
 ## Todo for actual application
 * Use Route 53/CloudMap for service discovery
