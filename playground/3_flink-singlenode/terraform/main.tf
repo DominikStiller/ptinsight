@@ -12,7 +12,7 @@ provider "aws" {
 # ---- >> Flink ------------------------------
 resource "aws_instance" "flink" {
 
-    ami                    = "ami-0be110ffd53859e30"
+    ami                    = "ami-04cf43aca3e6f3de3"
     instance_type          = "t3.medium"
     vpc_security_group_ids = [aws_security_group.basic_security.id]
     key_name               = aws_key_pair.deploy.key_name
@@ -152,7 +152,7 @@ resource "aws_iam_role_policy_attachment" "lambda_logging_attachment" {
 
 resource "aws_security_group" "basic_security" {
 
-    name = "${local.name_prefix}basic_security"
+    name = "${local.name_prefix}playground-3"
 
     ingress {
         description = "SSH from trusted CIDRs"
@@ -184,7 +184,7 @@ resource "aws_security_group" "basic_security" {
 
 resource "aws_key_pair" "deploy" {
 
-    key_name   = "${local.name_prefix}deploy"
+    key_name   = "${local.name_prefix}deploy-playground-3"
     public_key = file("${var.ssh_key}.pub")
 
     tags = {

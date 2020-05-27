@@ -1,4 +1,10 @@
 ---
+- name: install epel-release
+  become: true
+  package:
+    name: epel-release
+    state: present
+
 - name: install htop
   become: true
   package:
@@ -23,11 +29,17 @@
     name: tmux
     state: present
 
-- name: install epel-release
+- name: install at
   become: true
   package:
-    name: epel-release
+    name: at
     state: present
+
+- name: start at
+  become: true
+  systemd:
+    state: started
+    name: at
 
 - name: check AWS CLI installation
   become: true
