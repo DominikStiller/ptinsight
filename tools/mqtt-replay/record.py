@@ -2,11 +2,16 @@
 
 import argparse
 import base64
+import logging
 import os
 import time
 from datetime import datetime, timezone
 
 import paho.mqtt.client as mqtt
+
+
+logger = logging.getLogger('mqtt-recorder')
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 class Recorder:
@@ -38,15 +43,15 @@ class Recorder:
         t_start_absolute = datetime.now(timezone.utc)
         self.file.write(f"Start time: {t_start_absolute.isoformat()}\n\n")
 
-        print(f"Recording of {self.host}:{self.port} at {t_start_absolute}")
-        print(f"Topics: {','.join(self.topics)}\n")
+        logger.info(f"Recording of {self.host}:{self.port} at {t_start_absolute}")
+        logger.info(f"Topics: {','.join(self.topics)}\n")
 
         self.client.loop_start()
 
     def stop(self):
         self.client.disconnect()
         self.file.close()
-        print(f"\nRecorded {self.count} messages to {os.path.realpath(self.file.name)}")
+        logger.info(f"\nRecorded {self.count} messages to {os.path.realpath(self.file.name)}")
 
     def _mqtt_on_connect(self, client, userdata, flags, rc):
         for topic in self.topics:
@@ -60,7 +65,7 @@ class Recorder:
         self.file.write(f'{t_offset} "{msg.topic}" {msg.qos} {msg.retain} ')
         self.file.write(base64.b64encode(msg.payload).decode())
         self.file.write('\n')
-        print(f"(t={t_offset:.2f}) topic={msg.topic} qos={msg.qos} retain={msg.retain}")
+        logger.debug(f"(t={t_offset:.2f}) topic={msg.topic} qos={msg.qos} retain={msg.retain}")
 
 
 def convert_to_seconds(duration):
@@ -74,8 +79,12 @@ if __name__ == '__main__':
     parser.add_argument('port', type=int)
     parser.add_argument('duration', type=str)
     parser.add_argument('topics', type=str, nargs='+')
+    parser.add_argument('-v', action='store_true')
 
     args = parser.parse_args()
+
+    if args.v:
+        logger.setLevel(logging.DEBUG)
 
     rec = Recorder(args.host, args.port, args.topics)
     rec.start()

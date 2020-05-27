@@ -23,6 +23,7 @@
         - Pipfile.lock
         - record.py
         - replay.py
+        - analyze.py
 
     - name: install dependencies
       command:

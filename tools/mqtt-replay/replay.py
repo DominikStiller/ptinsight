@@ -2,6 +2,7 @@
 
 import argparse
 import base64
+import logging
 import os
 import re
 import sched
@@ -10,6 +11,10 @@ import time
 from datetime import datetime
 
 import paho.mqtt.client as mqtt
+
+
+logger = logging.getLogger('mqtt-recorder')
+logging.basicConfig(level=logging.INFO, format='%(message)s')
 
 
 class Replayer:
@@ -26,8 +31,8 @@ class Replayer:
         self.original_broker = self.file.readline()[8:-1]
         self.original_topics = self.file.readline()[8:-1]
         self.original_t_start = datetime.fromisoformat(self.file.readline()[12:-1]).replace(microsecond=0)
-        print(f"Recording of {self.original_broker} at {str(self.original_t_start)}")
-        print(f"Topics: {self.original_topics}\n")
+        logger.info(f"Recording of {self.original_broker} at {str(self.original_t_start)}")
+        logger.info(f"Topics: {self.original_topics}\n")
 
     def start(self):
         self.client.connect(self.host, self.port, keepalive=60)
@@ -76,7 +81,7 @@ class Replayer:
         thread.join()
         self.client.disconnect()
         self.file.close()
-        print(f"\nReplayed {count} messages from {os.path.realpath(self.file.name)}")
+        logger.debug(f"\nReplayed {count} messages from {os.path.realpath(self.file.name)}")
 
 
 if __name__ == '__main__':
@@ -84,8 +89,12 @@ if __name__ == '__main__':
     parser.add_argument('host', type=str)
     parser.add_argument('port', type=int)
     parser.add_argument('recording', type=str)
+    parser.add_argument('-v', action='store_true')
 
     args = parser.parse_args()
+
+    if args.v:
+        logger.setLevel(logging.DEBUG)
 
     rep = Replayer(args.host, args.port, args.recording)
     rep.start()

@@ -180,3 +180,4 @@ fabric.properties
 
 Pipfile.lock
 recordings/
+*.png

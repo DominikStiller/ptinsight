@@ -12,7 +12,7 @@ provider "aws" {
 # ---- >> Instance ------------------------------
 resource "aws_instance" "instance" {
 
-    ami                    = "ami-0be110ffd53859e30"
+    ami                    = "ami-04cf43aca3e6f3de3"
     instance_type          = "t3.nano"
     vpc_security_group_ids = [aws_security_group.basic_security.id]
     key_name               = aws_key_pair.deploy.key_name
@@ -20,7 +20,7 @@ resource "aws_instance" "instance" {
 
     root_block_device {
         delete_on_termination = true
-        volume_size = 64
+        volume_size = 50
     }
 
     tags = {
@@ -77,6 +77,8 @@ resource "aws_iam_role_policy" "s3_write" {
             "Sid": "Write",
             "Effect": "Allow",
             "Action": [
+                "s3:HeadObject",
+                "s3:GetObject",
                 "s3:PutObject"
             ],
             "Resource": "arn:aws:s3:::mqtt-recordings/*"
