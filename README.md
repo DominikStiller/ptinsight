@@ -16,6 +16,7 @@ Goal of the project is the setup of an example application based on an event-dri
 * `tools`: Useful scripts
     * `mqtt-replay`: Recording and replay of MQTT messages
     * `terraform-inventory`: Dynamically generate Ansible inventory from Terraform state
+    * `hsl-client`: A collection of scripts for interacting with the HSL.fi API
 
 
 ## Development Environment Setup

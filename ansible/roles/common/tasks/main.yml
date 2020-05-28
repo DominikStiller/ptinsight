@@ -39,7 +39,7 @@
   become: true
   systemd:
     state: started
-    name: at
+    name: atd
 
 - name: check AWS CLI installation
   become: true
