@@ -7,6 +7,7 @@ import os
 import matplotlib.pyplot as plt
 import seaborn as sb
 sb.set()
+sb.set_style("whitegrid")
 
 
 class Analyzer:
@@ -58,16 +59,16 @@ class Analyzer:
 
         bin_edges = [i * self.bin_size for i in range(0, len(n_msg_bins) + 1)]
         bin_labels = [
-            (self.t_start + datetime.timedelta(seconds=n)).strftime('%H:%M:%S') for n in bin_edges
+            (self.t_start + datetime.timedelta(seconds=n)).strftime('%X') for n in bin_edges
         ]
 
-        plt.figure(figsize=[10, 4])
+        plt.figure(figsize=[10, 4], facecolor='white')
         plt.hist(offsets, bins=bin_edges, color='black')
         plt.xlabel("Time")
-        plt.xticks(bin_edges, bin_labels, rotation=45, ha='right')
+        plt.xticks(bin_edges, bin_labels, rotation=45, ha='right', y=.03)
         plt.ylabel("Number of messages")
         plt.tight_layout()
-        plt.savefig(f'{os.path.splitext(os.path.basename(self.file.name))[0]}.png')
+        plt.savefig(f'{os.path.splitext(os.path.basename(self.file.name))[0]}.png', dpi=300)
         plt.show()
 
     def _convert_to_seconds(self, duration):

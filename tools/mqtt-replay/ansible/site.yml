@@ -31,10 +31,12 @@
         chdir: "/home/centos/deploy"
 
     - name: start recorder
+      tags:
+        - record
       shell:
-        cmd: >
-          nohup sh -c
-          "pipenv run python record.py {{ mqtt_host }} {{ mqtt_port }} {{ recording_duration }} {{ mqtt_topics}}
-          && aws s3 sync recordings s3://mqtt-recordings"
-          </dev/null >/dev/null 2>&1  &
-        chdir: "/home/centos/deploy"
+       cmd: >
+         nohup sh -c
+         "pipenv run python record.py {{ mqtt_host }} {{ mqtt_port }} {{ recording_duration }} {{ mqtt_topics}}
+         && aws s3 sync recordings s3://mqtt-recordings"
+         </dev/null >/dev/null 2>&1  &
+       chdir: "/home/centos/deploy"

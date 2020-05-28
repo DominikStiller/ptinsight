@@ -58,15 +58,20 @@ make init
 make apply
 ```
 
-3. Set up server, deploy tool, start recording and upload to S3 afterwards
+3. Set up server and deploy tool
 ```
 make deploy
 ```
 
-### Makefile Targets
+4. Start recording and upload to S3 afterwards
+```
+make record
+```
 
-* `all`: apply, deploy
-* `apply`: Set up AWS infrastructure
-* `destroy`: Destroy AWS infrastructure
-* `reapply`: Destroy, then set up AWS infrastructure
-* `deploy`: Set up und run
+5. Analyze the recording. You might need to switch to an EC2 instance type with more memory (about 2 GB for 60
+ million messages, that is one day of recording from mqtt.hsl.fi).
+```
+./ssh.sh
+cd deploy
+pipenv run python analyze.py args
+```
