@@ -14,22 +14,26 @@ def on_connect(client, userdata, flags, rc):
 
 
 def on_message(client, userdata, msg):
-    if msg.topic == 'carpool/order':
+    if msg.topic == "carpool/order":
         executor.submit(handle_order, client, msg)
+
 
 def handle_order(client, msg):
     order = json.loads(msg.payload)
     time.sleep(random.randint(1, 3))
-    client.publish('carpool/pickup', json.dumps({
-        'destination': order['destination'],
-        'orders': [{
-            'id': order['id'],
-            'name': order['name']
-        }]
-    }), qos=1)
+    client.publish(
+        "carpool/pickup",
+        json.dumps(
+            {
+                "destination": order["destination"],
+                "orders": [{"id": order["id"], "name": order["name"]}],
+            }
+        ),
+        qos=1,
+    )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     client = mqtt.Client()
 
     client.on_connect = on_connect

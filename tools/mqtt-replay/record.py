@@ -10,12 +10,11 @@ from datetime import datetime, timezone
 import paho.mqtt.client as mqtt
 
 
-logger = logging.getLogger('mqtt-recorder')
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger("mqtt-recorder")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class Recorder:
-
     def __init__(self, host, port, topics):
         self.host = host
         self.port = port
@@ -30,8 +29,8 @@ class Recorder:
             self.client.tls_set()
 
         rec_id = datetime.now().replace(microsecond=0).isoformat().replace(":", "-")
-        os.makedirs(f'recordings/{host}', exist_ok=True)
-        self.file = open(f'recordings/{host}/{rec_id}.rec', 'w', encoding='utf-8')
+        os.makedirs(f"recordings/{host}", exist_ok=True)
+        self.file = open(f"recordings/{host}/{rec_id}.rec", "w", encoding="utf-8")
 
         self.file.write(f"Broker: {host}:{port}\n")
         self.file.write(f"Topics: {','.join(topics)}\n")
@@ -51,7 +50,9 @@ class Recorder:
     def stop(self):
         self.client.disconnect()
         self.file.close()
-        logger.info(f"\nRecorded {self.count} messages to {os.path.realpath(self.file.name)}")
+        logger.info(
+            f"\nRecorded {self.count} messages to {os.path.realpath(self.file.name)}"
+        )
 
     def _mqtt_on_connect(self, client, userdata, flags, rc):
         for topic in self.topics:
@@ -64,8 +65,10 @@ class Recorder:
 
         self.file.write(f'{t_offset} "{msg.topic}" {msg.qos} {msg.retain} ')
         self.file.write(base64.b64encode(msg.payload).decode())
-        self.file.write('\n')
-        logger.debug(f"(t={t_offset:.2f}) topic={msg.topic} qos={msg.qos} retain={msg.retain}")
+        self.file.write("\n")
+        logger.debug(
+            f"(t={t_offset:.2f}) topic={msg.topic} qos={msg.qos} retain={msg.retain}"
+        )
 
 
 def convert_to_seconds(duration):
@@ -73,13 +76,13 @@ def convert_to_seconds(duration):
     return float(duration[:-1]) * seconds_per_unit[duration[-1]]
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Record MQTT messages.")
-    parser.add_argument('host', type=str)
-    parser.add_argument('port', type=int)
-    parser.add_argument('duration', type=str)
-    parser.add_argument('topics', type=str, nargs='+')
-    parser.add_argument('-v', action='store_true')
+    parser.add_argument("host", type=str)
+    parser.add_argument("port", type=int)
+    parser.add_argument("duration", type=str)
+    parser.add_argument("topics", type=str, nargs="+")
+    parser.add_argument("-v", action="store_true")
 
     args = parser.parse_args()
 

@@ -13,14 +13,13 @@ from datetime import datetime
 import paho.mqtt.client as mqtt
 
 
-logger = logging.getLogger('mqtt-recorder')
-logging.basicConfig(level=logging.INFO, format='%(message)s')
+logger = logging.getLogger("mqtt-recorder")
+logging.basicConfig(level=logging.INFO, format="%(message)s")
 
 
 class Replayer:
-
     def __init__(self, host, port, recording_file):
-        self.file = open(recording_file, 'r', encoding='utf-8')
+        self.file = open(recording_file, "r", encoding="utf-8")
         self.host = host
         self.port = port
 
@@ -30,8 +29,12 @@ class Replayer:
 
         self.original_broker = self.file.readline()[8:-1]
         self.original_topics = self.file.readline()[8:-1]
-        self.original_t_start = datetime.fromisoformat(self.file.readline()[12:-1]).replace(microsecond=0)
-        logger.info(f"Recording of {self.original_broker} at {str(self.original_t_start)}")
+        self.original_t_start = datetime.fromisoformat(
+            self.file.readline()[12:-1]
+        ).replace(microsecond=0)
+        logger.info(
+            f"Recording of {self.original_broker} at {str(self.original_t_start)}"
+        )
         logger.info(f"Topics: {self.original_topics}\n")
 
     def start(self):
@@ -41,6 +44,7 @@ class Replayer:
         count = 0
 
         scheduler = sched.scheduler(time.perf_counter, time.sleep)
+
         # Custom run method is necessary to prevent scheduler from exiting early because no events are scheduled yet
         # Only returns when no events are in the queue but there wes at least one earlier
         def run_scheduler():
@@ -51,15 +55,13 @@ class Replayer:
                     ran_once = True
                 elif ran_once:
                     break
+
         thread = threading.Thread(target=run_scheduler)
         thread.start()
         t_start = time.perf_counter()
 
         self.file.readline()
-        while True:
-            line = self.file.readline()
-            if not line:
-                break
+        while line := self.file.readline():
             count += 1
 
             # Parse record
@@ -73,23 +75,31 @@ class Replayer:
             # Use factory method to force early binding for variables
             def make_publish(t_offset, topic, payload, qos, retain):
                 def _publish():
-                    print(f"(t={t_offset:.2f}) topic={topic} qos={qos} retain={retain}")
+                    print(f"(t={t_offset:.2f}) {topic=!s} {qos=} {retain=}")
                     self.client.publish(topic, payload, qos, retain)
+
                 return _publish
-            scheduler.enterabs(t_start + t_offset, 1, make_publish(t_offset, topic, payload, qos, retain))
+
+            scheduler.enterabs(
+                t_start + t_offset,
+                1,
+                make_publish(t_offset, topic, payload, qos, retain),
+            )
 
         thread.join()
         self.client.disconnect()
         self.file.close()
-        logger.debug(f"\nReplayed {count} messages from {os.path.realpath(self.file.name)}")
+        logger.debug(
+            f"\nReplayed {count} messages from {os.path.realpath(self.file.name)}"
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Replay MQTT messages.")
-    parser.add_argument('host', type=str)
-    parser.add_argument('port', type=int)
-    parser.add_argument('recording', type=str)
-    parser.add_argument('-v', action='store_true')
+    parser.add_argument("host", type=str)
+    parser.add_argument("port", type=int)
+    parser.add_argument("recording", type=str)
+    parser.add_argument("-v", action="store_true")
 
     args = parser.parse_args()
 

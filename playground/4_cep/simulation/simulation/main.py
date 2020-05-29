@@ -43,33 +43,35 @@ class CarpoolService:
         self.client.loop_start()
 
     def _on_mqtt_connect(self, client, userdata, flags, rc):
-        self.client.subscribe('carpool/pickup', qos=1)
+        self.client.subscribe("carpool/pickup", qos=1)
 
     def _on_mqtt_message(self, client, userdata, msg):
         payload = json.loads(msg.payload)
-        if msg.topic == 'carpool/pickup':
+        if msg.topic == "carpool/pickup":
             destination = payload["destination"]
             rider_names = [order["name"] for order in payload["orders"]]
             print(f'(t={env.now}) PICKUP: {", ".join(rider_names)} to {destination}')
-            for order in payload['orders']:
-                self.orders[order['id']].succeed(destination)
-                del self.orders[order['id']]
+            for order in payload["orders"]:
+                self.orders[order["id"]].succeed(destination)
+                del self.orders[order["id"]]
 
     def order(self, name, destination: Location):
         id = str(uuid.uuid4())
-        self.client.publish("carpool/order", json.dumps({
-            'id': str(id),
-            'destination': str(destination),
-            'name': name
-        }), qos=1)
-        print(f'(t={env.now}) ORDER: {name} to {destination}')
+        self.client.publish(
+            "carpool/order",
+            json.dumps({"id": str(id), "destination": str(destination), "name": name}),
+            qos=1,
+        )
+        print(f"(t={env.now}) ORDER: {name} to {destination}")
 
         self.orders[id] = self.env.event()
         return self.orders[id]
 
 
 class Citizen:
-    def __init__(self, name: str, env: simpy.Environment, carpool_service: CarpoolService):
+    def __init__(
+        self, name: str, env: simpy.Environment, carpool_service: CarpoolService
+    ):
         self.env = env
         self.carpool_service = carpool_service
         self.action = env.process(self.run())
@@ -82,8 +84,12 @@ class Citizen:
             # Remain at the location for a random time
             yield self.env.timeout(random.randint(2, 7))
 
-            destination = yield self.carpool_service.order(self.name, Location.random(self.location))
-            print(f'(t={env.now}) -> {self.name} went from {self.location} to {destination}')
+            destination = yield self.carpool_service.order(
+                self.name, Location.random(self.location)
+            )
+            print(
+                f"(t={env.now}) -> {self.name} went from {self.location} to {destination}"
+            )
             self.location = destination
 
 
@@ -93,10 +99,18 @@ def clock(env: simpy.Environment):
         yield env.timeout(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     citizen_names = [
-        'Anna', 'Brad', 'Clara', 'Dave', 'Emilia',
-        'Freddy', 'Gwen', 'Harry', 'Isabell', 'Jacob'
+        "Anna",
+        "Brad",
+        "Clara",
+        "Dave",
+        "Emilia",
+        "Freddy",
+        "Gwen",
+        "Harry",
+        "Isabell",
+        "Jacob",
     ]
 
     env = simpy.rt.RealtimeEnvironment(strict=False)

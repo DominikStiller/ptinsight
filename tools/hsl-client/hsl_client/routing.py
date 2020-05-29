@@ -4,11 +4,13 @@ from gql.transport.requests import RequestsHTTPTransport
 import json
 
 
-API_BASE = 'https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql'
+API_BASE = "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql"
 
 
 client = Client(transport=RequestsHTTPTransport(url=API_BASE))
-res = client.execute(gql('''
+res = client.execute(
+    gql(
+        """
 {
   cancelledTripTimes(
     feeds: ["HSL"]
@@ -33,6 +35,8 @@ res = client.execute(gql('''
     headsign
   }
 }
-'''))
+"""
+    )
+)
 
 print(json.dumps(res, indent=2))

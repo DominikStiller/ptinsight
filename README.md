@@ -19,7 +19,9 @@ Goal of the project is the setup of an example application based on an event-dri
     * `hsl-client`: A collection of scripts for interacting with the HSL.fi API
 
 
-## Development Environment Setup
+## Development
+
+### Environment Setup
 
 Follow these steps to set up your development environment on Ubuntu 18.04. Adapt the `apt` commands to your package manager for other Linux distributions.
 
@@ -68,6 +70,11 @@ The user needs following policies attached:
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
+
+### Python
+Common tools:
+* `pipenv`: dependency management and virtual environments, run `pipenv install --dev` in the project folder to set up the environment
+* `black`: code formatter, run `black .` in the project folder to format all .py files
 
 
 ## Abbreviations
