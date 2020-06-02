@@ -10,6 +10,7 @@ black = "*"
 protobuf = "*"
 requests = "*"
 gql = "*"
+owslib = "*"
 
 [requires]
 python_version = "3.8"
