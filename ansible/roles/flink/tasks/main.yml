@@ -15,7 +15,7 @@
   block:
     - name: download and untar Flink
       unarchive:
-        src: https://mirror.dkd.de/apache/flink/flink-1.10.1/flink-1.10.1-bin-scala_2.11.tgz
+        src: https://ftp.fau.de/apache/flink/flink-1.10.1/flink-1.10.1-bin-scala_2.11.tgz
         dest: /opt
         remote_src: yes
 

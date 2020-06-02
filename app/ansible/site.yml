@@ -1,0 +1,24 @@
+---
+- name: set up all hosts
+  hosts: all
+  roles:
+    - { role: ../../ansible/roles/common,
+        tags: setup }
+
+- name: set up Flink cluster
+  hosts: flink
+  vars:
+    - application_source_path: "{{playbook_dir}}/../application/"
+  roles:
+    - { role: ../../ansible/roles/flink,
+        tags: setup }
+    - { role: flink,
+        tags: deploy }
+
+- name: set up Kafka cluster
+  hosts: kafka
+  roles:
+    - { role: ../../ansible/roles/kafka,
+        tags: setup }
+    - { role: kafka,
+        tags: deploy }
