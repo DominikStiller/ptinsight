@@ -65,7 +65,9 @@ make deploy
 
 4. Start recording and upload to S3 afterwards
 ```
-make record
+./ssh.sh
+cd deploy
+./record_and_upload.sh host port duration topics
 ```
 
 5. Analyze the recording. You might need to switch to an EC2 instance type with more memory (about 2 GB for 60

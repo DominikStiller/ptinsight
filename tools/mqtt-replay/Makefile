@@ -23,11 +23,6 @@ destroy:
 reapply: destroy apply
 
 # Ansible
-define ansible_cmd =
-	ANSIBLE_HOST_KEY_CHECKING=False\
-	ansible-playbook -i ${ROOT}../terraform-inventory/terraform_inventory.py $(1) record --timeout 60 ${ROOT}ansible/site.yml
-endef
 deploy:
-	$(call ansible_cmd, "--skip-tags")
-record:
-	$(call ansible_cmd, "--tags")
+	ANSIBLE_HOST_KEY_CHECKING=False \
+	ansible-playbook -i ${ROOT}../terraform-inventory/terraform_inventory.py --timeout 60 ${ROOT}ansible/site.yml
