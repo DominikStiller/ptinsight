@@ -6,7 +6,7 @@ import sys
 import os
 
 
-def ansible_list(instances):
+def ansible_list(instances, args):
     inventory = {"_meta": {"hostvars": {}}}
 
     def add_host(group, public_ip_addr):
@@ -37,10 +37,15 @@ def ansible_list(instances):
     print(json.dumps(inventory, indent=2))
 
 
-def ssh(instances):
+def ssh(instances, args):
+    commands = []
+
     for instance in instances:
         for sub_instance in instance["instances"]:
             sub_instance_attributes = sub_instance["attributes"]
+            tags = sub_instance_attributes["tags"]
+
+            # Only use public EC2 instances
             if "public_ip" in sub_instance_attributes:
                 command = "ssh "
 
@@ -62,6 +67,19 @@ def ssh(instances):
                 else:
                     command += host
 
+                # Ansible groups
+                if "AnsibleGroups" in tags:
+                    groups = tags["AnsibleGroups"].split(",")
+                else:
+                    groups = []
+
+                commands.append((command, groups))
+
+    if not args:
+        print(commands[0][0])
+    else:
+        for command, groups in commands:
+            if args[0] in groups:
                 print(command)
                 return
 
@@ -95,7 +113,7 @@ def main():
         if instance["type"] == "aws_instance"
     )
 
-    command(instances)
+    command(instances, sys.argv[2:])
 
 
 if __name__ == "__main__":

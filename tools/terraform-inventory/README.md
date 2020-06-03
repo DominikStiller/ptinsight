@@ -23,7 +23,7 @@ Usage (with Ansible): `ansible-playbook -i path/to/terraform_inventory.py playbo
 Prints the inventory as JSON.
 
 ## SSH Command
-Usage (print): `path/to/terraform_inventory.py --ssh`  
+Usage (print): `path/to/terraform_inventory.py --ssh [group]`  
 Usage (execute): `$(path/to/terraform_inventory.py --ssh)`
 
-Print or execute the SSH command to connect to the first instance specified in Terraform file, utomatically setting private key, user and host.
+Print or execute the SSH command to connect to the first instance specified in Terraform file, automatically setting private key, user and host. If `[group]` is specified, use first instance of that Ansible group.
