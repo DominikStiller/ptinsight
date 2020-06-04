@@ -9,10 +9,10 @@ import os
 def ansible_list(instances, args):
     inventory = {"_meta": {"hostvars": {}}}
 
-    def add_host(group, public_ip_addr):
+    def add_host(group, ip_addr):
         if group not in inventory:
             inventory[group] = {"hosts": []}
-        inventory[group]["hosts"].append(public_ip_addr)
+        inventory[group]["hosts"].append(ip_addr)
 
     for instance in instances:
         for sub_instance in instance["instances"]:
@@ -33,6 +33,31 @@ def ansible_list(instances, args):
                 if "AnsibleGroups" in tags:
                     for group in tags["AnsibleGroups"].split(","):
                         add_host(group, public_ip_addr)
+
+    print(json.dumps(inventory, indent=2))
+
+
+def list_private(instances, args):
+    inventory = {}
+
+    def add_host(group, ip_addr):
+        if group not in inventory:
+            inventory[group] = []
+        inventory[group].append(ip_addr)
+
+    for instance in instances:
+        for sub_instance in instance["instances"]:
+            sub_instance_attributes = sub_instance["attributes"]
+            tags = sub_instance_attributes["tags"]
+
+            # Only add public EC2 instances
+            if "private_ip" in sub_instance_attributes:
+                private_ip_addr = sub_instance_attributes["private_ip"]
+
+                # Add to all group and groups specified in tags
+                if "AnsibleGroups" in tags:
+                    for group in tags["AnsibleGroups"].split(","):
+                        add_host(group, private_ip_addr)
 
     print(json.dumps(inventory, indent=2))
 
@@ -82,6 +107,7 @@ def ssh(instances, args):
             if args[0] in groups:
                 print(command)
                 return
+        print(f"No host for group {args[0]} found")
 
 
 def main():
@@ -89,6 +115,8 @@ def main():
     # https://docs.ansible.com/ansible/latest/dev_guide/developing_inventory.html#tuning-the-external-inventory-script
     if sys.argv[1] == "--list":
         command = ansible_list
+    elif sys.argv[1] == "--list-private":
+        command = list_private
     elif sys.argv[1] == "--ssh":
         command = ssh
     else:
