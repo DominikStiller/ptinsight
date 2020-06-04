@@ -8,12 +8,14 @@
 - name: set up Flink cluster
   hosts: flink
   vars:
-    - application_source_path: "{{ playbook_dir }}/../application/"
+    - source_path: "{{ playbook_dir }}/../processing"
+    - deploy_path: /opt/ptinsight/processing
+    - deploy_user: flink
   roles:
     - { role: ../ansible/roles/flink,
         tags: setup }
-    # - { role: flink-deploy,
-    #     tags: deploy, deploy-flink }
+    - { role: flink-deploy,
+        tags: deploy }
 
 - name: set up Kafka cluster
   hosts: kafka
@@ -21,7 +23,7 @@
     - { role: ../ansible/roles/kafka,
         tags: setup }
     - { role: kafka-deploy,
-        tags: deploy, deploy-kafka }
+        tags: deploy }
 
 - name: set up Ingest cluster
   hosts: ingest
@@ -33,7 +35,7 @@
     - { role: ../ansible/roles/python,
         tags: setup }
     - { role: ingest-deploy,
-        tags: deploy, deploy-ingest }
+        tags: deploy }
 
 - name: set up UI cluster
   hosts: ui
@@ -41,4 +43,4 @@
     - { role: ../ansible/roles/python,
         tags: setup }
     - { role: ui-deploy,
-        tags: deploy, deploy-ui }
+        tags: deploy }

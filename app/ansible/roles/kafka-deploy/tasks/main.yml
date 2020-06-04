@@ -7,4 +7,5 @@
       loop:
         - ingress.arrival
         - ingress.vehicle-position
+        - egress.arrival-count
 
