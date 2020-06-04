@@ -38,10 +38,31 @@
         recurse: yes
         owner: flink
         group: flink
+    
   when: >
     flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.10.1')
-
-- name: start Flink cluster
+- name: Copy Flink service file
   become: true
-  # su instead of become_user is necessary, otherwise cluster shuts down after Ansible is done, nohup does not work
-  command: su -c "/opt/flink/bin/start-cluster.sh" flink
+  template:
+    src: flink.service.j2
+    dest: /usr/lib/systemd/system/flink.service
+
+- name: reload systemd
+  become: true
+  systemd:
+      daemon_reload: yes
+
+- name: upload properties
+  become: true
+  template:
+    src: flink-conf.yaml.j2
+    dest: '/opt/flink/conf/flink-conf.yaml'
+  notify:
+    - restart Flink service
+
+- name: start the Flink service
+  become: true
+  service:
+    name: flink
+    state: started
+    enabled: yes

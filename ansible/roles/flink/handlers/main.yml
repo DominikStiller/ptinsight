@@ -1,0 +1,6 @@
+---
+- name: restart Flink service
+  become: true
+  service:
+    name: flink
+    state: restarted
