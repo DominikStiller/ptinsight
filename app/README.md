@@ -2,6 +2,7 @@
 
 This is a demo application for large-scale complex event processing. It will be referred to as "PT Insight" (Public Transportation Insight).
 
+
 ## Use Case
 * Ingest real-time event stream from [Helsinki Public Transportation API](https://digitransit.fi/en/developers/apis/4-realtime-api/)
 * Ingest other [data like schedules, routes, service information](https://digitransit.fi/en/developers/apis/1-routing-api/), ...
@@ -10,6 +11,11 @@ This is a demo application for large-scale complex event processing. It will be 
     * Detect busiest places with respect to number of arrivals
     * Detect routes with highest speeds and accelerations
 * Display that information in a heatmap as overlay for a city map
+
+
+## Requirements
+* Resiliency to failures:
+    * Requires state checkpoints and re-deployment of app to new server (Docker can aid fast deployment)
 
 
 ## Deployment
@@ -26,12 +32,12 @@ _Note: Steps 2-4 can be executed in a single command using `make all`_
 make apply
 ```
 
-3. Install Flink and Kafka using Ansible, pulling the inventory from the Terraform state. If Ansible reports the server to be unreachable, the server is likely not yet ready. Try again a minute later.
+3. Install platforms (Java, Python, Flink, Kafka...). If Ansible reports the server to be unreachable, the server is likely not yet ready. Try again a minute later.
 ```
 make setup
 ```
 
-4. Deploy Flink job using Ansible, pulling the inventory from the Terraform state.
+1. Deploy applications.
 ```
 make deploy
 ```
@@ -43,8 +49,12 @@ make deploy
 * `apply`: Set up AWS infrastructure
 * `destroy`: Destroy AWS infrastructure
 * `reapply`: Destroy, then set up AWS infrastructure
-* `setup`: Install Flink and Kafka
-* `deploy`: Deploy Flink job
+* `setup`: Install platforms
+* `deploy`: Deploy everything
+* `deploy-flink`: Deploy Flink
+* `deploy-kafka`: Deploy Kafka
+* `deploy-ingest`: Deploy ingest
+* `deploy-ui`: Deploy UI
 
 ## Links
 * List of Helsinki APIs: https://www.notion.so/faa753c34e1f469d92750c13f7f9d0d8?v=ba0f9f25b9a34d31afba6d05db2ffa96

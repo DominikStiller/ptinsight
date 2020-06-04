@@ -8,17 +8,37 @@
 - name: set up Flink cluster
   hosts: flink
   vars:
-    - application_source_path: "{{playbook_dir}}/../application/"
+    - application_source_path: "{{ playbook_dir }}/../application/"
   roles:
-    - { role: ../../ansible/roles/flink,
+    - { role: ../ansible/roles/flink,
         tags: setup }
-    - { role: flink,
-        tags: deploy }
+    # - { role: flink-deploy,
+    #     tags: deploy, deploy-flink }
 
 - name: set up Kafka cluster
   hosts: kafka
   roles:
-    - { role: ../../ansible/roles/kafka,
+    - { role: ../ansible/roles/kafka,
         tags: setup }
-    - { role: kafka,
-        tags: deploy }
+    - { role: kafka-deploy,
+        tags: deploy, deploy-kafka }
+
+- name: set up Ingest cluster
+  hosts: ingest
+  vars:
+    - source_path: "{{ playbook_dir }}/../ingest"
+    - deploy_path: /opt/ptinsight/ingest
+    - deploy_user: ptinsight-ingest
+  roles:
+    - { role: ../ansible/roles/python,
+        tags: setup }
+    - { role: ingest-deploy,
+        tags: deploy, deploy-ingest }
+
+- name: set up UI cluster
+  hosts: ui
+  roles:
+    - { role: ../ansible/roles/python,
+        tags: setup }
+    - { role: ui-deploy,
+        tags: deploy, deploy-ui }

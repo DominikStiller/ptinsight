@@ -1,0 +1,10 @@
+---
+- name: upload application
+  copy:
+    src: "{{ simulation_source_path }}"
+    dest: /opt/ptinsight/
+
+- name: install dependencies
+  command: 
+    cmd: pipenv sync
+    chdir: "/home/centos/deploy/{{ simulation_source_path | basename }}"

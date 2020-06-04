@@ -1,0 +1,32 @@
+---
+kafka:
+  bootstrap_servers:
+    {{ (kafka_bootstrap_servers.stdout | from_json).kafka | to_nice_yaml }}
+
+sources:
+  - type: mqtt
+    broker:
+      host: mqtt.hsl.fi
+      port: 8883
+    streams:
+      - topic: /hfp/v2/journey/ongoing/arr/bus/#
+        target: ingress.arrival
+        select_fields:
+          - ARR.*
+        static_fields:
+          vehicle_type: bus
+        event_timestamp: ARR.tst
+      - topic: /hfp/v2/journey/ongoing/vp/bus/#
+        target: ingress.vehicle-position
+        select_fields:
+          - VP.*
+        static_fields:
+          vehicle_type: bus
+        event_timestamp: VP.tst
+      - topic: /hfp/v2/journey/ongoing/vp/tram/#
+        target: ingress.vehicle-position
+        select_fields:
+          - VP.*
+        static_fields:
+          vehicle_type: tram
+        event_timestamp: VP.tst

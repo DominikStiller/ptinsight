@@ -74,6 +74,7 @@ resource "aws_instance" "core" {
 
     root_block_device {
         delete_on_termination = true
+        volume_size = 32
     }
 
     tags = {

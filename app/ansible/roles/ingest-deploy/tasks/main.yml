@@ -1,0 +1,61 @@
+---
+- name: add ptinsight-ingest user
+  become: true
+  user:
+    name: "{{ deploy_user }}"
+    
+- name: create deploy directory
+  become: true
+  file:
+    path: "{{ deploy_path }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+
+- name: upload application
+  become: true
+  become_user: "{{ deploy_user }}"
+  copy:
+    src: "{{ source_path }}/{{ item }}"
+    dest: "{{ deploy_path }}"
+  loop:
+    - Pipfile
+    - Pipfile.lock
+    - ptinsight
+
+- name: create config directory
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/config"
+    state: directory
+
+- name: get Kafka server addresses
+  command:
+    argv: 
+      - "{{ playbook_dir }}/../../tools/terraform-inventory/terraform_inventory.py"
+      - --list-private
+    chdir: "{{ playbook_dir }}/.."
+  delegate_to: localhost
+  register: kafka_bootstrap_servers
+
+- name: upload config
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: ingest.yaml.j2
+    dest: "{{ deploy_path }}/config/ingest.yaml"
+
+- name: install dependencies
+  become: true
+  become_user: "{{ deploy_user }}"
+  command: 
+    cmd: /usr/local/bin/pipenv sync
+    chdir: "{{ deploy_path }}"
+
+- name: start ingest
+  become: true
+  become_user: "{{ deploy_user }}"
+  shell: 
+    cmd: nohup /usr/local/bin/pipenv run python -m ptinsight.ingest </dev/null >/dev/null 2>&1 &
+    chdir: "{{ deploy_path }}"

@@ -25,9 +25,17 @@ reapply: destroy apply
 # Ansible
 define ansible_cmd =
 	ANSIBLE_HOST_KEY_CHECKING=False\
-	ansible-playbook -i ${ROOT}../tools/terraform-inventory/terraform_inventory.py --tags $(1) --timeout 60 ${ROOT}ansible/site.yml
+	ansible-playbook -i ${ROOT}../tools/terraform-inventory/terraform_inventory.py --tags $(1) --limit $(2) --timeout 60 ${ROOT}ansible/site.yml
 endef
 setup:
-	$(call ansible_cmd, "setup")
+	$(call ansible_cmd, "setup", "all")
 deploy:
-	$(call ansible_cmd, "deploy")
+	$(call ansible_cmd, "deploy", "all")
+deploy-flink:
+	$(call ansible_cmd, "deploy", "flink")
+deploy-kafka:
+	$(call ansible_cmd, "deploy", "kafka")
+deploy-ingest:
+	$(call ansible_cmd, "deploy", "ingest")
+deploy-ui:
+	$(call ansible_cmd, "deploy", "ui")

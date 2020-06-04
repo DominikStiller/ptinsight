@@ -50,13 +50,17 @@
   when: >
     kafka_version.rc != 0 or not kafka_version.stdout is match('2.5.0')
 
-- name: Upload broker properties
+- name: upload broker properties
   become: true
   template:
     src: server.properties.j2
     dest: '/opt/kafka/config/server.properties'
   notify:
     - restart Kafka service
+
+- name: start Zookeeper
+  become: true
+  command: su -c "/opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties" kafka
 
 - name: start the Kafka service
   become: true
