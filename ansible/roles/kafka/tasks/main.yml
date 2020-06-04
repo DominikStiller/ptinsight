@@ -10,12 +10,18 @@
   failed_when: no
   register: kafka_version
 
-- name: install Kafka
+- name: install Kafka as service
   become: true
   block:
+    - name: find Kafka mirror
+      uri:
+        url: https://www.apache.org/dyn/closer.cgi?as_json
+        return_content: yes
+      register: kafka_mirror
+
     - name: download and untar Kafka
       unarchive:
-        src: https://ftp.fau.de/apache/kafka/2.5.0/kafka_2.12-2.5.0.tgz
+        src: "{{ kafka_mirror.json.preferred }}/kafka/2.5.0/kafka_2.12-2.5.0.tgz"
         dest: /opt
         remote_src: yes
 
@@ -32,13 +38,29 @@
         recurse: yes
         owner: kafka
         group: kafka
+
+    - name: Copy Kafka service file
+      template:
+        src: kafka.service.j2
+        dest: /usr/lib/systemd/system/kafka.service
+
+    - name: reload systemd
+      systemd:
+          daemon_reload: yes
   when: >
     kafka_version.rc != 0 or not kafka_version.stdout is match('2.5.0')
 
-- name: start Zookeeper
+- name: Upload broker properties
   become: true
-  command: su -c "/opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties" kafka
+  template:
+    src: server.properties.j2
+    dest: '/opt/kafka/config/server.properties'
+  notify:
+    - restart Kafka service
 
-- name: start Kafka
+- name: start the Kafka service
   become: true
-  command: su -c "/opt/kafka/bin/kafka-server-start.sh -daemon /opt/kafka/config/server.properties" kafka
+  service:
+    name: kafka
+    state: started
+    enabled: yes
