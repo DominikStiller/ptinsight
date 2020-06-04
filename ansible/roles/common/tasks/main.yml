@@ -1,38 +1,8 @@
 ---
-- name: install epel-release
+- name: install common packages
   become: true
   package:
-    name: epel-release
-    state: present
-
-- name: install htop
-  become: true
-  package:
-    name: htop
-    state: present
-
-- name: install wget
-  become: true
-  package:
-    name: wget
-    state: present
-
-- name: install unzip
-  become: true
-  package:
-    name: unzip
-    state: present
-
-- name: install tmux
-  become: true
-  package:
-    name: tmux
-    state: present
-
-- name: install at
-  become: true
-  package:
-    name: at
+    name: epel-release, htop, wget, unzip, tmux, at, chrony
     state: present
 
 - name: start at
@@ -40,6 +10,14 @@
   systemd:
     state: started
     name: atd
+
+- name: add Amazon Time Sync server
+  become: true
+  lineinfile:
+    path: /etc/chrony.conf
+    line: server 169.254.169.123 prefer iburst minpoll 4 maxpoll 4
+    insertbefore: BOF
+  notify: restart chrony service
 
 - name: check AWS CLI installation
   become: true
