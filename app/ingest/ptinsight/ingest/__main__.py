@@ -7,6 +7,7 @@ import kafka.errors
 import yaml
 
 from ptinsight.ingest.ingestor import MQTTIngestor, Ingestor
+from ptinsight.ingest.connectors import Connector, MQTTConnector
 
 logger = logging.getLogger(__name__)
 
@@ -27,13 +28,18 @@ if __name__ == "__main__":
         logger.error("Cannot connect to Kafka bootstrap servers")
         sys.exit(1)
 
+    connectors = {}
+    for type in [MQTTConnector]:
+        classes = type.__subclasses__()
+        for cls in classes:
+            connectors[cls.name()] = cls
+
     ingestors = []
     for source in config["sources"]:
         if source["type"] == "mqtt":
             broker = source["broker"]
-            ingestor = MQTTIngestor(
-                broker["host"], int(broker["port"]), source["streams"]
-            )
+            connector = connectors[source["connector"]](source["config"])
+            ingestor = MQTTIngestor(broker["host"], int(broker["port"]), connector)
             ingestors.append(ingestor)
 
     with ThreadPoolExecutor() as executor:

@@ -10,7 +10,7 @@ The ingest component is responsible for ingesting events from external APIs into
 
 ## Usage
 
-Install dependencies (`pipenv install`) and enter the pipenv (`pipenv shell`) before starting. Then execute with `python -m ptinsight.ingest`.
+Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shell`) before starting. Then execute with `python -m ptinsight.ingest`.
 
 
 ## Configuration
