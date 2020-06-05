@@ -23,8 +23,10 @@
     - Pipfile.lock
     - ptinsight/
     - static/html/
-    - static/css/
+    - static/scss/
     - static/js/
+  notify:
+    - restart UI service
 
 - name: create config directory
   become: true
@@ -48,20 +50,32 @@
   template:
     src: ui.yaml.j2
     dest: "{{ deploy_path }}/config/ui.yaml"
+  notify:
+    - restart UI service
+
+- name: Copy UI service file
+  become: true
+  template:
+    src: ptinsight-ui.service.j2
+    dest: /usr/lib/systemd/system/ptinsight-ui.service
+
+- name: reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
 
 - name: install dependencies
   become: true
   become_user: "{{ deploy_user }}"
   command: 
-    cmd: /usr/local/bin/pipenv sync --python /usr/local/bin/python3
+    cmd: pipenv sync
     chdir: "{{ deploy_path }}"
 
-- name: start ui
+- meta: flush_handlers
+
+- name: start the UI service
   become: true
-  become_user: "{{ deploy_user }}"
-  shell: 
-    cmd: nohup /usr/local/bin/pipenv run python -m ptinsight.ui </dev/null >/dev/null 2>&1 &
-    chdir: "{{ deploy_path }}"
-  environment:
-    FLASK_ENV: production
-
+  service:
+    name: ptinsight-ui
+    state: started
+    enabled: yes

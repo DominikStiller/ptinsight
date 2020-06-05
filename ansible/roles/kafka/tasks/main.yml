@@ -62,6 +62,8 @@
   become: true
   command: su -c "/opt/kafka/bin/zookeeper-server-start.sh -daemon /opt/kafka/config/zookeeper.properties" kafka
 
+- meta: flush_handlers
+
 - name: start the Kafka service
   become: true
   service:

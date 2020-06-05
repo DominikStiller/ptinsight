@@ -3,6 +3,7 @@
 buildscript {
     repositories {
         jcenter() // this applies only to the Gradle 'Shadow' plugin
+        mavenCentral()
     }
     dependencies {
         classpath 'com.github.jengelman.gradle.plugins:shadow:2.0.4'
@@ -20,7 +21,7 @@ plugins {
 // artifact properties
 group = 'com.dxc'
 version = '1.0'
-mainClassName = 'com.dxc.ptinsight.ProcessingJob'
+mainClassName = 'com.dxc.ptinsight.processing.ProcessingJob'
 
 ext {
     javaVersion = '1.11'
@@ -72,6 +73,7 @@ dependencies {
     // --------------------------------------------------------------
     flinkShadowJar "org.apache.flink:flink-connector-kafka_2.11:${flinkVersion}"
     flinkShadowJar 'com.fasterxml.jackson.core:jackson-databind:2.11.0'
+    flinkShadowJar 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310:2.11.0'
 
     implementation "log4j:log4j:1.2.17"
     implementation "org.slf4j:slf4j-log4j12:1.7.7"

@@ -60,6 +60,8 @@
   notify:
     - restart Flink service
 
+- meta: flush_handlers
+
 - name: start the Flink service
   become: true
   service:

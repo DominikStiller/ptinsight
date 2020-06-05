@@ -1,0 +1,16 @@
+[Unit]
+Description=PT Insight UI
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ deploy_path }}
+ExecStart=/usr/local/bin/pipenv run python -m ptinsight.ui
+User={{ deploy_user }}
+Group={{ deploy_user }}
+Environment=FLASK_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+Alias=ptinsight-ui.service

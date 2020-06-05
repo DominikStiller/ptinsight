@@ -1,3 +1,5 @@
+import json
+
 import eventlet
 
 eventlet.monkey_patch()
@@ -29,7 +31,12 @@ def receive_from_kafka(config: dict):
     try:
         consumer = kafka.KafkaConsumer("egress.arrival-count", **config)
         for message in consumer:
-            socketio.emit("arrival-count", {"count": int(message.value.decode())})
+            message = json.loads(message.value)
+            socketio.emit("arrival-count", {
+                "ts": message["event_ts"],
+                "vt": message["payload"]["vt"],
+                "count": message["payload"]["count"]
+            })
     except kafka.errors.NoBrokersAvailable:
         app.logger.error("Cannot connect to Kafka bootstrap servers")
 

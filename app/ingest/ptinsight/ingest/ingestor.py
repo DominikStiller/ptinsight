@@ -7,7 +7,7 @@ from typing import final
 import paho.mqtt.client as mqtt
 from kafka import KafkaProducer
 
-from ptinsight.event import Event
+from ptinsight.event import IngressEvent
 from ptinsight.ingest.connectors import MQTTConnector
 
 
@@ -31,7 +31,7 @@ class Ingestor(abc.ABC):
         Ingestor._producer = KafkaProducer(**config)
 
     @final
-    def _ingest(self, topic: str, event: Event):
+    def _ingest(self, topic: str, event: IngressEvent):
         logger.info(f"Ingesting event to {topic}")
         json_repr = json.dumps(event.to_dict())
         Ingestor._producer.send(topic, json_repr.encode())
@@ -72,6 +72,6 @@ class MQTTIngestor(Ingestor):
         if not event_timestamp:
             event_timestamp = ingestion_timestamp
 
-        event = Event(event_timestamp, ingestion_timestamp, payload)
+        event = IngressEvent(event_timestamp, ingestion_timestamp, payload)
 
         self._ingest(target_topic, event)

@@ -3,7 +3,7 @@ from datetime import datetime
 
 
 @dataclass
-class Event:
+class IngressEvent:
     event_timestamp: datetime
     ingestion_timestamp: datetime
     payload: dict
