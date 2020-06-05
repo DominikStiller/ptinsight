@@ -1,10 +1,67 @@
 ---
+- name: add ptinsight-ui user
+  become: true
+  user:
+    name: "{{ deploy_user }}"
+    
+- name: create deploy directory
+  become: true
+  file:
+    path: "{{ deploy_path }}"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+
 - name: upload application
+  become: true
+  become_user: "{{ deploy_user }}"
   copy:
-    src: "{{ simulation_source_path }}"
-    dest: /opt/ptinsight/
+    src: "{{ source_path }}/{{ item }}"
+    dest: "{{ deploy_path }}/{{ item |dirname }}"
+  loop:
+    - Pipfile
+    - Pipfile.lock
+    - ptinsight/
+    - static/html/
+    - static/css/
+    - static/js/
+
+- name: create config directory
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/config"
+    state: directory
+
+- name: get Kafka server addresses
+  command:
+    argv: 
+      - "{{ playbook_dir }}/../../tools/terraform-inventory/terraform_inventory.py"
+      - --list-private
+    chdir: "{{ playbook_dir }}/.."
+  delegate_to: localhost
+  register: kafka_bootstrap_servers
+
+- name: upload config
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: ui.yaml.j2
+    dest: "{{ deploy_path }}/config/ui.yaml"
 
 - name: install dependencies
+  become: true
+  become_user: "{{ deploy_user }}"
   command: 
-    cmd: pipenv sync
-    chdir: "/home/centos/deploy/{{ simulation_source_path | basename }}"
+    cmd: /usr/local/bin/pipenv sync --python /usr/local/bin/python3
+    chdir: "{{ deploy_path }}"
+
+- name: start ui
+  become: true
+  become_user: "{{ deploy_user }}"
+  shell: 
+    cmd: nohup /usr/local/bin/pipenv run python -m ptinsight.ui </dev/null >/dev/null 2>&1 &
+    chdir: "{{ deploy_path }}"
+  environment:
+    FLASK_ENV: production
+

@@ -8,6 +8,11 @@ black = "*"
 
 [packages]
 flask = "*"
+kafka-python = "*"
+libsass = "*"
+flask-socketio = "*"
+pyyaml = "*"
+eventlet = "*"
 
 [requires]
 python_version = "3.8"

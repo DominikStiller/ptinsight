@@ -139,8 +139,8 @@ dmypy.json
 cython_debug/
 
 # static files generated from Django application using `collectstatic`
-media
-static
+# media
+# static
 
 # User-specific stuff
 .idea/
@@ -179,5 +179,5 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 Pipfile.lock
-recordings/
-*.png
+
+static/css/
