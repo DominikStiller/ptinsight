@@ -1,8 +1,14 @@
 ---
+- name: add epel-release package repo
+  become: true
+  package:
+    name: epel-release
+    state: present
+
 - name: install common packages
   become: true
   package:
-    name: epel-release, htop, wget, unzip, tmux, at, chrony
+    name: htop, wget, unzip, tmux, at, chrony
     state: present
 
 - name: start at

@@ -50,7 +50,7 @@
   become: true
   become_user: "{{ deploy_user }}"
   command: 
-    cmd: /usr/local/bin/pipenv sync
+    cmd: /usr/local/bin/pipenv sync --python /usr/local/bin/python3
     chdir: "{{ deploy_path }}"
 
 - name: start ingest

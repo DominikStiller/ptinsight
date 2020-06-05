@@ -5,6 +5,14 @@
     - { role: ../../ansible/roles/common,
         tags: setup }
 
+- name: set up Kafka cluster
+  hosts: kafka
+  roles:
+    - { role: ../ansible/roles/kafka,
+        tags: setup }
+    - { role: kafka-deploy,
+        tags: deploy }
+
 - name: set up Flink cluster
   hosts: flink
   vars:
@@ -15,14 +23,6 @@
     - { role: ../ansible/roles/flink,
         tags: setup }
     - { role: flink-deploy,
-        tags: deploy }
-
-- name: set up Kafka cluster
-  hosts: kafka
-  roles:
-    - { role: ../ansible/roles/kafka,
-        tags: setup }
-    - { role: kafka-deploy,
         tags: deploy }
 
 - name: set up Ingest cluster
