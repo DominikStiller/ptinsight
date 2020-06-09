@@ -13,6 +13,7 @@ libsass = "*"
 flask-socketio = "*"
 pyyaml = "*"
 eventlet = "*"
+ptinsight-common = {editable = true, path = "./../common/python"}
 
 [requires]
 python_version = "3.8"

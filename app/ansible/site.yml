@@ -29,8 +29,8 @@
   hosts: ingest
   vars:
     - source_path: "{{ playbook_dir }}/../ingest"
-    - deploy_path: /opt/ptinsight/ingest
-    - deploy_user: ptinsight-ingest
+    - deploy_path: /opt/ptinsight
+    - deploy_user: ptinsight
   roles:
     - { role: ../ansible/roles/python,
         tags: setup }
@@ -41,8 +41,8 @@
   hosts: ui
   vars:
     - source_path: "{{ playbook_dir }}/../ui"
-    - deploy_path: /opt/ptinsight/ui
-    - deploy_user: ptinsight-ui
+    - deploy_path: /opt/ptinsight
+    - deploy_user: ptinsight
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
   roles:

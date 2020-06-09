@@ -1,7 +1,7 @@
 package com.dxc.ptinsight.processing;
 
-import com.dxc.ptinsight.Event;
-import com.dxc.ptinsight.JSON;
+import static com.dxc.ptinsight.proto.Base.Event;
+import com.dxc.ptinsight.ProtobufSerializer;
 import org.apache.flink.api.common.typeinfo.TypeInformation;
 import org.apache.flink.streaming.connectors.kafka.KafkaDeserializationSchema;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -11,7 +11,7 @@ public class EventDeserializationSchema implements KafkaDeserializationSchema<Ev
 
     @Override
     public Event deserialize(ConsumerRecord<byte[], byte[]> record) throws Exception {
-        return JSON.getMapper().readValue(record.value(), Event.class);
+        return ProtobufSerializer.deserialize(record.value(), "json");
     }
 
     @Override

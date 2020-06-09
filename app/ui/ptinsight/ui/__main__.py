@@ -1,6 +1,7 @@
-import json
-
 import eventlet
+from ptinsight.common import VehicleType
+from ptinsight.common.proto.egress.counts_pb2 import ArrivalCount
+from ptinsight.common.serialize import deserialize
 
 eventlet.monkey_patch()
 
@@ -28,14 +29,21 @@ def page():
 
 
 def receive_from_kafka(config: dict):
+    if "protobuf_format" in config:
+        protobuf_format = config.pop("protobuf_format")
+    else:
+        protobuf_format = "json"
     try:
         consumer = kafka.KafkaConsumer("egress.arrival-count", **config)
         for message in consumer:
-            message = json.loads(message.value)
+            event = deserialize(message.value, protobuf_format)
+            arrival_count = ArrivalCount()
+            event.details.Unpack(arrival_count)
+
             socketio.emit("arrival-count", {
-                "ts": message["event_ts"],
-                "vt": message["payload"]["vt"],
-                "count": message["payload"]["count"]
+                "ts": arrival_count.window_start.ToJsonString(),
+                "vt": VehicleType.Name(arrival_count.vehicle_type).lower(),
+                "count": arrival_count.count
             })
     except kafka.errors.NoBrokersAvailable:
         app.logger.error("Cannot connect to Kafka bootstrap servers")

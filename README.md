@@ -45,7 +45,7 @@ sudo apt-add-repository --yes --update ppa:ansible/ansible
 sudo apt install ansible
 ```
 
-4. Install Terraform to local bin (https://www.terraform.io/downloads.html). 
+4. Install Terraform to local bin (https://www.terraform.io/downloads.html)
 ```
 wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
 unzip terraform_0.12.24_linux_amd64.zip
@@ -69,6 +69,14 @@ The user needs following policies attached:
 6. Generate an SSH key to use for EC2 instances
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
+```
+
+7. Install protoc if you want to compile protobuf schemas
+```
+wget -P /tmp https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
+sudo unzip -d /opt/protoc /tmp/protoc-*.zip
+rm /tmp/protoc-*.zip
+sudo chmod -R 755 /opt/protoc
 ```
 
 ### Python

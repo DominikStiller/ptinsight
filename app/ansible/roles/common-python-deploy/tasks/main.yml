@@ -1,0 +1,23 @@
+---
+- name: add ptinsight user
+  become: true
+  user:
+    name: "{{ deploy_user }}"
+    
+- name: create deploy directory
+  become: true
+  file:
+    path: "{{ deploy_path }}/common/python"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+
+- name: upload Python common library
+  become: true
+  become_user: "{{ deploy_user }}"
+  copy:
+    src: "{{ playbook_dir }}/../common/python/{{ item }}"
+    dest: "{{ deploy_path }}/common/python"
+  loop:
+    - setup.py
+    - ptinsight

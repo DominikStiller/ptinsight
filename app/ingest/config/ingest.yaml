@@ -1,5 +1,6 @@
 ---
 kafka:
+  protobuf_format: json-pretty
   bootstrap_servers:
     - localhost:9092
 
@@ -8,7 +9,7 @@ sources:
     broker:
       host: mqtt.hsl.fi
       port: 8883
-    connector: hsl-realtime
+    processor: hsl-realtime
     config:
       vehicle_types: bus,tram
-      event_types: arr,dep
+      event_types: arr,dep,vp

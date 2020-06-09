@@ -1,13 +1,8 @@
 ---
-- name: add ptinsight-ui user
-  become: true
-  user:
-    name: "{{ deploy_user }}"
-    
 - name: create deploy directory
   become: true
   file:
-    path: "{{ deploy_path }}"
+    path: "{{ deploy_path }}/ui"
     state: directory
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
@@ -17,7 +12,7 @@
   become_user: "{{ deploy_user }}"
   copy:
     src: "{{ source_path }}/{{ item }}"
-    dest: "{{ deploy_path }}/{{ item |dirname }}"
+    dest: "{{ deploy_path }}/ui/{{ item |dirname }}"
   loop:
     - Pipfile
     - Pipfile.lock
@@ -32,7 +27,7 @@
   become: true
   become_user: "{{ deploy_user }}"
   file:
-    path: "{{ deploy_path }}/config"
+    path: "{{ deploy_path }}/ui/config"
     state: directory
 
 - name: get Kafka server addresses
@@ -49,7 +44,7 @@
   become_user: "{{ deploy_user }}"
   template:
     src: ui.yaml.j2
-    dest: "{{ deploy_path }}/config/ui.yaml"
+    dest: "{{ deploy_path }}/ui/config/ui.yaml"
   notify:
     - restart UI service
 
@@ -69,7 +64,7 @@
   become_user: "{{ deploy_user }}"
   command: 
     cmd: pipenv sync
-    chdir: "{{ deploy_path }}"
+    chdir: "{{ deploy_path }}/ui"
 
 - meta: flush_handlers
 

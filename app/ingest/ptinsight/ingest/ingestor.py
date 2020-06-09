@@ -1,22 +1,23 @@
+import abc
+import datetime
 import json
 import logging
-import datetime
-import abc
 from typing import final
 
 import paho.mqtt.client as mqtt
 from kafka import KafkaProducer
+from ptinsight.common import Event
+from ptinsight.common.serialize import serialize
 
-from ptinsight.event import IngressEvent
-from ptinsight.ingest.connectors import MQTTConnector
-
+from ptinsight.ingest.processors import MQTTProcessor
 
 logger = logging.getLogger(__name__)
 
 
 class Ingestor(abc.ABC):
 
-    _producer: KafkaProducer
+    _protobuf_format = "binary"
+    _producer = None
 
     def __init__(self):
         pass
@@ -25,24 +26,41 @@ class Ingestor(abc.ABC):
     def start(self):
         pass
 
-    @staticmethod
+    @classmethod
     @final
-    def create_producer(config: dict):
-        Ingestor._producer = KafkaProducer(**config)
+    def create_kafka_producer(cls, config: dict):
+        if "protobuf_format" in config:
+            Ingestor._protobuf_format = config.pop("protobuf_format")
+        cls._producer = KafkaProducer(**config)
+
+    @classmethod
+    @final
+    def create_debug_producer(cls, config: dict):
+        if "protobuf_format" in config:
+            Ingestor._protobuf_format = config.pop("protobuf_format")
+        cls._producer = cls._DebugProducer()
+
+    class _DebugProducer:
+        def send(self, topic, value):
+            print(f"{topic}: {value}")
 
     @final
-    def _ingest(self, topic: str, event: IngressEvent):
+    def _ingest(self, topic: str, event: Event):
         logger.info(f"Ingesting event to {topic}")
-        json_repr = json.dumps(event.to_dict())
-        Ingestor._producer.send(topic, json_repr.encode())
+
+        value = serialize(event, format=self._protobuf_format)
+        if isinstance(value, str):
+            value = value.encode()
+
+        Ingestor._producer.send(topic, value)
 
 
 class MQTTIngestor(Ingestor):
-    def __init__(self, host: str, port: int, connector: MQTTConnector):
+    def __init__(self, host: str, port: int, processor: MQTTProcessor):
         super().__init__()
         self.host = host
         self.port = port
-        self.connector = connector
+        self.processor = processor
 
         self.client = mqtt.Client()
         self.client.enable_logger(logger)
@@ -58,7 +76,7 @@ class MQTTIngestor(Ingestor):
         self.client.loop_forever()
 
     def _mqtt_on_connect(self, client, userdata, flags, rc):
-        for topic in self.connector.topics:
+        for topic in self.processor.topics:
             client.subscribe(topic)
 
     def _mqtt_on_message(self, client, userdata, msg: mqtt.MQTTMessage):
@@ -66,12 +84,12 @@ class MQTTIngestor(Ingestor):
             microsecond=0
         )
 
-        target_topic, event_timestamp, payload = self.connector.process(
-            msg.topic, json.loads(msg.payload)
-        )
-        if not event_timestamp:
-            event_timestamp = ingestion_timestamp
+        if processed := self.processor.process(msg.topic, json.loads(msg.payload)):
+            target_topic, event_timestamp, details = processed
 
-        event = IngressEvent(event_timestamp, ingestion_timestamp, payload)
+            event = Event()
+            event.event_timestamp.FromDatetime(event_timestamp or ingestion_timestamp)
+            event.ingestion_timestamp.FromDatetime(ingestion_timestamp)
+            event.details.Pack(details)
 
-        self._ingest(target_topic, event)
+            self._ingest(target_topic, event)

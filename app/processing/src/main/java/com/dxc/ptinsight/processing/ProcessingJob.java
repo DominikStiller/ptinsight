@@ -1,28 +1,27 @@
 package com.dxc.ptinsight.processing;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.time.Instant;
 import java.util.Properties;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.dxc.ptinsight.Event;
+import com.dxc.ptinsight.proto.Base;
+import com.dxc.ptinsight.proto.egress.Counts;
+import com.dxc.ptinsight.proto.ingress.HslRealtime;
+import com.google.protobuf.Any;
+import com.google.protobuf.Timestamp;
 import org.apache.flink.api.common.functions.MapFunction;
-import org.apache.flink.api.common.functions.ReduceFunction;
-import org.apache.flink.api.common.serialization.SimpleStringSchema;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple5;
-import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.util.Collector;
+import static com.dxc.ptinsight.proto.Base.Event;
 
 public class ProcessingJob {
-    
+
     public static void main(String[] args) throws Exception {
         final StreamExecutionEnvironment env = StreamExecutionEnvironment.getExecutionEnvironment();
 
@@ -45,23 +44,43 @@ public class ProcessingJob {
         );
 
         env.addSource(kafkaSource)
-           .keyBy(new KeySelector<Event, String>() {
+           .map(new MapFunction<Event, HslRealtime.Arrival>() {
                @Override
-               public String getKey(Event value) throws Exception {
-                   return (String) value.getPayload().getOrDefault("vt", "");
+               public HslRealtime.Arrival map(Event value) throws Exception {
+                   return value.getDetails().unpack(HslRealtime.Arrival.class);
+               }
+           })
+           .keyBy(new KeySelector<HslRealtime.Arrival, Base.VehicleType>() {
+               @Override
+               public Base.VehicleType getKey(HslRealtime.Arrival value) throws Exception {
+                   return value.getVehicle().getType();
                }
            })
            .timeWindow(Time.seconds(1))
-           .process(new ProcessWindowFunction<Event, Event, String, TimeWindow>() {
+           .process(new ProcessWindowFunction<HslRealtime.Arrival, Event, Base.VehicleType, TimeWindow>() {
                @Override
-               public void process(String key, Context context, Iterable<Event> elements, Collector<Event> out) throws Exception {
+               public void process(Base.VehicleType key, Context context, Iterable<HslRealtime.Arrival> elements, Collector<Event> out) {
                    AtomicInteger count = new AtomicInteger();
                    elements.forEach((e -> count.getAndIncrement()));
 
-                   var payload = new HashMap<String, Object>();
-                   payload.put("count", count);
-                   payload.put("vt", key);
-                   out.collect(new Event(payload));
+                   var details = Counts.ArrivalCount.newBuilder()
+                                                    .setVehicleType(key)
+                                                    .setCount(count.intValue())
+                                                    .setWindowStart(Timestamp.newBuilder()
+                                                                             .setSeconds(context.window().getStart() / 1000)
+                                                                             .build())
+                                                    .setWindowEnd(Timestamp.newBuilder()
+                                                                           .setSeconds(context.window().getEnd() / 1000)
+                                                                           .build())
+                                                    .build();
+                   var event = Event.newBuilder()
+                                    .setEventTimestamp(Timestamp.newBuilder().setSeconds(context.window().getStart() / 1000)
+                                                                .build())
+                                    .setIngestionTimestamp(Timestamp.newBuilder()
+                                                                    .setSeconds(Instant.now().getEpochSecond()).build())
+                                    .setDetails(Any.pack(details))
+                                    .build();
+                   out.collect(event);
                }
            })
            .addSink(kafkaProducer);

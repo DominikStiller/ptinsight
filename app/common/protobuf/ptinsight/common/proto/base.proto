@@ -1,0 +1,25 @@
+syntax = "proto3";
+package com.dxc.ptinsight;
+
+import "google/protobuf/any.proto";
+import "google/protobuf/timestamp.proto";
+
+
+option java_package = "com.dxc.ptinsight.proto";
+
+
+message Event {
+  google.protobuf.Timestamp event_timestamp = 1;
+  google.protobuf.Timestamp ingestion_timestamp = 2;
+  google.protobuf.Any details = 3;
+}
+
+enum VehicleType {
+  BUS = 0;
+  TRAM = 1;
+  TRAIN = 2;
+  FERRY = 3;
+  METRO = 4;
+  UBUS = 5;
+  ROBOT = 6;
+}

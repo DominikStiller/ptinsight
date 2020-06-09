@@ -11,6 +11,7 @@ paho-mqtt = "*"
 python-dateutil = "*"
 kafka-python = "*"
 pyyaml = "*"
+ptinsight-common = {editable = true,path = "./../common/python"}
 
 [requires]
 python_version = "3.8"

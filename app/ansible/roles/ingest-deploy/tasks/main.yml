@@ -1,13 +1,8 @@
 ---
-- name: add ptinsight-ingest user
-  become: true
-  user:
-    name: "{{ deploy_user }}"
-    
 - name: create deploy directory
   become: true
   file:
-    path: "{{ deploy_path }}"
+    path: "{{ deploy_path }}/ingest"
     state: directory
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
@@ -17,17 +12,19 @@
   become_user: "{{ deploy_user }}"
   copy:
     src: "{{ source_path }}/{{ item }}"
-    dest: "{{ deploy_path }}"
+    dest: "{{ deploy_path }}/ingest"
   loop:
     - Pipfile
     - Pipfile.lock
     - ptinsight
+  notify:
+    - restart ingest service
 
 - name: create config directory
   become: true
   become_user: "{{ deploy_user }}"
   file:
-    path: "{{ deploy_path }}/config"
+    path: "{{ deploy_path }}/ingest/config"
     state: directory
 
 - name: get Kafka server addresses
@@ -44,18 +41,33 @@
   become_user: "{{ deploy_user }}"
   template:
     src: ingest.yaml.j2
-    dest: "{{ deploy_path }}/config/ingest.yaml"
+    dest: "{{ deploy_path }}/ingest/config/ingest.yaml"
+  notify:
+    - restart ingest service
+
+- name: Copy ingest service file
+  become: true
+  template:
+    src: ptinsight-ingest.service.j2
+    dest: /usr/lib/systemd/system/ptinsight-ingest.service
+
+- name: reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
 
 - name: install dependencies
   become: true
   become_user: "{{ deploy_user }}"
   command: 
     cmd: /usr/local/bin/pipenv sync --python /usr/local/bin/python3
-    chdir: "{{ deploy_path }}"
+    chdir: "{{ deploy_path }}/ingest"
 
-- name: start ingest
+- meta: flush_handlers
+
+- name: start the ingest service
   become: true
-  become_user: "{{ deploy_user }}"
-  shell: 
-    cmd: nohup /usr/local/bin/pipenv run python -m ptinsight.ingest </dev/null >/dev/null 2>&1 &
-    chdir: "{{ deploy_path }}"
+  service:
+    name: ptinsight-ingest
+    state: started
+    enabled: yes

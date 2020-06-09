@@ -1,5 +1,6 @@
 ---
 kafka:
+  protobuf_format: json
   bootstrap_servers:
     {{ (kafka_bootstrap_servers.stdout | from_json).kafka | to_nice_yaml }}
 
@@ -8,7 +9,7 @@ sources:
     broker:
       host: mqtt.hsl.fi
       port: 8883
-    connector: hsl-realtime
+    processor: hsl-realtime
     config:
       vehicle_types: bus,tram
       event_types: arr,dep,vp

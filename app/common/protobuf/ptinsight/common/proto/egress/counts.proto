@@ -1,0 +1,23 @@
+syntax = "proto3";
+package com.dxc.ptinsight.egress;
+
+import "ptinsight/common/proto/base.proto";
+import "google/protobuf/timestamp.proto";
+
+
+option java_package = "com.dxc.ptinsight.proto.egress";
+
+
+message ArrivalCount {
+  com.dxc.ptinsight.VehicleType vehicle_type = 1;
+  google.protobuf.Timestamp window_start = 2;
+  google.protobuf.Timestamp window_end = 3;
+  int32 count = 4;
+}
+
+message DepartureCount {
+  com.dxc.ptinsight.VehicleType vehicle_type = 1;
+  google.protobuf.Timestamp window_start = 2;
+  google.protobuf.Timestamp window_end = 3;
+  int32 count = 4;
+}
