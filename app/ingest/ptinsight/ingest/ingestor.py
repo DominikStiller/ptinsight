@@ -80,9 +80,7 @@ class MQTTIngestor(Ingestor):
             client.subscribe(topic)
 
     def _mqtt_on_message(self, client, userdata, msg: mqtt.MQTTMessage):
-        ingestion_timestamp = datetime.datetime.now(datetime.timezone.utc).replace(
-            microsecond=0
-        )
+        ingestion_timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         if processed := self.processor.process(msg.topic, json.loads(msg.payload)):
             target_topic, event_timestamp, details = processed

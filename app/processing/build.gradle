@@ -20,7 +20,7 @@ plugins {
 
 group = 'com.dxc'
 version = '1.0'
-mainClassName = 'com.dxc.ptinsight.processing.ProcessingJob'
+mainClassName = 'com.dxc.ptinsight.processing.EntryPoint'
 
 ext {
     javaVersion = '1.11'

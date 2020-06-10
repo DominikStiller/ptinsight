@@ -91,6 +91,7 @@ We use `pipenv` for dependency management and virtual environments. Run `pipenv 
 ## Abbreviations
 * **CPE**: Complex Event Processing.
 * **EDA**: Event-Driven Architecture
+* **protobuf**: [Protocol Buffers](https://developers.google.com/protocol-buffers)
 
 
 ## Todo for actual application

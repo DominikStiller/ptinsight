@@ -1,6 +1,6 @@
 ---
 kafka:
-  protobuf_format: json-pretty
+  protobuf_format: json
   bootstrap_servers:
     - localhost:9092
 

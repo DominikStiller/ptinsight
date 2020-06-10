@@ -1,4 +1,4 @@
-package com.dxc.ptinsight.processing;
+package com.dxc.ptinsight.processing.flink;
 
 import com.dxc.ptinsight.proto.Base;
 import com.google.protobuf.Message;

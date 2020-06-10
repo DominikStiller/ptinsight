@@ -20,6 +20,6 @@ dependencies {
 spotless {
     java {
         googleJavaFormat()
-        targetExclude 'src/main/com/dxc/ptinsight/proto'
+        targetExclude 'src/main/java/com/dxc/ptinsight/proto/**'
     }
 }

@@ -1,4 +1,4 @@
-package com.dxc.ptinsight.processing;
+package com.dxc.ptinsight.processing.flink;
 
 import static com.dxc.ptinsight.proto.Base.Event;
 import static org.apache.flink.api.java.typeutils.TypeExtractor.getForClass;
