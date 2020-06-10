@@ -13,8 +13,8 @@
     - { role: kafka-deploy,
         tags: deploy }
 
-- name: set up Flink cluster
-  hosts: flink
+- name: set up processing cluster
+  hosts: processing
   vars:
     - source_path: "{{ playbook_dir }}/../processing"
     - deploy_path: /opt/ptinsight/processing
@@ -22,7 +22,7 @@
   roles:
     - { role: ../ansible/roles/flink,
         tags: setup }
-    - { role: flink-deploy,
+    - { role: processing-deploy,
         tags: deploy }
 
 - name: set up Ingest cluster

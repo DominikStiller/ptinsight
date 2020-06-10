@@ -61,7 +61,7 @@ resource "aws_key_pair" "deploy" {
     public_key = file("${var.ssh_key}.pub")
 }
 
-# ---- >> Core (Flink + Kafka) ---------------
+# ---- >> Core (Processing + Kafka) ---------------
 resource "aws_instance" "core" {
 
     ami                    = "ami-04cf43aca3e6f3de3"
@@ -79,7 +79,7 @@ resource "aws_instance" "core" {
 
     tags = {
         Name = "${local.name_prefix}core"
-        AnsibleGroups = "flink,kafka"
+        AnsibleGroups = "processing,kafka"
         AnsibleVar_ansible_user = "centos"
         AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }

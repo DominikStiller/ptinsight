@@ -56,8 +56,8 @@ make deploy
 * `reapply`: Destroy, then set up AWS infrastructure
 * `setup`: Install platforms
 * `deploy`: Deploy everything
-* `deploy-flink`: Deploy Flink
 * `deploy-kafka`: Deploy Kafka
+* `deploy-processing`: Deploy processing
 * `deploy-ingest`: Deploy ingest
 * `deploy-ui`: Deploy UI
 

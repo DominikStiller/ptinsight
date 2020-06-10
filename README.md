@@ -7,6 +7,7 @@ Goal of the project is the setup of an example application based on an event-dri
 
 ## Repository Structure
 * `ansible`: Ansible roles for common platforms and applications (e.g., Java, Python, Flink)
+* `app`: The main proof of concept application
 * `litreview`: A review of literature for EDA and CPE in smart cities
 * `playground`: Testing ground for different platforms and applications
     * `1_vagrant-ansible`: Setup of an EC2 instance with an httpd using Vagrant and Ansible

@@ -31,8 +31,8 @@ setup:
 	$(call ansible_cmd, "setup", "all")
 deploy:
 	$(call ansible_cmd, "deploy", "all")
-deploy-flink:
-	$(call ansible_cmd, "deploy", "flink")
+deploy-processing:
+	$(call ansible_cmd, "deploy", "processing")
 deploy-kafka:
 	$(call ansible_cmd, "deploy", "kafka")
 deploy-ingest:
