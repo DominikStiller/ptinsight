@@ -1,7 +1,7 @@
 # PT Insight - Real-Time Analysis of Public Transportation Data
 
 This is a demo application for large-scale complex event processing. It will be referred to as "PT Insight" (Public Transportation Insight).
-
+For general documentations, see `docs/`. For component-specific documentation, see their folders.
 
 ## Use Case
 * Ingest real-time event stream from [Helsinki Public Transportation API](https://digitransit.fi/en/developers/apis/4-realtime-api/)
@@ -16,6 +16,11 @@ This is a demo application for large-scale complex event processing. It will be 
 ## Requirements
 * Resiliency to failures:
     * Requires state checkpoints and re-deployment of app to new server (Docker can aid fast deployment)
+
+
+## Architecture
+
+![Architecture](docs/images/architecture.png)
 
 
 ## Deployment

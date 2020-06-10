@@ -1,6 +1,9 @@
 # PT Insight: Ingest
 
 The ingest component is responsible for ingesting events from external APIs into the appropriate Kafka topics.
+It receives MQTT messages and polls REST APIs regularly as specified in the configuration and transforms them into the strongly typed protobuf event messages.
+Invalid and unwanted events are filtered out, and, so all Kafka topics contain valid messages.
+
 
 
 ## Prerequisites

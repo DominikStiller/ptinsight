@@ -14,6 +14,7 @@ plugins {
     id 'java'
     id 'application'
     id 'com.github.johnrengelman.shadow' version '5.2.0'
+    id 'com.diffplug.gradle.spotless' version '4.3.0'
 }
 
 
@@ -23,7 +24,7 @@ mainClassName = 'com.dxc.ptinsight.processing.ProcessingJob'
 
 ext {
     javaVersion = '1.11'
-    flinkVersion = '1.10.0'
+    flinkVersion = '1.10.1'
     scalaBinaryVersion = '2.11'
 }
 
@@ -100,4 +101,11 @@ jar {
 
 shadowJar {
     configurations = [project.configurations.flinkShadowJar]
+}
+
+// Formatting
+spotless {
+    java {
+        googleJavaFormat()
+    }
 }

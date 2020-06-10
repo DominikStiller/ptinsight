@@ -1,0 +1,6 @@
+[tool.black]
+# https://black.readthedocs.io/en/stable/pyproject_toml.html#configuration-format
+# Python regex syntax
+exclude = '''
+    ptinsight/common/proto/
+'''

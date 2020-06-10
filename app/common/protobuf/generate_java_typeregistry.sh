@@ -15,7 +15,7 @@ java_dir="$(realpath "$(dirname "$0")")/../java/src/main/java/com/dxc/ptinsight/
             path="${f%.*}"
             file="$(basename $path)"
             imports+="import com.dxc.ptinsight.proto.${path/\//.};"$'\n'
-            adds+="        .add($file.getDescriptor().getMessageTypes())"$'\n'
+            adds+="    .add($file.getDescriptor().getMessageTypes())"$'\n'
         fi
     done
 
@@ -27,8 +27,8 @@ $imports
 import static com.google.protobuf.util.JsonFormat.TypeRegistry;
 
 public class Registry {
-    public static final TypeRegistry INSTANCE = TypeRegistry.newBuilder()
-$adds        .build();
+  public static final TypeRegistry INSTANCE = TypeRegistry.newBuilder()
+$adds    .build();
 }
 EOF
 )

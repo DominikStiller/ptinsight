@@ -1,5 +1,5 @@
 #!/bin/bash
-# Generates the __init__.py file for ptinsight.proto to import all protobuf classes
+# Generates the __init__.py file for ptinsight.common.proto to import all protobuf classes
 
 root=$(realpath "$(dirname "$0")")
 init_file="${root}/../python/ptinsight/common/proto/__init__.py"

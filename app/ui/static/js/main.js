@@ -1,7 +1,7 @@
 const app = new Vue({
     el: '#app',
     data: {
-        ts: "",
+        ts: "never",
         count: {
             bus: 0,
             tram: 0

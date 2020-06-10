@@ -1,6 +1,6 @@
 # Kafka
 
-Apache Kafka is used as event transport and storage backbone.
+Apache Kafka is used as event transport and storage backbone. Every topic only contains a single protobuf message type.
 
 
 ## Topics

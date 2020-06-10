@@ -80,9 +80,11 @@ sudo chmod -R 755 /opt/protoc
 ```
 
 ### Python
-Common tools:
-* `pipenv`: dependency management and virtual environments, run `pipenv install --dev` in the project folder to set up the environment
-* `black`: code formatter, run `black .` in the project folder to format all .py files
+We use `pipenv` for dependency management and virtual environments. Run `pipenv install --dev` in the project folder to set up the environment.
+
+### Code Style
+* Python: [black](https://black.readthedocs.io/en/stable/). Run `pipenv run black .` in the project folder to format all .py files.
+* Java: [Google Java Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` in the project folder to format all .java files.
 
 
 ## Abbreviations
