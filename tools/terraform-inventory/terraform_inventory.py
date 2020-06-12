@@ -28,6 +28,10 @@ def ansible_list(instances, args):
                     tag[11:]: tags[tag] for tag in tags if tag.startswith("AnsibleVar_")
                 }
 
+                # Extract private IP
+                if "private_ip" in sub_instance_attributes:
+                    inventory["_meta"]["hostvars"][public_ip_addr]["private_ip"] = sub_instance_attributes["private_ip"]
+
                 # Add to all group and groups specified in tags
                 add_host("all", public_ip_addr)
                 if "AnsibleGroups" in tags:

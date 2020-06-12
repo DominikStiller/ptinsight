@@ -140,6 +140,14 @@ resource "aws_security_group" "core" {
         cidr_blocks = var.trusted_cidr
     }
 
+    ingress {
+        description = "Kafka from trusted CIDRs"
+        from_port   = 9093
+        to_port     = 9093
+        protocol    = "tcp"
+        cidr_blocks = var.trusted_cidr
+    }
+
     egress {
         from_port   = 0
         to_port     = 0
