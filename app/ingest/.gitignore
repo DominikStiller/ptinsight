@@ -179,5 +179,4 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 Pipfile.lock
-recordings/
-*.png
+/config/ingest.yaml

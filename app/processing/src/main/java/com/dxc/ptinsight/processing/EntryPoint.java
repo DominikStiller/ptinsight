@@ -14,12 +14,13 @@ public class EntryPoint {
 
   public static Configuration getConfiguration() {
     if (configuration == null) {
+      var stream = Configuration.class.getClassLoader().getResourceAsStream("processing.yaml");
+      if (stream == null) {
+        stream =
+            Configuration.class.getClassLoader().getResourceAsStream("processing.default.yaml");
+      }
       try {
-        configuration =
-            YamlSerializer.getMapper()
-                .readValue(
-                    Configuration.class.getClassLoader().getResourceAsStream("processing.yaml"),
-                    Configuration.class);
+        configuration = YamlSerializer.getMapper().readValue(stream, Configuration.class);
       } catch (IOException e) {
         e.printStackTrace();
       }

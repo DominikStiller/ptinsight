@@ -105,3 +105,5 @@ gradle-app.setting
 
 *.lck
 .project
+
+/src/main/resources/processing.yaml

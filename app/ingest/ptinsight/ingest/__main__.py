@@ -16,12 +16,16 @@ logger = logging.getLogger(__name__)
 if __name__ == "__main__":
     logging.basicConfig(level=logging.INFO)
 
-    try:
-        with open("config/ingest.yaml") as f:
-            config = yaml.safe_load(f)
-    except FileNotFoundError:
+    if os.path.exists("config/ingest.yaml"):
+        config_path = "config/ingest.yaml"
+    elif os.path.exists("config/ingest.default.yaml"):
+        config_path = "config/ingest.default.yaml"
+    else:
         logger.error("Config file not found")
         sys.exit(1)
+
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
 
     if "INGEST_DEBUG" in os.environ:
         Ingestor.create_debug_producer(config["kafka"])

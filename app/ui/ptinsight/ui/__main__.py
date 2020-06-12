@@ -50,12 +50,16 @@ def receive_from_kafka(config: dict):
 
 
 if __name__ == "__main__":
-    try:
-        with open("config/ui.yaml") as f:
-            config = yaml.safe_load(f)
-    except FileNotFoundError:
-        app.logger.error("Config file not found")
+    if os.path.exists("config/ui.yaml"):
+        config_path = "config/ui.yaml"
+    elif os.path.exists("config/ui.default.yaml"):
+        config_path = "config/ui.default.yaml"
+    else:
+        logger.error("Config file not found")
         sys.exit(1)
+
+    with open(config_path) as f:
+        config = yaml.safe_load(f)
 
     threading.Thread(target=receive_from_kafka, args=(config["kafka"],)).start()
 

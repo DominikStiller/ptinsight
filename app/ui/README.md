@@ -17,5 +17,6 @@ Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shel
 
 ## Configuration
 
-Local: `./config/ui.yaml`  
+Default: `config/ui.default.yaml`  
+Local: `config/ui.yaml`  (create a copy of default)
 Deployed: `../ansible/roles/ui-deploy/templates/ui.yaml.j2`

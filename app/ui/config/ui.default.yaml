@@ -2,4 +2,4 @@
 kafka:
   protobuf_format: json
   bootstrap_servers:
-    - localhost:9092
+    - kafka-public-ip:9093

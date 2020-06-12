@@ -180,4 +180,5 @@ fabric.properties
 
 Pipfile.lock
 
-static/css/
+/static/css/
+/config/ui.yaml
