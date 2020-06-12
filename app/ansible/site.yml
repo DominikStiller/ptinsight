@@ -4,6 +4,15 @@
   roles:
     - { role: ../../ansible/roles/common,
         tags: setup }
+  tasks:
+    - name: get Kafka server addresses
+      command:
+        argv: 
+          - "{{ playbook_dir }}/../../tools/terraform-inventory/terraform_inventory.py"
+          - --list-private
+        chdir: "{{ playbook_dir }}/.."
+      delegate_to: localhost
+      register: kafka_bootstrap_servers
 
 - name: set up Kafka cluster
   hosts: kafka

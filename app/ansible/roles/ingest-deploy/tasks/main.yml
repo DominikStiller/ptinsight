@@ -27,15 +27,6 @@
     path: "{{ deploy_path }}/ingest/config"
     state: directory
 
-- name: get Kafka server addresses
-  command:
-    argv: 
-      - "{{ playbook_dir }}/../../tools/terraform-inventory/terraform_inventory.py"
-      - --list-private
-    chdir: "{{ playbook_dir }}/.."
-  delegate_to: localhost
-  register: kafka_bootstrap_servers
-
 - name: upload config
   become: true
   become_user: "{{ deploy_user }}"

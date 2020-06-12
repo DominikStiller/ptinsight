@@ -1,6 +1,7 @@
 package com.dxc.ptinsight.processing.flink;
 
 import com.dxc.ptinsight.Timestamps;
+import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.proto.Base.Event;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
@@ -35,7 +36,9 @@ public abstract class Job {
 
   private void configureKafka() {
     props.clear();
-    props.setProperty("bootstrap.servers", "localhost:9092");
+
+    var config = EntryPoint.getConfiguration().kafka;
+    props.setProperty("bootstrap.servers", String.join(",", config.bootstrapServers));
   }
 
   protected final <T extends Message> SingleOutputStreamOperator<T> source(

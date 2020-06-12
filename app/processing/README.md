@@ -12,3 +12,9 @@ It receives the stream from Kafka and sends complex events back to Kafka.
 ## Usage
 
 Run via `./gradlew run` or create distribution jar via `./gradlew clean shadowJar`. It might not run locally if the Kafka cluster is inaccessible.
+
+
+## Configuration
+
+Local: `./src/main/resources/processing.yaml`  
+Deployed: `../ansible/roles/processing-deploy/templates/processing.yaml.j2`

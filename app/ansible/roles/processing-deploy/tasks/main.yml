@@ -26,6 +26,20 @@
     - "{{ source_path }}/build/libs/*.jar"
   register: uploaded_jars
 
+- name: upload config
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: processing.yaml.j2
+    dest: "/tmp/processing.yaml"
+
+- name: copy configuration into job jars
+  become: true
+  become_user: "{{ deploy_user }}"
+  command: "zip {{ item.dest }} processing.yaml"
+  chdir: /tmp
+  loop: "{{ uploaded_jars.results }}"
+
 - name: start jobs
   become: true
   become_user: "{{ deploy_user }}"

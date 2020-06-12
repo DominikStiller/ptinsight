@@ -19,4 +19,4 @@ Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shel
 ## Configuration
 
 Local: `./config/ingest.yaml`  
-Deployed: `../ansible/roles/ingest-deploy/ingest.yaml.j2`
+Deployed: `../ansible/roles/ingest-deploy/templates/ingest.yaml.j2`
