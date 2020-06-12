@@ -1,9 +1,7 @@
 ---
-- name: set up all hosts
+- name: set up playbook variables
   hosts: all
-  roles:
-    - { role: ../../ansible/roles/common,
-        tags: setup }
+  tags: always
   tasks:
     - name: get Kafka server addresses
       command:
@@ -12,7 +10,16 @@
           - --list-private
         chdir: "{{ playbook_dir }}/.."
       delegate_to: localhost
-      register: kafka_bootstrap_servers
+      register: kafka_servers_result
+    - name: set Kafka server addresses variable
+      set_fact:
+        kafka_servers: "{{ (kafka_servers_result.stdout | from_json).kafka | map('regex_replace', '$', ':9092') | list }}"
+
+- name: set up all hosts
+  hosts: all
+  roles:
+    - { role: ../../ansible/roles/common,
+        tags: setup }
 
 - name: set up Kafka cluster
   hosts: kafka
@@ -20,7 +27,7 @@
     - { role: ../ansible/roles/kafka,
         tags: setup }
     - { role: kafka-deploy,
-        tags: deploy }
+        tags: [deploy, deploy-kafka] }
 
 - name: set up processing cluster
   hosts: processing
@@ -32,7 +39,7 @@
     - { role: ../ansible/roles/flink,
         tags: setup }
     - { role: processing-deploy,
-        tags: deploy }
+        tags: [deploy, deploy-processing] }
 
 - name: set up Ingest cluster
   hosts: ingest
@@ -44,7 +51,7 @@
     - { role: ../ansible/roles/python,
         tags: setup }
     - { role: ingest-deploy,
-        tags: deploy }
+        tags: [deploy, deploy-ingest] }
 
 - name: set up UI cluster
   hosts: ui
@@ -58,4 +65,4 @@
     - { role: ../ansible/roles/python,
         tags: setup }
     - { role: ui-deploy,
-        tags: deploy }
+        tags: [deploy, deploy-ui] }

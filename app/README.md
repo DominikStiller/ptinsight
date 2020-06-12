@@ -32,17 +32,17 @@ make init
 
 _Note: Steps 2-4 can be executed in a single command using `make all`_
 
-2. Set up infrastructure using Terraform, you might need to wait a couple of seconds after this for the server to boot
+1. Set up infrastructure using Terraform
 ```
 make apply
 ```
 
-3. Install platforms (Java, Python, Flink, Kafka...). If Ansible reports the server to be unreachable, the server is likely not yet ready. Try again a minute later.
+1. Install platforms (Java, Python, Flink, Kafka...)
 ```
 make setup
 ```
 
-1. Deploy applications.
+1. Deploy applications
 ```
 make deploy
 ```

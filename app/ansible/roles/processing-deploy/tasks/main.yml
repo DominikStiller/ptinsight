@@ -36,8 +36,9 @@
 - name: copy configuration into job jars
   become: true
   become_user: "{{ deploy_user }}"
-  command: "zip {{ item.dest }} processing.yaml"
-  chdir: /tmp
+  command:
+    cmd: "zip {{ item.dest }} processing.yaml"
+    chdir: /tmp
   loop: "{{ uploaded_jars.results }}"
 
 - name: start jobs

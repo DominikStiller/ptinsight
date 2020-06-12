@@ -8,7 +8,7 @@
 - name: install common packages
   become: true
   package:
-    name: htop, wget, unzip, tmux, at, chrony, tree
+    name: htop, wget, zip, unzip, tmux, at, chrony, tree
     state: present
 
 - name: start at
