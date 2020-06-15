@@ -10,9 +10,8 @@ import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import com.uber.h3core.H3Core;
 import java.io.IOException;
-import java.util.concurrent.atomic.AtomicInteger;
-import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
+import java.util.HashMap;
+import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -40,31 +39,35 @@ public class VehicleCountJob extends Job {
 
   @Override
   protected void setup() {
-
+    // Cannot use keyed window because deduplication needs to be applied to all cells
     source("ingress.vehicle-position", VehiclePosition.class)
-        .keyBy(
-            (KeySelector<VehiclePosition, Long>)
-                value ->
-                    h3.geoToH3(
-                        value.getLatitude(),
-                        value.getLongitude(),
-                        EntryPoint.getConfiguration().h3.resolution))
-        .window(SlidingEventTimeWindows.of(Time.minutes(1), Time.seconds(5)))
+        .windowAll(SlidingEventTimeWindows.of(Time.minutes(1), Time.seconds(5)))
         .evictor(new MostRecentDeduplicationEvictor<>(new UniqueVehicleIdKeySelector()))
         .process(new VehicleCounterProcessFunction())
         .addSink(sink("egress.vehicle-count"));
   }
 
   private static class VehicleCounterProcessFunction
-      extends ProcessWindowFunction<VehiclePosition, Event, Long, TimeWindow> {
-    @Override
-    public void process(
-        Long key, Context context, Iterable<VehiclePosition> elements, Collector<Event> out) {
-      AtomicInteger count = new AtomicInteger();
-      elements.forEach((e -> count.getAndIncrement()));
+      extends ProcessAllWindowFunction<VehiclePosition, Event, TimeWindow> {
 
-      var details = VehicleCount.newBuilder().setH3Index(key).setCount(count.intValue()).build();
-      out.collect(output(details, context.window()));
+    @Override
+    public void process(Context context, Iterable<VehiclePosition> elements, Collector<Event> out) {
+      var counts = new HashMap<Long, Integer>();
+      elements.forEach(
+          e -> {
+            var h3index =
+                h3.geoToH3(
+                    e.getLatitude(), e.getLongitude(), EntryPoint.getConfiguration().h3.resolution);
+            counts.merge(h3index, 1, Integer::sum);
+          });
+
+      for (var entry : counts.entrySet()) {
+        //        System.out.println(String.format("H3: %s   Cnt: %d", entry.getKey(),
+        // entry.getValue()));
+        var details =
+            VehicleCount.newBuilder().setH3Index(entry.getKey()).setCount(entry.getValue()).build();
+        out.collect(output(details, context.window()));
+      }
     }
   }
 }

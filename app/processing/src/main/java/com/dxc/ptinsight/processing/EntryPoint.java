@@ -13,7 +13,6 @@ public class EntryPoint {
   public static Configuration configuration;
 
   public static void main(String[] args) throws Exception {
-    //    new ArrivalCountJob().execute();
     new VehicleCountJob().execute();
   }
 
