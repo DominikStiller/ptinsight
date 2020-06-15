@@ -35,8 +35,6 @@ tasks.withType(JavaCompile) {
     options.encoding = 'UTF-8'
 }
 
-applicationDefaultJvmArgs = ["-Dlog4j.configuration=log4j.properties"]
-
 repositories {
     mavenCentral()
     maven { url "https://repository.apache.org/content/repositories/snapshots/" }
@@ -71,6 +69,7 @@ dependencies {
     // --------------------------------------------------------------
     flinkShadowJar "org.apache.flink:flink-connector-kafka_2.11:${flinkVersion}"
     flinkShadowJar "com.dxc:ptinsight-common"
+    flinkShadowJar "com.uber:h3:3.6.3"
 
     implementation "log4j:log4j:1.2.17"
     implementation "org.slf4j:slf4j-log4j12:1.7.7"
@@ -83,7 +82,6 @@ sourceSets {
     test.compileClasspath += configurations.flinkShadowJar
     test.runtimeClasspath += configurations.flinkShadowJar
 
-    javadoc.classpath += configurations.flinkShadowJar
 }
 
 run.classpath = sourceSets.main.runtimeClasspath

@@ -3,3 +3,6 @@ kafka:
   protobuf_format: json
   bootstrap_servers:
     - kafka-public-ip:9093
+
+h3:
+  resolution: 7

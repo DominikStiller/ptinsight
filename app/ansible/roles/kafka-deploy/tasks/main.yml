@@ -8,3 +8,4 @@
     - ingress.departure
     - ingress.vehicle-position
     - egress.arrival-count
+    - egress.vehicle-count

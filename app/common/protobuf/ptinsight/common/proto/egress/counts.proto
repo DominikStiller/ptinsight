@@ -21,3 +21,8 @@ message DepartureCount {
   google.protobuf.Timestamp window_end = 3;
   int32 count = 4;
 }
+
+message VehicleCount {
+  int64 h3index = 1;
+  int32 count = 2;
+}

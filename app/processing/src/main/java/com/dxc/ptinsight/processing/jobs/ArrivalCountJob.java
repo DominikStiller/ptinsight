@@ -11,7 +11,6 @@ import java.time.Instant;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction.Context;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -24,7 +23,6 @@ public class ArrivalCountJob extends Job {
 
   @Override
   protected void setup() {
-    // TODO get bootstrap servers from config
     source("ingress.arrival", Arrival.class)
         .keyBy((KeySelector<Arrival, VehicleType>) value -> value.getVehicle().getType())
         .timeWindow(Time.seconds(1))

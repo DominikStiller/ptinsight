@@ -13,6 +13,7 @@ import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
 import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
 import org.apache.flink.streaming.api.windowing.time.Time;
+import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 
@@ -65,7 +66,11 @@ public abstract class Job {
   }
 
   protected static Event output(Message details) {
-    return output(details, null);
+    return output(details, (Instant) null);
+  }
+
+  protected static Event output(Message details, TimeWindow window) {
+    return output(details, Instant.ofEpochMilli(window.getStart()));
   }
 
   protected static Event output(Message details, Instant eventTimestamp) {

@@ -5,6 +5,7 @@ from ptinsight.common.serialize import deserialize
 
 eventlet.monkey_patch()
 
+import os
 import sys
 import threading
 
