@@ -1,29 +1,48 @@
 ---
 - name: build frontend bundle
-  command:
-    cmd: npm run build
+  shell:
+    cmd: PATH=/bin:$PATH && NVM_DIR=~/.nvm && . "$NVM_DIR/nvm.sh" && nvm use node && npm run build
     chdir: "{{ source_path }}/frontend"
+    executable: /bin/bash
   delegate_to: localhost
 
-- name: create deploy directory
+- name: create frontend deploy directory
   become: true
   file:
-    path: "{{ deploy_path }}/ui"
+    path: "{{ deploy_path }}/ui/frontend"
     state: directory
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
 
-- name: upload application
+- name: upload frontend
   become: true
   become_user: "{{ deploy_user }}"
   copy:
-    src: "{{ source_path }}/{{ item }}"
-    dest: "{{ deploy_path }}/ui"
+    src: "{{ source_path }}/frontend/{{ item }}"
+    dest: "{{ deploy_path }}/ui/frontend"
   loop:
-    - backend/Pipfile
-    - backend/Pipfile.lock
-    - backend/ptinsight
-    - frontend/dist
+    - dist
+  notify:
+    - restart UI service
+
+- name: create backend deploy directory
+  become: true
+  file:
+    path: "{{ deploy_path }}/ui/backend"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+
+- name: upload backend
+  become: true
+  become_user: "{{ deploy_user }}"
+  copy:
+    src: "{{ source_path }}/backend/{{ item }}"
+    dest: "{{ deploy_path }}/ui/backend"
+  loop:
+    - Pipfile
+    - Pipfile.lock
+    - ptinsight
   notify:
     - restart UI service
 

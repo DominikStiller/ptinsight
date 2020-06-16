@@ -26,31 +26,33 @@ Goal of the project is the setup of an example application based on an event-dri
 
 Follow these steps to set up your development environment on Ubuntu 18.04. Adapt the `apt` commands to your package manager for other Linux distributions.
 
-1. Install the Java 11 JDK
+1. Install common packages
 ```
-sudo apt install openjdk-11-jdk
+sudo apt install -y make software-properties-common
+```
+
+2. Install the Java 11 JDK
+```
+sudo apt install -y openjdk-11-jdk
 ```
 
 2. Install Python 3.8
 ```
-sudo apt install -y software-properties-common
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt install -y python3.8
 ```
 
 3. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
 ```
-sudo apt update
-sudo apt install software-properties-common
-sudo apt-add-repository --yes --update ppa:ansible/ansible
-sudo apt install ansible
+sudo apt-add-repository -y ppa:ansible/ansible
+sudo apt install -y ansible
 ```
 
 4. Install Terraform to local bin (https://www.terraform.io/downloads.html)
 ```
 wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
 unzip terraform_0.12.24_linux_amd64.zip
-mv terraform ~/.local/bin  # add this directory to PATH
+sudo mv terraform /usr/local/bin
 rm terraform_0.12.24_linux_amd64.zip
 ```
 
@@ -72,9 +74,9 @@ The user needs following policies attached:
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
 
-7. Install Node.js 12
+1. Install Node.js using Node Version Manager
 ```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+wget -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 nvm install --lts
 ```
 

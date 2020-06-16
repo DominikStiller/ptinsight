@@ -1,6 +1,6 @@
-export class ExpiringMap extends Map {
+export class ExpiringMap<K, V> extends Map<K, Entity<V>> {
   // @ts-ignore
-  set(key: any, value: any, duration: number) {
+  set(key: K, value: V, duration: number) {
     var entity = new Entity(value, duration);
     super.set(key, entity);
     if (duration)
@@ -17,17 +17,18 @@ export class ExpiringMap extends Map {
       );
   }
 
-  get(key: any) {
+  // @ts-ignore
+  get(key: K) {
     var entity = super.get(key);
     return entity === undefined || entity.expired ? undefined : entity.data;
   }
 }
 
-export class Entity {
-  private data: any;
+export class Entity<T> {
+  data: T;
   private expire: number;
 
-  constructor(data: any, duration: number) {
+  constructor(data: T, duration: number) {
     this.data = data;
     this.expire = duration ? Date.now() + duration : undefined;
   }

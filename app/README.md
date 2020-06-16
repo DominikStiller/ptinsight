@@ -25,6 +25,8 @@ For general documentations, see `docs/`. For component-specific documentation, s
 
 ## Deployment
 
+1. Set up your environment as described in the top-level README, and set up the individual components as desribed in their READMEs.
+
 1. Initialize Terraform
 ```
 make init
@@ -47,6 +49,12 @@ make setup
 make deploy
 ```
 
+1. Open the UI in your browser
+```
+make show-hosts # get UI host
+Navigate to http://ui-host:8080/
+```
+
 
 ## Makefile Targets
 
@@ -60,6 +68,7 @@ make deploy
 * `deploy-processing`: Deploy processing
 * `deploy-ingest`: Deploy ingest
 * `deploy-ui`: Deploy UI
+* `show-hosts`: Show addresses of hosts
 
 ## Links
 * List of Helsinki APIs: https://www.notion.so/faa753c34e1f469d92750c13f7f9d0d8?v=ba0f9f25b9a34d31afba6d05db2ffa96

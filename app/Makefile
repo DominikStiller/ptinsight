@@ -11,7 +11,7 @@ all: apply setup deploy
 # Terraform
 define terraform_cmd =
 	cd ${ROOT}terraform
-	TF_STATE=. terraform $(1) -auto-approve --var deployment=${USER}
+	terraform $(1) -auto-approve --var deployment=${USER}
 endef
 init:
 	cd ${ROOT}terraform
@@ -21,6 +21,9 @@ apply:
 destroy:
 	$(call terraform_cmd, "destroy")
 reapply: destroy apply
+show-hosts:
+	cd ${ROOT}terraform
+	terraform output
 
 # Ansible
 define ansible_cmd =

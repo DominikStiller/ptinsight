@@ -332,11 +332,11 @@ resource "aws_security_group" "ui" {
 # --------------------------------------------
 
 output "core_host" {
-    value = aws_instance.core.public_dns
+    value = aws_instance.core.public_ip
 }
 output "ingest_host" {
-    value = aws_instance.ingest.public_dns
+    value = aws_instance.ingest.public_ip
 }
 output "ui_host" {
-    value = aws_instance.ui.public_dns
+    value = aws_instance.ui.public_ip
 }
