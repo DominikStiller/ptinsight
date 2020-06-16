@@ -5,7 +5,7 @@ After=network.target
 
 [Service]
 Type=simple
-WorkingDirectory={{ deploy_path }}/ui
+WorkingDirectory={{ deploy_path }}/ui/backend
 ExecStart=/usr/local/bin/pipenv run python -m ptinsight.ui
 User={{ deploy_user }}
 Group={{ deploy_user }}

@@ -179,6 +179,3 @@ fabric.properties
 .idea/caches/build_file_checksums.ser
 
 Pipfile.lock
-
-/static/css/
-/config/ui.yaml

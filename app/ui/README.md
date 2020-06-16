@@ -1,21 +1,23 @@
 # PT Insight: UI
 
 The UI component is responsible for displaying the complex events detected in the processing component.
-The backend receives messages from Kafka and sends them to the frontend via [Socket.IO](https://socket.io/).
+The backend receives messages from Kafka and sends them to the frontend via [Socket.IO](https://socket.io/). The
+ backend also serves the frontend files, so only the backend needs to be started.
 
 
+## Backend
 
-## Prerequisites
+### Prerequisites
 * Python 3.8
 * pipenv (`pip install pipenv`)
 
 
-## Usage
+### Usage
 
 Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shell`) before starting. Then execute with `python -m ptinsight.ui`.
 
 
-## Configuration
+### Configuration
 
 Default: `config/ui.default.yaml`  
 Local: `config/ui.yaml`  (create a copy of default)

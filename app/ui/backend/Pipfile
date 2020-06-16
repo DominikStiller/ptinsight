@@ -13,7 +13,7 @@ libsass = "*"
 flask-socketio = "*"
 pyyaml = "*"
 eventlet = "*"
-ptinsight-common = {editable = true,path = "./../common/python"}
+ptinsight-common = {editable = true,path = "./../../common/python"}
 h3 = "*"
 
 [requires]

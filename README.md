@@ -80,6 +80,12 @@ rm /tmp/protoc-*.zip
 sudo chmod -R 755 /opt/protoc
 ```
 
+8. Install Node.js if you want to change the UI frontend
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+nvm install --lts
+```
+
 ### Python
 We use `pipenv` for dependency management and virtual environments. Run `pipenv install --dev` in the project folder to set up the environment.
 
