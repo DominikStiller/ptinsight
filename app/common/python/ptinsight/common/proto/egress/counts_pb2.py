@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\036com.dxc.ptinsight.proto.egress',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n*ptinsight/common/proto/egress/counts.proto\x12\x18\x63om.dxc.ptinsight.egress\x1a!ptinsight/common/proto/base.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb5\x01\n\x0c\x41rrivalCount\x12\x34\n\x0cvehicle_type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x30\n\x0cwindow_start\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nwindow_end\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\r\n\x05\x63ount\x18\x04 \x01(\x05\"\xb7\x01\n\x0e\x44\x65partureCount\x12\x34\n\x0cvehicle_type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x30\n\x0cwindow_start\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nwindow_end\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\r\n\x05\x63ount\x18\x04 \x01(\x05\".\n\x0cVehicleCount\x12\x0f\n\x07h3index\x18\x01 \x01(\x03\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x42 \n\x1e\x63om.dxc.ptinsight.proto.egressb\x06proto3'
+  serialized_pb=b'\n*ptinsight/common/proto/egress/counts.proto\x12\x18\x63om.dxc.ptinsight.egress\x1a!ptinsight/common/proto/base.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb5\x01\n\x0c\x41rrivalCount\x12\x34\n\x0cvehicle_type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x30\n\x0cwindow_start\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nwindow_end\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\r\n\x05\x63ount\x18\x04 \x01(\x05\"\xb7\x01\n\x0e\x44\x65partureCount\x12\x34\n\x0cvehicle_type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x30\n\x0cwindow_start\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nwindow_end\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\r\n\x05\x63ount\x18\x04 \x01(\x05\".\n\x0cVehicleCount\x12\x0f\n\x07geocell\x18\x01 \x01(\x03\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x42 \n\x1e\x63om.dxc.ptinsight.proto.egressb\x06proto3'
   ,
   dependencies=[ptinsight_dot_common_dot_proto_dot_base__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -143,7 +143,7 @@ _VEHICLECOUNT = _descriptor.Descriptor(
   create_key=_descriptor._internal_create_key,
   fields=[
     _descriptor.FieldDescriptor(
-      name='h3index', full_name='com.dxc.ptinsight.egress.VehicleCount.h3index', index=0,
+      name='geocell', full_name='com.dxc.ptinsight.egress.VehicleCount.geocell', index=0,
       number=1, type=3, cpp_type=2, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,

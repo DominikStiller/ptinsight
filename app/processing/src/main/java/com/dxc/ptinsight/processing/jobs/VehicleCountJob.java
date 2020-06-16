@@ -45,6 +45,7 @@ public class VehicleCountJob extends Job {
         .evictor(new MostRecentDeduplicationEvictor<>(new UniqueVehicleIdKeySelector()))
         .process(new VehicleCounterProcessFunction())
         .addSink(sink("egress.vehicle-count"));
+    // TODO use staggered window when available: https://github.com/apache/flink/pull/12297
   }
 
   private static class VehicleCounterProcessFunction
@@ -55,17 +56,17 @@ public class VehicleCountJob extends Job {
       var counts = new HashMap<Long, Integer>();
       elements.forEach(
           e -> {
-            var h3index =
+            var h3cell =
                 h3.geoToH3(
                     e.getLatitude(), e.getLongitude(), EntryPoint.getConfiguration().h3.resolution);
-            counts.merge(h3index, 1, Integer::sum);
+            counts.merge(h3cell, 1, Integer::sum);
           });
 
       for (var entry : counts.entrySet()) {
         //        System.out.println(String.format("H3: %s   Cnt: %d", entry.getKey(),
         // entry.getValue()));
         var details =
-            VehicleCount.newBuilder().setH3Index(entry.getKey()).setCount(entry.getValue()).build();
+            VehicleCount.newBuilder().setGeocell(entry.getKey()).setCount(entry.getValue()).build();
         out.collect(output(details, context.window()));
       }
     }

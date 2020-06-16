@@ -2021,10 +2021,10 @@ public final class Counts {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>int64 h3index = 1;</code>
-     * @return The h3index.
+     * <code>int64 geocell = 1;</code>
+     * @return The geocell.
      */
-    long getH3Index();
+    long getGeocell();
 
     /**
      * <code>int32 count = 2;</code>
@@ -2079,7 +2079,7 @@ public final class Counts {
               break;
             case 8: {
 
-              h3Index_ = input.readInt64();
+              geocell_ = input.readInt64();
               break;
             }
             case 16: {
@@ -2119,15 +2119,15 @@ public final class Counts {
               com.dxc.ptinsight.proto.egress.Counts.VehicleCount.class, com.dxc.ptinsight.proto.egress.Counts.VehicleCount.Builder.class);
     }
 
-    public static final int H3INDEX_FIELD_NUMBER = 1;
-    private long h3Index_;
+    public static final int GEOCELL_FIELD_NUMBER = 1;
+    private long geocell_;
     /**
-     * <code>int64 h3index = 1;</code>
-     * @return The h3index.
+     * <code>int64 geocell = 1;</code>
+     * @return The geocell.
      */
     @java.lang.Override
-    public long getH3Index() {
-      return h3Index_;
+    public long getGeocell() {
+      return geocell_;
     }
 
     public static final int COUNT_FIELD_NUMBER = 2;
@@ -2155,8 +2155,8 @@ public final class Counts {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (h3Index_ != 0L) {
-        output.writeInt64(1, h3Index_);
+      if (geocell_ != 0L) {
+        output.writeInt64(1, geocell_);
       }
       if (count_ != 0) {
         output.writeInt32(2, count_);
@@ -2170,9 +2170,9 @@ public final class Counts {
       if (size != -1) return size;
 
       size = 0;
-      if (h3Index_ != 0L) {
+      if (geocell_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(1, h3Index_);
+          .computeInt64Size(1, geocell_);
       }
       if (count_ != 0) {
         size += com.google.protobuf.CodedOutputStream
@@ -2193,8 +2193,8 @@ public final class Counts {
       }
       com.dxc.ptinsight.proto.egress.Counts.VehicleCount other = (com.dxc.ptinsight.proto.egress.Counts.VehicleCount) obj;
 
-      if (getH3Index()
-          != other.getH3Index()) return false;
+      if (getGeocell()
+          != other.getGeocell()) return false;
       if (getCount()
           != other.getCount()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
@@ -2208,9 +2208,9 @@ public final class Counts {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      hash = (37 * hash) + H3INDEX_FIELD_NUMBER;
+      hash = (37 * hash) + GEOCELL_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getH3Index());
+          getGeocell());
       hash = (37 * hash) + COUNT_FIELD_NUMBER;
       hash = (53 * hash) + getCount();
       hash = (29 * hash) + unknownFields.hashCode();
@@ -2346,7 +2346,7 @@ public final class Counts {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        h3Index_ = 0L;
+        geocell_ = 0L;
 
         count_ = 0;
 
@@ -2376,7 +2376,7 @@ public final class Counts {
       @java.lang.Override
       public com.dxc.ptinsight.proto.egress.Counts.VehicleCount buildPartial() {
         com.dxc.ptinsight.proto.egress.Counts.VehicleCount result = new com.dxc.ptinsight.proto.egress.Counts.VehicleCount(this);
-        result.h3Index_ = h3Index_;
+        result.geocell_ = geocell_;
         result.count_ = count_;
         onBuilt();
         return result;
@@ -2426,8 +2426,8 @@ public final class Counts {
 
       public Builder mergeFrom(com.dxc.ptinsight.proto.egress.Counts.VehicleCount other) {
         if (other == com.dxc.ptinsight.proto.egress.Counts.VehicleCount.getDefaultInstance()) return this;
-        if (other.getH3Index() != 0L) {
-          setH3Index(other.getH3Index());
+        if (other.getGeocell() != 0L) {
+          setGeocell(other.getGeocell());
         }
         if (other.getCount() != 0) {
           setCount(other.getCount());
@@ -2461,33 +2461,33 @@ public final class Counts {
         return this;
       }
 
-      private long h3Index_ ;
+      private long geocell_ ;
       /**
-       * <code>int64 h3index = 1;</code>
-       * @return The h3index.
+       * <code>int64 geocell = 1;</code>
+       * @return The geocell.
        */
       @java.lang.Override
-      public long getH3Index() {
-        return h3Index_;
+      public long getGeocell() {
+        return geocell_;
       }
       /**
-       * <code>int64 h3index = 1;</code>
-       * @param value The h3index to set.
+       * <code>int64 geocell = 1;</code>
+       * @param value The geocell to set.
        * @return This builder for chaining.
        */
-      public Builder setH3Index(long value) {
+      public Builder setGeocell(long value) {
         
-        h3Index_ = value;
+        geocell_ = value;
         onChanged();
         return this;
       }
       /**
-       * <code>int64 h3index = 1;</code>
+       * <code>int64 geocell = 1;</code>
        * @return This builder for chaining.
        */
-      public Builder clearH3Index() {
+      public Builder clearGeocell() {
         
-        h3Index_ = 0L;
+        geocell_ = 0L;
         onChanged();
         return this;
       }
@@ -2612,7 +2612,7 @@ public final class Counts {
       "indow_start\030\002 \001(\0132\032.google.protobuf.Time" +
       "stamp\022.\n\nwindow_end\030\003 \001(\0132\032.google.proto" +
       "buf.Timestamp\022\r\n\005count\030\004 \001(\005\".\n\014VehicleC" +
-      "ount\022\017\n\007h3index\030\001 \001(\003\022\r\n\005count\030\002 \001(\005B \n\036" +
+      "ount\022\017\n\007geocell\030\001 \001(\003\022\r\n\005count\030\002 \001(\005B \n\036" +
       "com.dxc.ptinsight.proto.egressb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
@@ -2638,7 +2638,7 @@ public final class Counts {
     internal_static_com_dxc_ptinsight_egress_VehicleCount_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_egress_VehicleCount_descriptor,
-        new java.lang.String[] { "H3Index", "Count", });
+        new java.lang.String[] { "Geocell", "Count", });
     com.dxc.ptinsight.proto.Base.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
   }

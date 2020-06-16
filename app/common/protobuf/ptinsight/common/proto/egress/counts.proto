@@ -23,6 +23,6 @@ message DepartureCount {
 }
 
 message VehicleCount {
-  int64 h3index = 1;
+  int64 geocell = 1;
   int32 count = 2;
 }
