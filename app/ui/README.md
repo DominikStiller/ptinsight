@@ -22,3 +22,16 @@ Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shel
 Default: `config/ui.default.yaml`  
 Local: `config/ui.yaml`  (create a copy of default)
 Deployed: `../ansible/roles/ui-deploy/templates/ui.yaml.j2`
+
+
+## Frontend
+
+### Prerequisites
+* Node.JS 12
+* npm
+
+
+### Development
+
+Set up your development environment with `npm install` and start the Webpack bundler (to update the published assets
+) using `npm run build-watch`.

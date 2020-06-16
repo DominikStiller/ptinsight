@@ -1,8 +1,4 @@
 import eventlet
-import h3.api.basic_int as h3
-from kafka import KafkaConsumer
-from ptinsight.common.proto.egress.counts_pb2 import VehicleCount
-from ptinsight.common.serialize import deserialize
 
 eventlet.monkey_patch()
 
@@ -10,24 +6,23 @@ import os
 import sys
 import threading
 
+import h3.api.basic_int as h3
 import kafka
 import kafka.errors
+from kafka import KafkaConsumer
 import yaml
 from flask import Flask
 from flask_socketio import SocketIO
-from sassutils.wsgi import SassMiddleware
+from ptinsight.common.proto.egress.counts_pb2 import VehicleCount
+from ptinsight.common.serialize import deserialize
 
-app = Flask(__name__, template_folder="../../templates", static_folder="../../static")
-app.wsgi_app = SassMiddleware(
-    app.wsgi_app,
-    {"ptinsight.ui": ("../../static/scss", "../../static/css", "/static/css", True)},
-)
+app = Flask(__name__, static_folder="../../../frontend/dist", static_url_path="/")
 socketio = SocketIO(app)
 
 
 @app.route("/")
 def page():
-    return app.send_static_file("html/index.html")
+    return app.send_static_file("index.html")
 
 
 def receive_from_kafka(config: dict):

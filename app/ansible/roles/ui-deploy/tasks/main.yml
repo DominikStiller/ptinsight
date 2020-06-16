@@ -1,4 +1,10 @@
 ---
+- name: build frontend bundle
+  command:
+    cmd: npm run build
+    chdir: "{{ source_path }}/frontend"
+  delegate_to: localhost
+
 - name: create deploy directory
   become: true
   file:
@@ -12,14 +18,12 @@
   become_user: "{{ deploy_user }}"
   copy:
     src: "{{ source_path }}/{{ item }}"
-    dest: "{{ deploy_path }}/ui/{{ item |dirname }}"
+    dest: "{{ deploy_path }}/ui"
   loop:
-    - Pipfile
-    - Pipfile.lock
-    - ptinsight/
-    - static/html/
-    - static/scss/
-    - static/js/
+    - backend/Pipfile
+    - backend/Pipfile.lock
+    - backend/ptinsight
+    - frontend/dist
   notify:
     - restart UI service
 
@@ -27,7 +31,7 @@
   become: true
   become_user: "{{ deploy_user }}"
   file:
-    path: "{{ deploy_path }}/ui/config"
+    path: "{{ deploy_path }}/ui/backend/config"
     state: directory
 
 - name: upload config
@@ -35,7 +39,7 @@
   become_user: "{{ deploy_user }}"
   template:
     src: ui.yaml.j2
-    dest: "{{ deploy_path }}/ui/config/ui.yaml"
+    dest: "{{ deploy_path }}/ui/backend/config/ui.yaml"
   notify:
     - restart UI service
 
@@ -55,7 +59,7 @@
   become_user: "{{ deploy_user }}"
   command: 
     cmd: pipenv sync
-    chdir: "{{ deploy_path }}/ui"
+    chdir: "{{ deploy_path }}/ui/backend"
 
 - meta: flush_handlers
 

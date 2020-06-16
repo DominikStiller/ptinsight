@@ -72,7 +72,13 @@ The user needs following policies attached:
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
 
-7. Install protoc if you want to compile protobuf schemas
+7. Install Node.js 12
+```
+curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+nvm install --lts
+```
+
+8. Install protoc
 ```
 wget -P /tmp https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
 sudo unzip -d /opt/protoc /tmp/protoc-*.zip
@@ -80,11 +86,6 @@ rm /tmp/protoc-*.zip
 sudo chmod -R 755 /opt/protoc
 ```
 
-8. Install Node.js if you want to change the UI frontend
-```
-curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-nvm install --lts
-```
 
 ### Python
 We use `pipenv` for dependency management and virtual environments. Run `pipenv install --dev` in the project folder to set up the environment.
@@ -92,6 +93,7 @@ We use `pipenv` for dependency management and virtual environments. Run `pipenv 
 ### Code Style
 * Python: [black](https://black.readthedocs.io/en/stable/). Run `pipenv run black .` in the project folder to format all .py files.
 * Java: [Google Java Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` in the project folder to format all .java files.
+* TypeScript: [Prettier](https://prettier.io/). Run `npm run format` in the project folder to format all .ts/.json files.
 
 
 ## Abbreviations
