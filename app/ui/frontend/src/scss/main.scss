@@ -13,12 +13,21 @@ body {
   height: 100vh;
 }
 
-#count-colormap {
-  width: 30px;
-  height: 100px;
+#legend-container {
   position: fixed;
-  right: 10px;
-  top: 10px;
-  background-color: red;
+  right: 0;
   z-index: 1000;
+  pointer-events: none;
+  padding: 10px;
+
+  svg {
+    width: 200px;
+    height: 100vh;
+    pointer-events: none;
+    overflow: visible;
+  }
+
+  #content {
+    pointer-events: auto;
+  }
 }

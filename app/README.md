@@ -72,3 +72,8 @@ Navigate to http://ui-host:8080/
 
 ## Links
 * List of Helsinki APIs: https://www.notion.so/faa753c34e1f469d92750c13f7f9d0d8?v=ba0f9f25b9a34d31afba6d05db2ffa96
+
+## Todo
+* Use multi-node Flink and Kafka clusters
+* Check high availibility and failover
+* Use Prometheus for metrics monitoring

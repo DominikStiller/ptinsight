@@ -74,7 +74,7 @@ The user needs following policies attached:
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
 ```
 
-1. Install Node.js using Node Version Manager
+7. Install Node.js using Node Version Manager
 ```
 wget -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 nvm install --lts
@@ -88,9 +88,14 @@ rm /tmp/protoc-*.zip
 sudo chmod -R 755 /opt/protoc
 ```
 
+### Java
+We use Gradle for dependency management. No environment setup is necessary.
 
 ### Python
 We use `pipenv` for dependency management and virtual environments. Run `pipenv install --dev` in the project folder to set up the environment.
+
+### TypeScript
+We use `npm` for dependency management. Run `npm install` in the project folder to set up the environment.
 
 ### Code Style
 * Python: [black](https://black.readthedocs.io/en/stable/). Run `pipenv run black .` in the project folder to format all .py files.
@@ -103,8 +108,3 @@ We use `pipenv` for dependency management and virtual environments. Run `pipenv 
 * **EDA**: Event-Driven Architecture
 * **protobuf**: [Protocol Buffers](https://developers.google.com/protocol-buffers)
 
-
-## Todo for actual application
-* Use Route 53/CloudMap for service discovery
-* Use remote backend for Terraform
-* Use Zookeeper/YARN for high availability
