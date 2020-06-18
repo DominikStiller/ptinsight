@@ -1,14 +1,16 @@
-import * as d3 from "d3";
+import { select, create, Selection, BaseType } from "d3-selection";
+import { ScaleSequential, scaleSequential } from "d3-scale";
+import { interpolateRgbBasis } from "d3-interpolate";
 
-type D3Selection = d3.Selection<d3.BaseType, unknown, HTMLElement, any>;
+type D3Selection = Selection<BaseType, unknown, HTMLElement, any>;
 
-export default class LegendUi {
+export class LegendUi {
   private defs: D3Selection;
   private content: D3Selection;
   private canvas: D3Selection;
 
   constructor() {
-    this.canvas = d3.select("#legend-container").append("svg");
+    this.canvas = select("#legend-container").append("svg");
     this.defs = this.canvas.append("defs");
     this.content = this.canvas.append("g").attr("id", "content");
   }
@@ -23,7 +25,7 @@ export default class LegendUi {
 }
 
 export class ColorBar {
-  private scale: d3.ScaleSequential<string>;
+  private readonly scale: ScaleSequential<string>;
 
   private gradientDef: D3Selection;
   private bar: D3Selection;
@@ -31,15 +33,12 @@ export class ColorBar {
   private maxText: D3Selection;
 
   constructor(private name: string, private colorScheme: string[]) {
-    this.scale = d3
-      .scaleSequential<string>(d3.interpolateRgbBasis(colorScheme))
-      .domain([0, 1]);
+    this.scale = scaleSequential<string>(interpolateRgbBasis(colorScheme));
     this.createElements();
   }
 
   private createElements(): void {
-    this.gradientDef = d3
-      .create("svg:linearGradient")
+    this.gradientDef = create("svg:linearGradient")
       .attr("id", `gradient-${this.name}`)
       .attr("x1", "0")
       .attr("x2", "0")
@@ -57,21 +56,18 @@ export class ColorBar {
       })
       .attr("stop-color", (d: string) => d);
 
-    this.bar = d3
-      .create("svg:rect")
+    this.bar = create("svg:rect")
       .attr("x", "180")
       .attr("width", 20)
       .attr("height", 300)
       .attr("fill", `url(#gradient-${this.name})`);
 
-    this.minText = d3
-      .create("svg:text")
+    this.minText = create("svg:text")
       .attr("x", "175")
       .attr("y", "300")
       .style("text-anchor", "end");
 
-    this.maxText = d3
-      .create("svg:text")
+    this.maxText = create("svg:text")
       .attr("x", "175")
       .attr("y", "20")
       .attr("text-anchor", "end");
@@ -79,8 +75,8 @@ export class ColorBar {
 
   public updateDomain(domain: [number, number]): void {
     this.scale.domain(domain);
-    this.minText.text(domain[0]);
-    this.maxText.text(domain[1]);
+    this.minText.text(domain[0] == Number.NEGATIVE_INFINITY ? 0 : domain[0]);
+    this.maxText.text(domain[1] == Number.POSITIVE_INFINITY ? 0 : domain[1]);
   }
 
   public getColor(value: number): string {

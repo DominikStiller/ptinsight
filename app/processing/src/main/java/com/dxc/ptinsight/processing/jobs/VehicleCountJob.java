@@ -41,8 +41,8 @@ public class VehicleCountJob extends Job {
   protected void setup() {
     // Cannot use keyed window because deduplication needs to be applied to all cells
     source("ingress.vehicle-position", VehiclePosition.class)
-        .windowAll(SlidingEventTimeWindows.of(Time.minutes(1), Time.seconds(5)))
-        .evictor(new MostRecentDeduplicationEvictor<>(new UniqueVehicleIdKeySelector()))
+        .windowAll(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5)))
+         .evictor(new MostRecentDeduplicationEvictor<>(new UniqueVehicleIdKeySelector()))
         .process(new VehicleCounterProcessFunction())
         .addSink(sink("egress.vehicle-count"));
     // TODO use staggered window when available: https://github.com/apache/flink/pull/12297

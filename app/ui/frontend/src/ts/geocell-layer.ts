@@ -1,9 +1,9 @@
 import * as leaflet from "leaflet";
+import * as underscore from "underscore";
 import { h3ToGeoBoundary, H3Index } from "h3-js";
 import { ExpiringMap } from "./expiring-map";
-import LegendUi, { ColorBar } from "./legend-ui";
-import * as d3 from "d3";
-import { magmaColorScheme } from "./colors";
+import { LegendUi, ColorBar } from "./legend-ui";
+import { schemeOrRd } from "d3-scale-chromatic";
 
 /**
  * Map layer for drawing H3 geocells
@@ -25,10 +25,10 @@ export default class GeocellLayer {
     private legend: LegendUi,
     private timeout: number
   ) {
-    setInterval(() => this.updateLimits(), timeout);
     // @ts-ignore
-    this.colorbar = new ColorBar("vehicle-count", d3.schemeOrRd[8]);
+    this.colorbar = new ColorBar("vehicle-count", schemeOrRd[8]);
     this.colorbar.attachTo(legend);
+    this.updateLimits = underscore.debounce(this.updateLimits, 2000);
   }
 
   public updateData(geocell: H3Index, data: number): void {
@@ -38,34 +38,30 @@ export default class GeocellLayer {
       this.cells.delete(key);
     });
 
-    if (this.data.size <= 5) {
-      // Update limits every time at the beginning to prevent all being at max
-      this.updateLimits();
-    }
+    this.updateLimits();
 
-    let style = {
-      stroke: false,
-      fillColor: this.colorbar.getColor(data),
-      fillOpacity: 0.7,
-    };
-
-    if (this.cells.has(geocell)) {
-      this.cells.get(geocell).setStyle(style);
-    } else {
-      // @ts-ignore
+    if (!this.cells.has(geocell)) {
       let hexagon = leaflet
-        .polygon(h3ToGeoBoundary(geocell), style)
-        .bindPopup((layer) => {
-          return `Vehicle count: ${data}`;
-        });
+        // @ts-ignore
+        .polygon(h3ToGeoBoundary(geocell));
       hexagon.addTo(this.map);
       this.cells.set(geocell, hexagon);
     }
+    this.cells
+      .get(geocell)
+      .setStyle({
+        stroke: false,
+        fillColor: this.colorbar.getColor(data),
+        fillOpacity: 0.7,
+      })
+      .bindPopup((layer) => {
+        return `Vehicle count: ${data}`;
+      });
   }
 
   private updateLimits(): void {
-    // Limits are calculated regularly from all data instead of at every data update
-    // because the limits will otherwise only increase but never go back, since they have no timeout
+    // Limits are calculated regularly from all data instead of for every data update
+    // because the limits cannot shrink otherwise
     let values = Array.from(this.data.values());
     this.minData = Math.min(...values);
     this.maxData = Math.max(...values);

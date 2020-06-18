@@ -2,7 +2,7 @@ import * as leaflet from "leaflet";
 import * as socketio from "socket.io-client";
 import "./styles";
 import GeocellLayer from "./geocell-layer";
-import LegendUi from "./legend-ui";
+import { LegendUi } from "./legend-ui";
 
 const map = leaflet.map("map-container").setView([60.1699, 24.9384], 11);
 leaflet

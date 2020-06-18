@@ -34,22 +34,22 @@ make init
 
 _Note: Steps 2-4 can be executed in a single command using `make all`_
 
-1. Set up infrastructure using Terraform
+2. Set up infrastructure using Terraform
 ```
 make apply
 ```
 
-1. Install platforms (Java, Python, Flink, Kafka...)
+3. Install platforms (Java, Python, Flink, Kafka...)
 ```
 make setup
 ```
 
-1. Deploy applications
+4. Deploy applications
 ```
 make deploy
 ```
 
-1. Open the UI in your browser
+5. Open the UI in your browser
 ```
 make show-hosts # get UI host
 Navigate to http://ui-host:8080/
