@@ -6,27 +6,30 @@ import { LegendUi, ColorBar } from "./legend-ui";
 import { schemeOrRd } from "d3-scale-chromatic";
 
 /**
- * Map layer for drawing H3 geocells
+ * Map layer for drawing H3 geocells with data-based coloring
  *
  * The timeout determines when old cell data is removed if no new data arrived
- * The hexagon overlays are cleared every second based on the available data
+ * The hexagon overlays are cleared at most every two seconds based on the available data
  */
-export default class GeocellLayer extends Layer {
-  private data = new ExpiringMap<string, number>();
+export default class GeocellLayer<T> extends Layer {
+  private data = new ExpiringMap<string, T>();
   private cells = new Map<string, Polygon>();
 
   private active = false;
   private minData = Number.POSITIVE_INFINITY;
   private maxData = Number.NEGATIVE_INFINITY;
 
+  private legend: LegendUi;
   private map: LMap;
   private colorbar: ColorBar;
 
+  private updateLimitsDebounced: () => void;
+
   constructor(
     private name: string,
-    private popupText: (data: number) => string,
-    private legend: LegendUi,
-    private timeout: number
+    private popupTextSelector: (data: T) => string = undefined,
+    private displayDataSelector: (data: T) => number = (data) => Number(data),
+    private timeout: number = 7000
   ) {
     super();
     this.colorbar = new ColorBar(
@@ -34,7 +37,13 @@ export default class GeocellLayer extends Layer {
       // @ts-ignore
       schemeOrRd[8]
     );
-    this.updateLimits = debounce(this.updateLimits, 2000);
+    this.updateLimitsDebounced = debounce(this.updateLimits, 2000);
+  }
+
+  public addToLegend(legend: LegendUi): this {
+    this.legend = legend;
+
+    return this;
   }
 
   public onAdd(map: LMap): this {
@@ -55,7 +64,7 @@ export default class GeocellLayer extends Layer {
     return this;
   }
 
-  public updateData(geocell: H3Index, data: number): void {
+  public updateData(geocell: H3Index, data: T): void {
     if (!this.active) {
       return;
     }
@@ -66,29 +75,36 @@ export default class GeocellLayer extends Layer {
       this.cells.delete(key);
     });
 
-    this.updateLimits();
+    if (this.cells.size <= 5) {
+      this.updateLimits();
+    } else {
+      this.updateLimitsDebounced();
+    }
 
+    let hexagon;
     if (!this.cells.has(geocell)) {
       // @ts-ignore
-      let hexagon = polygon(h3ToGeoBoundary(geocell)).addTo(this.map);
+      hexagon = polygon(h3ToGeoBoundary(geocell)).addTo(this.map);
       this.cells.set(geocell, hexagon);
+    } else {
+      hexagon = this.cells.get(geocell);
     }
-    this.cells
-      .get(geocell)
-      .setStyle({
-        stroke: false,
-        fillColor: this.colorbar.getColor(data),
-        fillOpacity: 0.7,
-      })
-      .bindPopup((layer) => {
-        return this.popupText(data);
+    hexagon.setStyle({
+      stroke: false,
+      fillColor: this.colorbar.getColor(this.displayDataSelector(data)),
+      fillOpacity: 0.7,
+    });
+    if (this.popupTextSelector) {
+      hexagon.bindPopup(() => {
+        return this.popupTextSelector(data);
       });
+    }
   }
 
   private updateLimits(): void {
     // Limits are calculated regularly from all data instead of for every data update
     // because the limits cannot shrink otherwise
-    let values = Array.from(this.data.values());
+    let values = Array.from(this.data.values()).map(this.displayDataSelector);
     this.minData = Math.min(...values);
     this.maxData = Math.max(...values);
     this.colorbar.updateDomain([this.minData, this.maxData]);
