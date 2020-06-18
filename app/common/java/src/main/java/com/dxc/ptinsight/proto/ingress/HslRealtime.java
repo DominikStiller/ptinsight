@@ -1678,38 +1678,50 @@ public final class HslRealtime {
     com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfoOrBuilder getVehicleOrBuilder();
 
     /**
-     * <code>int32 stop = 2;</code>
+     * <code>float latitude = 2;</code>
+     * @return The latitude.
+     */
+    float getLatitude();
+
+    /**
+     * <code>float longitude = 3;</code>
+     * @return The longitude.
+     */
+    float getLongitude();
+
+    /**
+     * <code>int32 stop = 4;</code>
      * @return The stop.
      */
     int getStop();
 
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return Whether the scheduledArrival field is set.
      */
     boolean hasScheduledArrival();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return The scheduledArrival.
      */
     com.google.protobuf.Timestamp getScheduledArrival();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      */
     com.google.protobuf.TimestampOrBuilder getScheduledArrivalOrBuilder();
 
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return Whether the scheduledDeparture field is set.
      */
     boolean hasScheduledDeparture();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return The scheduledDeparture.
      */
     com.google.protobuf.Timestamp getScheduledDeparture();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      */
     com.google.protobuf.TimestampOrBuilder getScheduledDepartureOrBuilder();
   }
@@ -1771,12 +1783,22 @@ public final class HslRealtime {
 
               break;
             }
-            case 16: {
+            case 21: {
+
+              latitude_ = input.readFloat();
+              break;
+            }
+            case 29: {
+
+              longitude_ = input.readFloat();
+              break;
+            }
+            case 32: {
 
               stop_ = input.readInt32();
               break;
             }
-            case 26: {
+            case 42: {
               com.google.protobuf.Timestamp.Builder subBuilder = null;
               if (scheduledArrival_ != null) {
                 subBuilder = scheduledArrival_.toBuilder();
@@ -1789,7 +1811,7 @@ public final class HslRealtime {
 
               break;
             }
-            case 34: {
+            case 50: {
               com.google.protobuf.Timestamp.Builder subBuilder = null;
               if (scheduledDeparture_ != null) {
                 subBuilder = scheduledDeparture_.toBuilder();
@@ -1860,10 +1882,32 @@ public final class HslRealtime {
       return getVehicle();
     }
 
-    public static final int STOP_FIELD_NUMBER = 2;
+    public static final int LATITUDE_FIELD_NUMBER = 2;
+    private float latitude_;
+    /**
+     * <code>float latitude = 2;</code>
+     * @return The latitude.
+     */
+    @java.lang.Override
+    public float getLatitude() {
+      return latitude_;
+    }
+
+    public static final int LONGITUDE_FIELD_NUMBER = 3;
+    private float longitude_;
+    /**
+     * <code>float longitude = 3;</code>
+     * @return The longitude.
+     */
+    @java.lang.Override
+    public float getLongitude() {
+      return longitude_;
+    }
+
+    public static final int STOP_FIELD_NUMBER = 4;
     private int stop_;
     /**
-     * <code>int32 stop = 2;</code>
+     * <code>int32 stop = 4;</code>
      * @return The stop.
      */
     @java.lang.Override
@@ -1871,10 +1915,10 @@ public final class HslRealtime {
       return stop_;
     }
 
-    public static final int SCHEDULED_ARRIVAL_FIELD_NUMBER = 3;
+    public static final int SCHEDULED_ARRIVAL_FIELD_NUMBER = 5;
     private com.google.protobuf.Timestamp scheduledArrival_;
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return Whether the scheduledArrival field is set.
      */
     @java.lang.Override
@@ -1882,7 +1926,7 @@ public final class HslRealtime {
       return scheduledArrival_ != null;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return The scheduledArrival.
      */
     @java.lang.Override
@@ -1890,17 +1934,17 @@ public final class HslRealtime {
       return scheduledArrival_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : scheduledArrival_;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      */
     @java.lang.Override
     public com.google.protobuf.TimestampOrBuilder getScheduledArrivalOrBuilder() {
       return getScheduledArrival();
     }
 
-    public static final int SCHEDULED_DEPARTURE_FIELD_NUMBER = 4;
+    public static final int SCHEDULED_DEPARTURE_FIELD_NUMBER = 6;
     private com.google.protobuf.Timestamp scheduledDeparture_;
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return Whether the scheduledDeparture field is set.
      */
     @java.lang.Override
@@ -1908,7 +1952,7 @@ public final class HslRealtime {
       return scheduledDeparture_ != null;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return The scheduledDeparture.
      */
     @java.lang.Override
@@ -1916,7 +1960,7 @@ public final class HslRealtime {
       return scheduledDeparture_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : scheduledDeparture_;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      */
     @java.lang.Override
     public com.google.protobuf.TimestampOrBuilder getScheduledDepartureOrBuilder() {
@@ -1940,14 +1984,20 @@ public final class HslRealtime {
       if (vehicle_ != null) {
         output.writeMessage(1, getVehicle());
       }
+      if (latitude_ != 0F) {
+        output.writeFloat(2, latitude_);
+      }
+      if (longitude_ != 0F) {
+        output.writeFloat(3, longitude_);
+      }
       if (stop_ != 0) {
-        output.writeInt32(2, stop_);
+        output.writeInt32(4, stop_);
       }
       if (scheduledArrival_ != null) {
-        output.writeMessage(3, getScheduledArrival());
+        output.writeMessage(5, getScheduledArrival());
       }
       if (scheduledDeparture_ != null) {
-        output.writeMessage(4, getScheduledDeparture());
+        output.writeMessage(6, getScheduledDeparture());
       }
       unknownFields.writeTo(output);
     }
@@ -1962,17 +2012,25 @@ public final class HslRealtime {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getVehicle());
       }
+      if (latitude_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, latitude_);
+      }
+      if (longitude_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, longitude_);
+      }
       if (stop_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, stop_);
+          .computeInt32Size(4, stop_);
       }
       if (scheduledArrival_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getScheduledArrival());
+          .computeMessageSize(5, getScheduledArrival());
       }
       if (scheduledDeparture_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getScheduledDeparture());
+          .computeMessageSize(6, getScheduledDeparture());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1994,6 +2052,12 @@ public final class HslRealtime {
         if (!getVehicle()
             .equals(other.getVehicle())) return false;
       }
+      if (java.lang.Float.floatToIntBits(getLatitude())
+          != java.lang.Float.floatToIntBits(
+              other.getLatitude())) return false;
+      if (java.lang.Float.floatToIntBits(getLongitude())
+          != java.lang.Float.floatToIntBits(
+              other.getLongitude())) return false;
       if (getStop()
           != other.getStop()) return false;
       if (hasScheduledArrival() != other.hasScheduledArrival()) return false;
@@ -2021,6 +2085,12 @@ public final class HslRealtime {
         hash = (37 * hash) + VEHICLE_FIELD_NUMBER;
         hash = (53 * hash) + getVehicle().hashCode();
       }
+      hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getLatitude());
+      hash = (37 * hash) + LONGITUDE_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getLongitude());
       hash = (37 * hash) + STOP_FIELD_NUMBER;
       hash = (53 * hash) + getStop();
       if (hasScheduledArrival()) {
@@ -2170,6 +2240,10 @@ public final class HslRealtime {
           vehicle_ = null;
           vehicleBuilder_ = null;
         }
+        latitude_ = 0F;
+
+        longitude_ = 0F;
+
         stop_ = 0;
 
         if (scheduledArrivalBuilder_ == null) {
@@ -2215,6 +2289,8 @@ public final class HslRealtime {
         } else {
           result.vehicle_ = vehicleBuilder_.build();
         }
+        result.latitude_ = latitude_;
+        result.longitude_ = longitude_;
         result.stop_ = stop_;
         if (scheduledArrivalBuilder_ == null) {
           result.scheduledArrival_ = scheduledArrival_;
@@ -2276,6 +2352,12 @@ public final class HslRealtime {
         if (other == com.dxc.ptinsight.proto.ingress.HslRealtime.Arrival.getDefaultInstance()) return this;
         if (other.hasVehicle()) {
           mergeVehicle(other.getVehicle());
+        }
+        if (other.getLatitude() != 0F) {
+          setLatitude(other.getLatitude());
+        }
+        if (other.getLongitude() != 0F) {
+          setLongitude(other.getLongitude());
         }
         if (other.getStop() != 0) {
           setStop(other.getStop());
@@ -2434,9 +2516,71 @@ public final class HslRealtime {
         return vehicleBuilder_;
       }
 
+      private float latitude_ ;
+      /**
+       * <code>float latitude = 2;</code>
+       * @return The latitude.
+       */
+      @java.lang.Override
+      public float getLatitude() {
+        return latitude_;
+      }
+      /**
+       * <code>float latitude = 2;</code>
+       * @param value The latitude to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLatitude(float value) {
+        
+        latitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float latitude = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLatitude() {
+        
+        latitude_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float longitude_ ;
+      /**
+       * <code>float longitude = 3;</code>
+       * @return The longitude.
+       */
+      @java.lang.Override
+      public float getLongitude() {
+        return longitude_;
+      }
+      /**
+       * <code>float longitude = 3;</code>
+       * @param value The longitude to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLongitude(float value) {
+        
+        longitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float longitude = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLongitude() {
+        
+        longitude_ = 0F;
+        onChanged();
+        return this;
+      }
+
       private int stop_ ;
       /**
-       * <code>int32 stop = 2;</code>
+       * <code>int32 stop = 4;</code>
        * @return The stop.
        */
       @java.lang.Override
@@ -2444,7 +2588,7 @@ public final class HslRealtime {
         return stop_;
       }
       /**
-       * <code>int32 stop = 2;</code>
+       * <code>int32 stop = 4;</code>
        * @param value The stop to set.
        * @return This builder for chaining.
        */
@@ -2455,7 +2599,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>int32 stop = 2;</code>
+       * <code>int32 stop = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearStop() {
@@ -2469,14 +2613,14 @@ public final class HslRealtime {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> scheduledArrivalBuilder_;
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        * @return Whether the scheduledArrival field is set.
        */
       public boolean hasScheduledArrival() {
         return scheduledArrivalBuilder_ != null || scheduledArrival_ != null;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        * @return The scheduledArrival.
        */
       public com.google.protobuf.Timestamp getScheduledArrival() {
@@ -2487,7 +2631,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder setScheduledArrival(com.google.protobuf.Timestamp value) {
         if (scheduledArrivalBuilder_ == null) {
@@ -2503,7 +2647,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder setScheduledArrival(
           com.google.protobuf.Timestamp.Builder builderForValue) {
@@ -2517,7 +2661,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder mergeScheduledArrival(com.google.protobuf.Timestamp value) {
         if (scheduledArrivalBuilder_ == null) {
@@ -2535,7 +2679,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder clearScheduledArrival() {
         if (scheduledArrivalBuilder_ == null) {
@@ -2549,7 +2693,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public com.google.protobuf.Timestamp.Builder getScheduledArrivalBuilder() {
         
@@ -2557,7 +2701,7 @@ public final class HslRealtime {
         return getScheduledArrivalFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public com.google.protobuf.TimestampOrBuilder getScheduledArrivalOrBuilder() {
         if (scheduledArrivalBuilder_ != null) {
@@ -2568,7 +2712,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
@@ -2588,14 +2732,14 @@ public final class HslRealtime {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> scheduledDepartureBuilder_;
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        * @return Whether the scheduledDeparture field is set.
        */
       public boolean hasScheduledDeparture() {
         return scheduledDepartureBuilder_ != null || scheduledDeparture_ != null;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        * @return The scheduledDeparture.
        */
       public com.google.protobuf.Timestamp getScheduledDeparture() {
@@ -2606,7 +2750,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder setScheduledDeparture(com.google.protobuf.Timestamp value) {
         if (scheduledDepartureBuilder_ == null) {
@@ -2622,7 +2766,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder setScheduledDeparture(
           com.google.protobuf.Timestamp.Builder builderForValue) {
@@ -2636,7 +2780,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder mergeScheduledDeparture(com.google.protobuf.Timestamp value) {
         if (scheduledDepartureBuilder_ == null) {
@@ -2654,7 +2798,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder clearScheduledDeparture() {
         if (scheduledDepartureBuilder_ == null) {
@@ -2668,7 +2812,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public com.google.protobuf.Timestamp.Builder getScheduledDepartureBuilder() {
         
@@ -2676,7 +2820,7 @@ public final class HslRealtime {
         return getScheduledDepartureFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public com.google.protobuf.TimestampOrBuilder getScheduledDepartureOrBuilder() {
         if (scheduledDepartureBuilder_ != null) {
@@ -2687,7 +2831,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
@@ -2775,38 +2919,50 @@ public final class HslRealtime {
     com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfoOrBuilder getVehicleOrBuilder();
 
     /**
-     * <code>int32 stop = 2;</code>
+     * <code>float latitude = 2;</code>
+     * @return The latitude.
+     */
+    float getLatitude();
+
+    /**
+     * <code>float longitude = 3;</code>
+     * @return The longitude.
+     */
+    float getLongitude();
+
+    /**
+     * <code>int32 stop = 4;</code>
      * @return The stop.
      */
     int getStop();
 
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return Whether the scheduledArrival field is set.
      */
     boolean hasScheduledArrival();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return The scheduledArrival.
      */
     com.google.protobuf.Timestamp getScheduledArrival();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      */
     com.google.protobuf.TimestampOrBuilder getScheduledArrivalOrBuilder();
 
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return Whether the scheduledDeparture field is set.
      */
     boolean hasScheduledDeparture();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return The scheduledDeparture.
      */
     com.google.protobuf.Timestamp getScheduledDeparture();
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      */
     com.google.protobuf.TimestampOrBuilder getScheduledDepartureOrBuilder();
   }
@@ -2868,12 +3024,22 @@ public final class HslRealtime {
 
               break;
             }
-            case 16: {
+            case 21: {
+
+              latitude_ = input.readFloat();
+              break;
+            }
+            case 29: {
+
+              longitude_ = input.readFloat();
+              break;
+            }
+            case 32: {
 
               stop_ = input.readInt32();
               break;
             }
-            case 26: {
+            case 42: {
               com.google.protobuf.Timestamp.Builder subBuilder = null;
               if (scheduledArrival_ != null) {
                 subBuilder = scheduledArrival_.toBuilder();
@@ -2886,7 +3052,7 @@ public final class HslRealtime {
 
               break;
             }
-            case 34: {
+            case 50: {
               com.google.protobuf.Timestamp.Builder subBuilder = null;
               if (scheduledDeparture_ != null) {
                 subBuilder = scheduledDeparture_.toBuilder();
@@ -2957,10 +3123,32 @@ public final class HslRealtime {
       return getVehicle();
     }
 
-    public static final int STOP_FIELD_NUMBER = 2;
+    public static final int LATITUDE_FIELD_NUMBER = 2;
+    private float latitude_;
+    /**
+     * <code>float latitude = 2;</code>
+     * @return The latitude.
+     */
+    @java.lang.Override
+    public float getLatitude() {
+      return latitude_;
+    }
+
+    public static final int LONGITUDE_FIELD_NUMBER = 3;
+    private float longitude_;
+    /**
+     * <code>float longitude = 3;</code>
+     * @return The longitude.
+     */
+    @java.lang.Override
+    public float getLongitude() {
+      return longitude_;
+    }
+
+    public static final int STOP_FIELD_NUMBER = 4;
     private int stop_;
     /**
-     * <code>int32 stop = 2;</code>
+     * <code>int32 stop = 4;</code>
      * @return The stop.
      */
     @java.lang.Override
@@ -2968,10 +3156,10 @@ public final class HslRealtime {
       return stop_;
     }
 
-    public static final int SCHEDULED_ARRIVAL_FIELD_NUMBER = 3;
+    public static final int SCHEDULED_ARRIVAL_FIELD_NUMBER = 5;
     private com.google.protobuf.Timestamp scheduledArrival_;
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return Whether the scheduledArrival field is set.
      */
     @java.lang.Override
@@ -2979,7 +3167,7 @@ public final class HslRealtime {
       return scheduledArrival_ != null;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      * @return The scheduledArrival.
      */
     @java.lang.Override
@@ -2987,17 +3175,17 @@ public final class HslRealtime {
       return scheduledArrival_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : scheduledArrival_;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+     * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
      */
     @java.lang.Override
     public com.google.protobuf.TimestampOrBuilder getScheduledArrivalOrBuilder() {
       return getScheduledArrival();
     }
 
-    public static final int SCHEDULED_DEPARTURE_FIELD_NUMBER = 4;
+    public static final int SCHEDULED_DEPARTURE_FIELD_NUMBER = 6;
     private com.google.protobuf.Timestamp scheduledDeparture_;
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return Whether the scheduledDeparture field is set.
      */
     @java.lang.Override
@@ -3005,7 +3193,7 @@ public final class HslRealtime {
       return scheduledDeparture_ != null;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      * @return The scheduledDeparture.
      */
     @java.lang.Override
@@ -3013,7 +3201,7 @@ public final class HslRealtime {
       return scheduledDeparture_ == null ? com.google.protobuf.Timestamp.getDefaultInstance() : scheduledDeparture_;
     }
     /**
-     * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+     * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
      */
     @java.lang.Override
     public com.google.protobuf.TimestampOrBuilder getScheduledDepartureOrBuilder() {
@@ -3037,14 +3225,20 @@ public final class HslRealtime {
       if (vehicle_ != null) {
         output.writeMessage(1, getVehicle());
       }
+      if (latitude_ != 0F) {
+        output.writeFloat(2, latitude_);
+      }
+      if (longitude_ != 0F) {
+        output.writeFloat(3, longitude_);
+      }
       if (stop_ != 0) {
-        output.writeInt32(2, stop_);
+        output.writeInt32(4, stop_);
       }
       if (scheduledArrival_ != null) {
-        output.writeMessage(3, getScheduledArrival());
+        output.writeMessage(5, getScheduledArrival());
       }
       if (scheduledDeparture_ != null) {
-        output.writeMessage(4, getScheduledDeparture());
+        output.writeMessage(6, getScheduledDeparture());
       }
       unknownFields.writeTo(output);
     }
@@ -3059,17 +3253,25 @@ public final class HslRealtime {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getVehicle());
       }
+      if (latitude_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(2, latitude_);
+      }
+      if (longitude_ != 0F) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeFloatSize(3, longitude_);
+      }
       if (stop_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(2, stop_);
+          .computeInt32Size(4, stop_);
       }
       if (scheduledArrival_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(3, getScheduledArrival());
+          .computeMessageSize(5, getScheduledArrival());
       }
       if (scheduledDeparture_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(4, getScheduledDeparture());
+          .computeMessageSize(6, getScheduledDeparture());
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -3091,6 +3293,12 @@ public final class HslRealtime {
         if (!getVehicle()
             .equals(other.getVehicle())) return false;
       }
+      if (java.lang.Float.floatToIntBits(getLatitude())
+          != java.lang.Float.floatToIntBits(
+              other.getLatitude())) return false;
+      if (java.lang.Float.floatToIntBits(getLongitude())
+          != java.lang.Float.floatToIntBits(
+              other.getLongitude())) return false;
       if (getStop()
           != other.getStop()) return false;
       if (hasScheduledArrival() != other.hasScheduledArrival()) return false;
@@ -3118,6 +3326,12 @@ public final class HslRealtime {
         hash = (37 * hash) + VEHICLE_FIELD_NUMBER;
         hash = (53 * hash) + getVehicle().hashCode();
       }
+      hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getLatitude());
+      hash = (37 * hash) + LONGITUDE_FIELD_NUMBER;
+      hash = (53 * hash) + java.lang.Float.floatToIntBits(
+          getLongitude());
       hash = (37 * hash) + STOP_FIELD_NUMBER;
       hash = (53 * hash) + getStop();
       if (hasScheduledArrival()) {
@@ -3267,6 +3481,10 @@ public final class HslRealtime {
           vehicle_ = null;
           vehicleBuilder_ = null;
         }
+        latitude_ = 0F;
+
+        longitude_ = 0F;
+
         stop_ = 0;
 
         if (scheduledArrivalBuilder_ == null) {
@@ -3312,6 +3530,8 @@ public final class HslRealtime {
         } else {
           result.vehicle_ = vehicleBuilder_.build();
         }
+        result.latitude_ = latitude_;
+        result.longitude_ = longitude_;
         result.stop_ = stop_;
         if (scheduledArrivalBuilder_ == null) {
           result.scheduledArrival_ = scheduledArrival_;
@@ -3373,6 +3593,12 @@ public final class HslRealtime {
         if (other == com.dxc.ptinsight.proto.ingress.HslRealtime.Departure.getDefaultInstance()) return this;
         if (other.hasVehicle()) {
           mergeVehicle(other.getVehicle());
+        }
+        if (other.getLatitude() != 0F) {
+          setLatitude(other.getLatitude());
+        }
+        if (other.getLongitude() != 0F) {
+          setLongitude(other.getLongitude());
         }
         if (other.getStop() != 0) {
           setStop(other.getStop());
@@ -3531,9 +3757,71 @@ public final class HslRealtime {
         return vehicleBuilder_;
       }
 
+      private float latitude_ ;
+      /**
+       * <code>float latitude = 2;</code>
+       * @return The latitude.
+       */
+      @java.lang.Override
+      public float getLatitude() {
+        return latitude_;
+      }
+      /**
+       * <code>float latitude = 2;</code>
+       * @param value The latitude to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLatitude(float value) {
+        
+        latitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float latitude = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLatitude() {
+        
+        latitude_ = 0F;
+        onChanged();
+        return this;
+      }
+
+      private float longitude_ ;
+      /**
+       * <code>float longitude = 3;</code>
+       * @return The longitude.
+       */
+      @java.lang.Override
+      public float getLongitude() {
+        return longitude_;
+      }
+      /**
+       * <code>float longitude = 3;</code>
+       * @param value The longitude to set.
+       * @return This builder for chaining.
+       */
+      public Builder setLongitude(float value) {
+        
+        longitude_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>float longitude = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearLongitude() {
+        
+        longitude_ = 0F;
+        onChanged();
+        return this;
+      }
+
       private int stop_ ;
       /**
-       * <code>int32 stop = 2;</code>
+       * <code>int32 stop = 4;</code>
        * @return The stop.
        */
       @java.lang.Override
@@ -3541,7 +3829,7 @@ public final class HslRealtime {
         return stop_;
       }
       /**
-       * <code>int32 stop = 2;</code>
+       * <code>int32 stop = 4;</code>
        * @param value The stop to set.
        * @return This builder for chaining.
        */
@@ -3552,7 +3840,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>int32 stop = 2;</code>
+       * <code>int32 stop = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearStop() {
@@ -3566,14 +3854,14 @@ public final class HslRealtime {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> scheduledArrivalBuilder_;
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        * @return Whether the scheduledArrival field is set.
        */
       public boolean hasScheduledArrival() {
         return scheduledArrivalBuilder_ != null || scheduledArrival_ != null;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        * @return The scheduledArrival.
        */
       public com.google.protobuf.Timestamp getScheduledArrival() {
@@ -3584,7 +3872,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder setScheduledArrival(com.google.protobuf.Timestamp value) {
         if (scheduledArrivalBuilder_ == null) {
@@ -3600,7 +3888,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder setScheduledArrival(
           com.google.protobuf.Timestamp.Builder builderForValue) {
@@ -3614,7 +3902,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder mergeScheduledArrival(com.google.protobuf.Timestamp value) {
         if (scheduledArrivalBuilder_ == null) {
@@ -3632,7 +3920,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public Builder clearScheduledArrival() {
         if (scheduledArrivalBuilder_ == null) {
@@ -3646,7 +3934,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public com.google.protobuf.Timestamp.Builder getScheduledArrivalBuilder() {
         
@@ -3654,7 +3942,7 @@ public final class HslRealtime {
         return getScheduledArrivalFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       public com.google.protobuf.TimestampOrBuilder getScheduledArrivalOrBuilder() {
         if (scheduledArrivalBuilder_ != null) {
@@ -3665,7 +3953,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_arrival = 3;</code>
+       * <code>.google.protobuf.Timestamp scheduled_arrival = 5;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
@@ -3685,14 +3973,14 @@ public final class HslRealtime {
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> scheduledDepartureBuilder_;
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        * @return Whether the scheduledDeparture field is set.
        */
       public boolean hasScheduledDeparture() {
         return scheduledDepartureBuilder_ != null || scheduledDeparture_ != null;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        * @return The scheduledDeparture.
        */
       public com.google.protobuf.Timestamp getScheduledDeparture() {
@@ -3703,7 +3991,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder setScheduledDeparture(com.google.protobuf.Timestamp value) {
         if (scheduledDepartureBuilder_ == null) {
@@ -3719,7 +4007,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder setScheduledDeparture(
           com.google.protobuf.Timestamp.Builder builderForValue) {
@@ -3733,7 +4021,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder mergeScheduledDeparture(com.google.protobuf.Timestamp value) {
         if (scheduledDepartureBuilder_ == null) {
@@ -3751,7 +4039,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public Builder clearScheduledDeparture() {
         if (scheduledDepartureBuilder_ == null) {
@@ -3765,7 +4053,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public com.google.protobuf.Timestamp.Builder getScheduledDepartureBuilder() {
         
@@ -3773,7 +4061,7 @@ public final class HslRealtime {
         return getScheduledDepartureFieldBuilder().getBuilder();
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       public com.google.protobuf.TimestampOrBuilder getScheduledDepartureOrBuilder() {
         if (scheduledDepartureBuilder_ != null) {
@@ -3784,7 +4072,7 @@ public final class HslRealtime {
         }
       }
       /**
-       * <code>.google.protobuf.Timestamp scheduled_departure = 4;</code>
+       * <code>.google.protobuf.Timestamp scheduled_departure = 6;</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
           com.google.protobuf.Timestamp, com.google.protobuf.Timestamp.Builder, com.google.protobuf.TimestampOrBuilder> 
@@ -3891,18 +4179,19 @@ public final class HslRealtime {
       ".com.dxc.ptinsight.ingress.VehicleInfo\022\020" +
       "\n\010latitude\030\002 \001(\002\022\021\n\tlongitude\030\003 \001(\002\022\017\n\007h" +
       "eading\030\004 \001(\005\022\r\n\005speed\030\005 \001(\002\022\024\n\014accelerat" +
-      "ion\030\006 \001(\002\"\300\001\n\007Arrival\0227\n\007vehicle\030\001 \001(\0132&" +
-      ".com.dxc.ptinsight.ingress.VehicleInfo\022\014" +
-      "\n\004stop\030\002 \001(\005\0225\n\021scheduled_arrival\030\003 \001(\0132" +
-      "\032.google.protobuf.Timestamp\0227\n\023scheduled" +
-      "_departure\030\004 \001(\0132\032.google.protobuf.Times" +
-      "tamp\"\302\001\n\tDeparture\0227\n\007vehicle\030\001 \001(\0132&.co" +
-      "m.dxc.ptinsight.ingress.VehicleInfo\022\014\n\004s" +
-      "top\030\002 \001(\005\0225\n\021scheduled_arrival\030\003 \001(\0132\032.g" +
+      "ion\030\006 \001(\002\"\345\001\n\007Arrival\0227\n\007vehicle\030\001 \001(\0132&" +
+      ".com.dxc.ptinsight.ingress.VehicleInfo\022\020" +
+      "\n\010latitude\030\002 \001(\002\022\021\n\tlongitude\030\003 \001(\002\022\014\n\004s" +
+      "top\030\004 \001(\005\0225\n\021scheduled_arrival\030\005 \001(\0132\032.g" +
       "oogle.protobuf.Timestamp\0227\n\023scheduled_de" +
-      "parture\030\004 \001(\0132\032.google.protobuf.Timestam" +
-      "pB!\n\037com.dxc.ptinsight.proto.ingressb\006pr" +
-      "oto3"
+      "parture\030\006 \001(\0132\032.google.protobuf.Timestam" +
+      "p\"\347\001\n\tDeparture\0227\n\007vehicle\030\001 \001(\0132&.com.d" +
+      "xc.ptinsight.ingress.VehicleInfo\022\020\n\010lati" +
+      "tude\030\002 \001(\002\022\021\n\tlongitude\030\003 \001(\002\022\014\n\004stop\030\004 " +
+      "\001(\005\0225\n\021scheduled_arrival\030\005 \001(\0132\032.google." +
+      "protobuf.Timestamp\0227\n\023scheduled_departur" +
+      "e\030\006 \001(\0132\032.google.protobuf.TimestampB!\n\037c" +
+      "om.dxc.ptinsight.proto.ingressb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3927,13 +4216,13 @@ public final class HslRealtime {
     internal_static_com_dxc_ptinsight_ingress_Arrival_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_ingress_Arrival_descriptor,
-        new java.lang.String[] { "Vehicle", "Stop", "ScheduledArrival", "ScheduledDeparture", });
+        new java.lang.String[] { "Vehicle", "Latitude", "Longitude", "Stop", "ScheduledArrival", "ScheduledDeparture", });
     internal_static_com_dxc_ptinsight_ingress_Departure_descriptor =
       getDescriptor().getMessageTypes().get(3);
     internal_static_com_dxc_ptinsight_ingress_Departure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_ingress_Departure_descriptor,
-        new java.lang.String[] { "Vehicle", "Stop", "ScheduledArrival", "ScheduledDeparture", });
+        new java.lang.String[] { "Vehicle", "Latitude", "Longitude", "Stop", "ScheduledArrival", "ScheduledDeparture", });
     com.dxc.ptinsight.proto.Base.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
   }

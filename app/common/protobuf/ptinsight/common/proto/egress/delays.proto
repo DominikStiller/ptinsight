@@ -1,0 +1,14 @@
+syntax = "proto3";
+package com.dxc.ptinsight.egress;
+
+
+option java_package = "com.dxc.ptinsight.proto.egress";
+
+
+message DelayStatistics {
+  int64 geocell = 1;
+  // In seconds
+  int64 percentile50th = 2;
+  int64 percentile90th = 3;
+  int64 percentile99th = 4;
+}

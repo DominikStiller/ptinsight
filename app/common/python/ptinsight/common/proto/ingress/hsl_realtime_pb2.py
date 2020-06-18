@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\037com.dxc.ptinsight.proto.ingress',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n1ptinsight/common/proto/ingress/hsl_realtime.proto\x12\x19\x63om.dxc.ptinsight.ingress\x1a!ptinsight/common/proto/base.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"]\n\x0bVehicleInfo\x12,\n\x04type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x10\n\x08operator\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"\xa5\x01\n\x0fVehiclePosition\x12\x37\n\x07vehicle\x18\x01 \x01(\x0b\x32&.com.dxc.ptinsight.ingress.VehicleInfo\x12\x10\n\x08latitude\x18\x02 \x01(\x02\x12\x11\n\tlongitude\x18\x03 \x01(\x02\x12\x0f\n\x07heading\x18\x04 \x01(\x05\x12\r\n\x05speed\x18\x05 \x01(\x02\x12\x14\n\x0c\x61\x63\x63\x65leration\x18\x06 \x01(\x02\"\xc0\x01\n\x07\x41rrival\x12\x37\n\x07vehicle\x18\x01 \x01(\x0b\x32&.com.dxc.ptinsight.ingress.VehicleInfo\x12\x0c\n\x04stop\x18\x02 \x01(\x05\x12\x35\n\x11scheduled_arrival\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x37\n\x13scheduled_departure\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"\xc2\x01\n\tDeparture\x12\x37\n\x07vehicle\x18\x01 \x01(\x0b\x32&.com.dxc.ptinsight.ingress.VehicleInfo\x12\x0c\n\x04stop\x18\x02 \x01(\x05\x12\x35\n\x11scheduled_arrival\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x37\n\x13scheduled_departure\x18\x04 \x01(\x0b\x32\x1a.google.protobuf.TimestampB!\n\x1f\x63om.dxc.ptinsight.proto.ingressb\x06proto3'
+  serialized_pb=b'\n1ptinsight/common/proto/ingress/hsl_realtime.proto\x12\x19\x63om.dxc.ptinsight.ingress\x1a!ptinsight/common/proto/base.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"]\n\x0bVehicleInfo\x12,\n\x04type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x10\n\x08operator\x18\x02 \x01(\x05\x12\x0e\n\x06number\x18\x03 \x01(\x05\"\xa5\x01\n\x0fVehiclePosition\x12\x37\n\x07vehicle\x18\x01 \x01(\x0b\x32&.com.dxc.ptinsight.ingress.VehicleInfo\x12\x10\n\x08latitude\x18\x02 \x01(\x02\x12\x11\n\tlongitude\x18\x03 \x01(\x02\x12\x0f\n\x07heading\x18\x04 \x01(\x05\x12\r\n\x05speed\x18\x05 \x01(\x02\x12\x14\n\x0c\x61\x63\x63\x65leration\x18\x06 \x01(\x02\"\xe5\x01\n\x07\x41rrival\x12\x37\n\x07vehicle\x18\x01 \x01(\x0b\x32&.com.dxc.ptinsight.ingress.VehicleInfo\x12\x10\n\x08latitude\x18\x02 \x01(\x02\x12\x11\n\tlongitude\x18\x03 \x01(\x02\x12\x0c\n\x04stop\x18\x04 \x01(\x05\x12\x35\n\x11scheduled_arrival\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x37\n\x13scheduled_departure\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\"\xe7\x01\n\tDeparture\x12\x37\n\x07vehicle\x18\x01 \x01(\x0b\x32&.com.dxc.ptinsight.ingress.VehicleInfo\x12\x10\n\x08latitude\x18\x02 \x01(\x02\x12\x11\n\tlongitude\x18\x03 \x01(\x02\x12\x0c\n\x04stop\x18\x04 \x01(\x05\x12\x35\n\x11scheduled_arrival\x18\x05 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\x37\n\x13scheduled_departure\x18\x06 \x01(\x0b\x32\x1a.google.protobuf.TimestampB!\n\x1f\x63om.dxc.ptinsight.proto.ingressb\x06proto3'
   ,
   dependencies=[ptinsight_dot_common_dot_proto_dot_base__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -157,22 +157,36 @@ _ARRIVAL = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='stop', full_name='com.dxc.ptinsight.ingress.Arrival.stop', index=1,
-      number=2, type=5, cpp_type=1, label=1,
+      name='latitude', full_name='com.dxc.ptinsight.ingress.Arrival.latitude', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='longitude', full_name='com.dxc.ptinsight.ingress.Arrival.longitude', index=2,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='stop', full_name='com.dxc.ptinsight.ingress.Arrival.stop', index=3,
+      number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='scheduled_arrival', full_name='com.dxc.ptinsight.ingress.Arrival.scheduled_arrival', index=2,
-      number=3, type=11, cpp_type=10, label=1,
+      name='scheduled_arrival', full_name='com.dxc.ptinsight.ingress.Arrival.scheduled_arrival', index=4,
+      number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='scheduled_departure', full_name='com.dxc.ptinsight.ingress.Arrival.scheduled_departure', index=3,
-      number=4, type=11, cpp_type=10, label=1,
+      name='scheduled_departure', full_name='com.dxc.ptinsight.ingress.Arrival.scheduled_departure', index=5,
+      number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -190,7 +204,7 @@ _ARRIVAL = _descriptor.Descriptor(
   oneofs=[
   ],
   serialized_start=412,
-  serialized_end=604,
+  serialized_end=641,
 )
 
 
@@ -210,22 +224,36 @@ _DEPARTURE = _descriptor.Descriptor(
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='stop', full_name='com.dxc.ptinsight.ingress.Departure.stop', index=1,
-      number=2, type=5, cpp_type=1, label=1,
+      name='latitude', full_name='com.dxc.ptinsight.ingress.Departure.latitude', index=1,
+      number=2, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='longitude', full_name='com.dxc.ptinsight.ingress.Departure.longitude', index=2,
+      number=3, type=2, cpp_type=6, label=1,
+      has_default_value=False, default_value=float(0),
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='stop', full_name='com.dxc.ptinsight.ingress.Departure.stop', index=3,
+      number=4, type=5, cpp_type=1, label=1,
       has_default_value=False, default_value=0,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='scheduled_arrival', full_name='com.dxc.ptinsight.ingress.Departure.scheduled_arrival', index=2,
-      number=3, type=11, cpp_type=10, label=1,
+      name='scheduled_arrival', full_name='com.dxc.ptinsight.ingress.Departure.scheduled_arrival', index=4,
+      number=5, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
       serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
     _descriptor.FieldDescriptor(
-      name='scheduled_departure', full_name='com.dxc.ptinsight.ingress.Departure.scheduled_departure', index=3,
-      number=4, type=11, cpp_type=10, label=1,
+      name='scheduled_departure', full_name='com.dxc.ptinsight.ingress.Departure.scheduled_departure', index=5,
+      number=6, type=11, cpp_type=10, label=1,
       has_default_value=False, default_value=None,
       message_type=None, enum_type=None, containing_type=None,
       is_extension=False, extension_scope=None,
@@ -242,8 +270,8 @@ _DEPARTURE = _descriptor.Descriptor(
   extension_ranges=[],
   oneofs=[
   ],
-  serialized_start=607,
-  serialized_end=801,
+  serialized_start=644,
+  serialized_end=875,
 )
 
 _VEHICLEINFO.fields_by_name['type'].enum_type = ptinsight_dot_common_dot_proto_dot_base__pb2._VEHICLETYPE

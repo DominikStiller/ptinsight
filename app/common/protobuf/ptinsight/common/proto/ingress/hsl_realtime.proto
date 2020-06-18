@@ -25,14 +25,18 @@ message VehiclePosition {
 
 message Arrival {
   VehicleInfo vehicle = 1;
-  int32 stop = 2;
-  google.protobuf.Timestamp scheduled_arrival = 3;
-  google.protobuf.Timestamp scheduled_departure = 4;
+  float latitude = 2;
+  float longitude = 3;
+  int32 stop = 4;
+  google.protobuf.Timestamp scheduled_arrival = 5;
+  google.protobuf.Timestamp scheduled_departure = 6;
 }
 
 message Departure {
   VehicleInfo vehicle = 1;
-  int32 stop = 2;
-  google.protobuf.Timestamp scheduled_arrival = 3;
-  google.protobuf.Timestamp scheduled_departure = 4;
+  float latitude = 2;
+  float longitude = 3;
+  int32 stop = 4;
+  google.protobuf.Timestamp scheduled_arrival = 5;
+  google.protobuf.Timestamp scheduled_departure = 6;
 }

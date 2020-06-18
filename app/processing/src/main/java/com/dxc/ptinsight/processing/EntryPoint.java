@@ -1,6 +1,7 @@
 package com.dxc.ptinsight.processing;
 
 import com.dxc.ptinsight.YamlSerializer;
+import com.dxc.ptinsight.processing.jobs.DelayDetectionJob;
 import com.dxc.ptinsight.processing.jobs.VehicleCountJob;
 import java.io.IOException;
 import org.slf4j.Logger;
@@ -14,6 +15,7 @@ public class EntryPoint {
 
   public static void main(String[] args) throws Exception {
     new VehicleCountJob().execute();
+    new DelayDetectionJob().execute();
   }
 
   public static Configuration getConfiguration() {

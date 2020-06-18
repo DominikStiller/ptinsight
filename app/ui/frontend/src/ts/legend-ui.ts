@@ -19,8 +19,16 @@ export class LegendUi {
     this.defs.append(() => def.node());
   }
 
+  public removeDef(def: D3Selection): void {
+    def.remove();
+  }
+
   public addContent(content: D3Selection): void {
     this.content.append(() => content.node());
+  }
+
+  public removeContent(content: D3Selection): void {
+    content.remove();
   }
 }
 
@@ -88,5 +96,12 @@ export class ColorBar {
     legend.addContent(this.bar);
     legend.addContent(this.minText);
     legend.addContent(this.maxText);
+  }
+
+  public removeFrom(legend: LegendUi): void {
+    legend.removeDef(this.gradientDef);
+    legend.removeContent(this.bar);
+    legend.removeContent(this.minText);
+    legend.removeContent(this.maxText);
   }
 }

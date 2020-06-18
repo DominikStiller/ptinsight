@@ -86,6 +86,7 @@ wget -P /tmp https://github.com/protocolbuffers/protobuf/releases/download/v3.12
 sudo unzip -d /opt/protoc /tmp/protoc-*.zip
 rm /tmp/protoc-*.zip
 sudo chmod -R 755 /opt/protoc
+sudo ln -s /opt/protoc/bin/protoc /usr/local/bin
 ```
 
 ### Java
