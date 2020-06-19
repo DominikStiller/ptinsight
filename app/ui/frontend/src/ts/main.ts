@@ -35,18 +35,25 @@ socket.on("delay-statistics", (msg: any) => {
 });
 
 // General maps
-var streetsLayer = tileLayer.provider("Stadia.AlidadeSmooth");
+var streetsLayerLite = tileLayer.provider("Stamen.TonerLite");
+var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 
 const map = lmap("map-container", {
-  center: [60.2199, 24.9184],
+  center: [60.2199, 24.9284],
   zoom: 11.7,
-  layers: [streetsLayer, vehicleCountsLayer],
+  layers: [streetsLayerLite, vehicleCountsLayer],
 });
 
 control
+  .scale({
+    imperial: false,
+  })
+  .addTo(map);
+control
   .layers(
     {
-      Streets: streetsLayer,
+      "Streets Light": streetsLayerLite,
+      "Streets Dark": streetsLayerDark,
     },
     {
       "Vehicle count": vehicleCountsLayer,
