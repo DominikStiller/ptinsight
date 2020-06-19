@@ -29,7 +29,7 @@ export default class GeocellLayer<T> extends Layer {
     private name: string,
     private popupTextSelector: (data: T) => string = undefined,
     private displayDataSelector: (data: T) => number = (data) => Number(data),
-    private timeout: number = 7000
+    private timeout: number = 10000
   ) {
     super();
     this.colorbar = new ColorBar(

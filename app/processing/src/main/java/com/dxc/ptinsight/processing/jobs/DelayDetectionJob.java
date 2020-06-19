@@ -23,6 +23,7 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** Get statistics of arrival delays for each cell */
 public class DelayDetectionJob extends Job {
 
   private static final Logger LOG = LoggerFactory.getLogger(DelayDetectionJob.class);

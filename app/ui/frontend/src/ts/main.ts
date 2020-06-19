@@ -2,6 +2,7 @@ import "leaflet-providers";
 import { control, map as lmap, tileLayer } from "leaflet";
 import * as socketio from "socket.io-client";
 import GeocellLayer from "./geocell-layer";
+import GeoedgeLayer from "./geoedge-layer";
 import { LegendUi } from "./legend-ui";
 import "./styles";
 
@@ -34,6 +35,15 @@ socket.on("delay-statistics", (msg: any) => {
   delayStatisticsLayer.updateData(msg.geocell, msg);
 });
 
+// Flow direction layer
+const flowDirectionLayer = new GeoedgeLayer(
+  "Flow direction",
+  (data) => `Vehicles in the last 5 min: ${data}`
+);
+socket.on("flow-direction", (msg: any) => {
+  flowDirectionLayer.updateData(msg.edge, msg.count);
+});
+
 // General maps
 var streetsLayerLite = tileLayer.provider("Stamen.TonerLite");
 var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
@@ -58,6 +68,7 @@ control
     {
       "Vehicle count": vehicleCountsLayer,
       "Delay statistics": delayStatisticsLayer,
+      "Flow direction": flowDirectionLayer,
     },
     {
       position: "bottomright",

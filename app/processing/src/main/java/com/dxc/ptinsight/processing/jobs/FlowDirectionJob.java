@@ -23,7 +23,10 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Determines the neighbor cell that */
+/**
+ * Find the most traversed edge for each cell, i.e. the neighbor cell that that the most vehicles
+ * from a cell travel to
+ */
 public class FlowDirectionJob extends Job {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlowDirectionJob.class);
@@ -39,32 +42,7 @@ public class FlowDirectionJob extends Job {
         .process(new CellChangeDetectionProcessFunction())
         .keyBy(value -> value.f0)
         .window(SlidingEventTimeWindows.of(Time.minutes(5), Time.seconds(5)))
-        .process(
-            new ProcessWindowFunction<Tuple2<Long, Long>, Event, Long, TimeWindow>() {
-              @Override
-              public void process(
-                  Long key,
-                  Context ctx,
-                  Iterable<Tuple2<Long, Long>> elements,
-                  Collector<Event> out) {
-                var counts = new HashMap<Long, Integer>();
-                elements.forEach(e -> counts.merge(e.f1, 1, Integer::sum));
-
-                counts.entrySet().stream()
-                    .max(Entry.comparingByValue())
-                    .ifPresent(
-                        targetCell -> {
-                          var edge =
-                              Geocells.h3().getH3UnidirectionalEdge(key, targetCell.getKey());
-                          var details =
-                              FlowDirection.newBuilder()
-                                  .setGeocellsEdge(edge)
-                                  .setCount(targetCell.getValue())
-                                  .build();
-                          out.collect(output(details, ctx.window()));
-                        });
-              }
-            })
+        .process(new FindMostTraversedEdgeProcessFunction())
         .addSink(sink("egress.flow-direction"));
   }
 
@@ -94,6 +72,29 @@ public class FlowDirectionJob extends Job {
       }
 
       lastCellState.update(currentCell);
+    }
+  }
+
+  private static class FindMostTraversedEdgeProcessFunction
+      extends ProcessWindowFunction<Tuple2<Long, Long>, Event, Long, TimeWindow> {
+    @Override
+    public void process(
+        Long key, Context ctx, Iterable<Tuple2<Long, Long>> elements, Collector<Event> out) {
+      var counts = new HashMap<Long, Integer>();
+      elements.forEach(e -> counts.merge(e.f1, 1, Integer::sum));
+
+      counts.entrySet().stream()
+          .max(Entry.comparingByValue())
+          .ifPresent(
+              targetCell -> {
+                var edge = Geocells.h3().getH3UnidirectionalEdge(key, targetCell.getKey());
+                var details =
+                    FlowDirection.newBuilder()
+                        .setGeocellsEdge(edge)
+                        .setCount(targetCell.getValue())
+                        .build();
+                out.collect(output(details, ctx.window()));
+              });
     }
   }
 }

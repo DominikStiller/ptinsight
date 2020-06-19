@@ -19,6 +19,10 @@ import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Count the number of vehicles in each cell If a vehicle was in multiple cells for a window, use
+ * only the last cell
+ */
 public class VehicleCountJob extends Job {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleCountJob.class);
