@@ -18,7 +18,7 @@ class Server:
             "/", view_func=lambda: self.app.send_static_file("index.html")
         )
         if self.app.env == "development":
-            self.app.config['SEND_FILE_MAX_AGE_DEFAULT'] = 0
+            self.app.config["SEND_FILE_MAX_AGE_DEFAULT"] = 0
 
     def start(self):
         threading.Thread(target=self.bridge.start).start()

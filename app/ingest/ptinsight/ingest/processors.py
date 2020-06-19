@@ -69,6 +69,9 @@ class HSLRealtimeProcessor(MQTTProcessor):
         payload = list(payload.values())[0]
         event_timestamp = isoparse(payload["tst"])
 
+        if not payload["lat"] or not payload["long"]:
+            return
+
         if event_type == "ars":
             target_topic = "ingress.arrival"
             event = Arrival()
@@ -84,9 +87,12 @@ class HSLRealtimeProcessor(MQTTProcessor):
         elif event_type == "vp":
             target_topic = "ingress.vehicle-position"
             event = VehiclePosition()
-            event.heading = int(payload["hdg"])
-            event.speed = float(payload["spd"])
-            event.acceleration = float(payload["acc"])
+            if payload["hdg"]:
+                event.heading = int(payload["hdg"])
+            if payload["spd"]:
+                event.speed = float(payload["spd"])
+            if payload["acc"]:
+                event.acceleration = float(payload["acc"])
         else:
             return
 

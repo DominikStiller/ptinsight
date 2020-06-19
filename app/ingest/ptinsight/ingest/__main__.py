@@ -14,20 +14,21 @@ logger = logging.getLogger(__name__)
 
 
 if __name__ == "__main__":
-    logging.basicConfig(level=logging.INFO)
-
     if os.path.exists("config/ingest.yaml"):
         config_path = "config/ingest.yaml"
     elif os.path.exists("config/ingest.default.yaml"):
         config_path = "config/ingest.default.yaml"
     else:
-        logger.error("Config file not found")
+        print("Config file not found")
         sys.exit(1)
 
     with open(config_path) as f:
         config = yaml.safe_load(f)
 
-    if "INGEST_DEBUG" in os.environ:
+    logging.basicConfig()
+    logging.getLogger("ptinsight").setLevel(config["logging"]["level"].upper())
+
+    if config["logging"]["console_producer"]:
         Ingestor.create_debug_producer(config["kafka"])
     else:
         try:

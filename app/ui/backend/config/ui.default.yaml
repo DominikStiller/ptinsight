@@ -1,4 +1,7 @@
 ---
+logging:
+  level: info
+
 kafka:
   protobuf_format: json
   bootstrap_servers:

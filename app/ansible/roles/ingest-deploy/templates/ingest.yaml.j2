@@ -1,4 +1,8 @@
 ---
+logging:
+  level: warning
+  console_producer: false
+
 kafka:
   protobuf_format: json
   bootstrap_servers:
@@ -11,5 +15,5 @@ sources:
       port: 8883
     processor: hsl-realtime
     config:
-      vehicle_types: bus,tram
+      vehicle_types: bus,tram,train
       event_types: ars,dep,vp
