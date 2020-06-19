@@ -10,3 +10,4 @@
     - egress.arrival-count
     - egress.vehicle-count
     - egress.delay-statistics
+    - egress.flow-direction

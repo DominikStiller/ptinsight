@@ -2,13 +2,13 @@ package com.dxc.ptinsight.processing.jobs;
 
 import static com.dxc.ptinsight.proto.Base.Event;
 
+import com.dxc.ptinsight.Geocells;
 import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
-import com.uber.h3core.H3Core;
 import java.io.IOException;
 import java.util.HashMap;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
@@ -22,16 +22,6 @@ import org.slf4j.LoggerFactory;
 public class VehicleCountJob extends Job {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleCountJob.class);
-
-  private static transient H3Core h3;
-
-  static {
-    try {
-      h3 = H3Core.newInstance();
-    } catch (IOException e) {
-      LOG.error("Could not create H3 instance", e);
-    }
-  }
 
   public VehicleCountJob() throws IOException {
     super("Vehicle Counter");
@@ -57,8 +47,11 @@ public class VehicleCountJob extends Job {
       elements.forEach(
           e -> {
             var geocell =
-                h3.geoToH3(
-                    e.getLatitude(), e.getLongitude(), EntryPoint.getConfiguration().h3.resolution);
+                Geocells.h3()
+                    .geoToH3(
+                        e.getLatitude(),
+                        e.getLongitude(),
+                        EntryPoint.getConfiguration().h3.resolution);
             counts.merge(geocell, 1, Integer::sum);
           });
 

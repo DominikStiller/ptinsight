@@ -62,17 +62,16 @@ dependencies {
     // --------------------------------------------------------------
     implementation "org.apache.flink:flink-java:${flinkVersion}"
     implementation "org.apache.flink:flink-streaming-java_${scalaBinaryVersion}:${flinkVersion}"
+    implementation "log4j:log4j:1.2.17"
+    implementation "org.slf4j:slf4j-log4j12:1.7.7"
 
     // --------------------------------------------------------------
     // Dependencies that should be part of the shadow jar, e.g.
     // connectors. These must be in the flinkShadowJar configuration!
     // --------------------------------------------------------------
     flinkShadowJar "org.apache.flink:flink-connector-kafka_2.11:${flinkVersion}"
+    flinkShadowJar "org.apache.flink:flink-cep_2.11:${flinkVersion}"
     flinkShadowJar "com.dxc:ptinsight-common"
-    flinkShadowJar "com.uber:h3:3.6.3"
-
-    implementation "log4j:log4j:1.2.17"
-    implementation "org.slf4j:slf4j-log4j12:1.7.7"
 }
 
 sourceSets {
