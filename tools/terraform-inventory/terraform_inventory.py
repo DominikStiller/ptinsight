@@ -102,16 +102,23 @@ def ssh(instances, args):
                 else:
                     groups = []
 
-                commands.append((command, groups))
+                # Terraform loop index
+                if "index_key" in sub_instance:
+                    index = int(sub_instance["index_key"])
+                else:
+                    index = 0
+
+                commands.append((command, groups, index))
 
     if not args:
         print(commands[0][0])
     else:
-        for command, groups in commands:
-            if args[0] in groups:
+        index = int(args[1]) if len(args) > 1 else 0
+        for command, groups, i in commands:
+            if args[0] in groups and i == index:
                 print(command)
                 return
-        print(f"No host for group {args[0]} found")
+        print(f"No host for group {args[0]} and index {index} found")
 
 
 def main():
