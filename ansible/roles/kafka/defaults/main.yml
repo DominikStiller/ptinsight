@@ -1,0 +1,4 @@
+---
+broker_id: 0
+zookeeper_hosts:
+  - localhost

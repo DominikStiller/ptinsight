@@ -20,7 +20,7 @@
 ############################# Server Basics #############################
 
 # The id of the broker. This must be set to a unique integer for each broker.
-broker.id=0
+broker.id={{ broker_id }}
 auto.create.topics.enable=false
 
 ############################# Socket Server Settings #############################
@@ -31,12 +31,12 @@ auto.create.topics.enable=false
 #     listeners = listener_name://host_name:port
 #   EXAMPLE:
 #     listeners = PLAINTEXT://your.host.name:9092
-listeners=INTERNAL://{{ private_ip }}:9092,EXTERNAL://0.0.0.0:9093
+listeners=INTERNAL://{{ private_ip_addr }}:9092,EXTERNAL://0.0.0.0:9093
 
 # Hostname and port the broker will advertise to producers and consumers. If not set, 
 # it uses the value for "listeners" if configured.  Otherwise, it will use the value
 # returned from java.net.InetAddress.getCanonicalHostName().
-advertised.listeners=INTERNAL://{{ private_ip }}:9092,EXTERNAL://{{ ansible_host }}:9093
+advertised.listeners=INTERNAL://{{ private_ip_addr }}:9092,EXTERNAL://{{ ansible_host }}:9093
 
 inter.broker.listener.name=INTERNAL
 
@@ -125,7 +125,7 @@ log.retention.check.interval.ms=300000
 # server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002".
 # You can also append an optional chroot string to the urls to specify the
 # root directory for all kafka znodes.
-zookeeper.connect=localhost:2181
+zookeeper.connect={{ zookeeper_hosts | map('regex_replace', '$', ':2181') | list | join(',') }}
 
 # Timeout in ms for connecting to zookeeper
 zookeeper.connection.timeout.ms=18000

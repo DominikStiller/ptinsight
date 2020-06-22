@@ -2,7 +2,7 @@
 - name: set up topics
   become: true
   become_user: kafka
-  command: /opt/kafka/bin/kafka-topics.sh --create --zookeeper localhost --replication-factor 1 --partitions 1 --if-not-exists --topic {{ item }}
+  command: /opt/kafka/bin/kafka-topics.sh --create --zookeeper localhost --replication-factor 3 --partitions 1 --if-not-exists --topic {{ item }}
   loop:
     - ingress.arrival
     - ingress.departure

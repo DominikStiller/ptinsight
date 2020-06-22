@@ -2,7 +2,7 @@
 kafka:
   protobuf_format: json
   bootstrap_servers:
-    {{ kafka_servers | to_nice_yaml }}
+    {{ kafka_servers | to_nice_yaml | indent(4) }}
 
 h3:
   resolution: 9

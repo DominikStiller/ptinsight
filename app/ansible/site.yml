@@ -2,32 +2,37 @@
 - name: set up playbook variables
   hosts: all
   tags: always
+  run_once: true
   tasks:
     - name: get Kafka server addresses
-      command:
-        argv: 
-          - "{{ playbook_dir }}/../../tools/terraform-inventory/terraform_inventory.py"
-          - --list-private
-        chdir: "{{ playbook_dir }}/.."
-      delegate_to: localhost
-      register: kafka_servers_result
-    - name: set Kafka server addresses variable
       set_fact:
-        kafka_servers: "{{ (kafka_servers_result.stdout | from_json).kafka | map('regex_replace', '$', ':9092') | list }}"
+        kafka_servers: "{{ groups['kafka'] | map('extract', hostvars, 'private_ip_addr') | map('regex_replace', '$', ':9092') | list }}"
 
 - name: set up all hosts
   hosts: all
   roles:
-    - { role: ../../ansible/roles/common,
-        tags: setup }
+    - role: ../../ansible/roles/common
+      tags: setup
+
+- name: set up Zookeeper cluster
+  hosts: zookeeper
+  vars:
+    - zookeeper_hosts: "{{ groups['zookeeper'] | map('extract', hostvars, 'private_ip_addr') | list }}"
+    - server_id: "{{ groups['zookeeper'].index(inventory_hostname) + 1 }}"
+  roles:
+    - role: ../ansible/roles/zookeeper
+      tags: [setup, setup-zookeeper]
 
 - name: set up Kafka cluster
   hosts: kafka
+  vars:
+    - zookeeper_hosts: "{{ groups['zookeeper'] | map('extract', hostvars, 'private_ip_addr') | list }}"
+    - broker_id: "{{ groups['kafka'].index(inventory_hostname) }}"
   roles:
-    - { role: ../ansible/roles/kafka,
-        tags: [setup, setup-kafka] }
-    - { role: kafka-deploy,
-        tags: [deploy, deploy-kafka] }
+    - role: ../ansible/roles/kafka
+      tags: [setup, setup-kafka]
+    - role: kafka-deploy
+      tags: [deploy, deploy-kafka]
 
 - name: set up processing cluster
   hosts: processing
@@ -35,11 +40,18 @@
     - source_path: "{{ playbook_dir }}/../processing"
     - deploy_path: /opt/ptinsight/processing
     - deploy_user: flink
+    - job_manager_address: "{{ ( groups['kafka'] | map('extract', hostvars, 'private_ip_addr') | list )[0] }}"
+  pre_tasks:
+    - name: set job manager flag
+      tags: setup, setup-processing, deploy, deploy-processing
+      set_fact:
+        is_job_manager: "{{ inventory_hostname == groups['processing'][0] }}"
   roles:
-    - { role: ../ansible/roles/flink,
-        tags: [setup, setup-processing] }
-    - { role: processing-deploy,
-        tags: [deploy, deploy-processing] }
+    - role: ../ansible/roles/flink
+      tags: [setup, setup-processing]
+    - role: processing-deploy
+      tags: [deploy, deploy-processing]
+      when: is_job_manager
 
 - name: set up Ingest cluster
   hosts: ingest
@@ -48,10 +60,10 @@
     - deploy_path: /opt/ptinsight
     - deploy_user: ptinsight
   roles:
-    - { role: ../ansible/roles/python,
-        tags: [setup, setup-ingest] }
-    - { role: ingest-deploy,
-        tags: [deploy, deploy-ingest] }
+    - role: ../ansible/roles/python
+      tags: [setup, setup-ingest]
+    - role: ingest-deploy
+      tags: [deploy, deploy-ingest]
 
 - name: set up UI cluster
   hosts: ui
@@ -62,7 +74,7 @@
   environment:
     PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
   roles:
-    - { role: ../ansible/roles/python,
-        tags: [setup, setup-ui] }
-    - { role: ui-deploy,
-        tags: [deploy, deploy-ui] }
+    - role: ../ansible/roles/python
+      tags: [setup, setup-ui]
+    - role: ui-deploy
+      tags: [deploy, deploy-ui]

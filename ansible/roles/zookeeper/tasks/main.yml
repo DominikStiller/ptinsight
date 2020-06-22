@@ -1,0 +1,84 @@
+---
+- name: add Zookeeper user
+  become: true
+  user:
+    name: zookeeper
+
+- name: check Zookeeper installation
+  become: true
+  command: /opt/zookeeper/bin/zkServer.sh version
+  failed_when: no
+  register: zookeeper_version
+
+- name: install Zookeeper as service
+  become: true
+  block:
+    - name: find Zookeeper mirror
+      uri:
+        url: https://www.apache.org/dyn/closer.cgi?as_json
+        return_content: yes
+      register: zookeeper_mirror
+
+    - name: download and untar Zookeeper
+      unarchive:
+        src: "{{ zookeeper_mirror.json.preferred }}/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz"
+        dest: /opt
+        remote_src: yes
+
+    - name: add generic Zookeeper symlink
+      file:
+        src: /opt/apache-zookeeper-3.6.1-bin
+        dest: /opt/zookeeper
+        state: link
+
+    - name: set Zookeeper permissions
+      file:
+        path: /opt/zookeeper
+        state: directory
+        recurse: yes
+        owner: zookeeper
+        group: zookeeper
+
+    - name: Copy Zookeeper service file
+      template:
+        src: zookeeper.service.j2
+        dest: /usr/lib/systemd/system/zookeeper.service
+
+    - name: reload systemd
+      systemd:
+          daemon_reload: yes
+  when: >
+    zookeeper_version.rc != 0 or not zookeeper_version.stdout is search('3.6.1')
+
+- name: upload server configuration
+  become: true
+  template:
+    src: zoo.cfg.j2
+    dest: '/opt/zookeeper/conf/zoo.cfg'
+  notify:
+    - restart Zookeeper service
+
+- name: set server id
+  become: true
+  copy:
+    content: "{{ server_id }}"
+    dest: /tmp/zookeeper/myid
+    owner: zookeeper
+    group: zookeeper
+
+- name: create initialize file
+  become: true
+  file:
+    path: /tmp/zookeeper/initialize
+    state: touch
+    owner: zookeeper
+    group: zookeeper
+
+- meta: flush_handlers
+
+- name: start the Zookeeper service
+  become: true
+  service:
+    name: zookeeper
+    state: started
+    enabled: yes

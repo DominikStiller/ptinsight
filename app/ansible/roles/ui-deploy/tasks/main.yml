@@ -1,5 +1,6 @@
 ---
 - name: build frontend bundle
+  run_once: true
   shell:
     cmd: PATH=/bin:$PATH && NVM_DIR=~/.nvm && . "$NVM_DIR/nvm.sh" && nvm use node && npm run build
     chdir: "{{ source_path }}/frontend"

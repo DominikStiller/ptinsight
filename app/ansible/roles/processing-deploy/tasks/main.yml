@@ -1,5 +1,6 @@
 ---
 - name: build jobs
+  run_once: true
   command:
     argv: 
       - ./gradlew

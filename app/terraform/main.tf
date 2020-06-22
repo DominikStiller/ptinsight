@@ -63,9 +63,10 @@ resource "aws_key_pair" "deploy" {
 
 # ---- >> Core (Processing + Kafka) ---------------
 resource "aws_instance" "core" {
+    count = 3
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.large"
+    instance_type          = "t3.medium"
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.core.name
 
@@ -74,12 +75,12 @@ resource "aws_instance" "core" {
 
     root_block_device {
         delete_on_termination = true
-        volume_size = 32
+        volume_size = 16
     }
 
     tags = {
-        Name = "${local.name_prefix}core"
-        AnsibleGroups = "processing,kafka"
+        Name = "${local.name_prefix}core-${count.index}"
+        AnsibleGroups = "processing,kafka,zookeeper"
         AnsibleVar_ansible_user = "centos"
         AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }
@@ -332,7 +333,7 @@ resource "aws_security_group" "ui" {
 # --------------------------------------------
 
 output "core_host" {
-    value = aws_instance.core.public_ip
+    value = aws_instance.core.*.public_ip
 }
 output "ingest_host" {
     value = aws_instance.ingest.public_ip
