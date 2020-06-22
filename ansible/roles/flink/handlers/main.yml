@@ -1,6 +1,12 @@
 ---
-- name: restart Flink service
+- name: restart the Flink job manager service
   become: true
   service:
-    name: flink
+    name: flink-jobmanager
+    state: restarted
+
+- name: restart the Flink task manager service
+  become: true
+  service:
+    name: flink-taskmanager
     state: restarted

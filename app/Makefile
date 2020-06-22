@@ -32,6 +32,14 @@ define ansible_cmd =
 endef
 setup:
 	$(call ansible_cmd, "setup")
+setup-processing:
+	$(call ansible_cmd, "setup-processing")
+setup-kafka:
+	$(call ansible_cmd, "setup-kafka")
+setup-ingest:
+	$(call ansible_cmd, "setup-ingest")
+setup-ui:
+	$(call ansible_cmd, "setup-ui")
 deploy:
 	$(call ansible_cmd, "deploy")
 deploy-processing:

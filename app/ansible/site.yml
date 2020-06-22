@@ -25,7 +25,7 @@
   hosts: kafka
   roles:
     - { role: ../ansible/roles/kafka,
-        tags: setup }
+        tags: [setup, setup-kafka] }
     - { role: kafka-deploy,
         tags: [deploy, deploy-kafka] }
 
@@ -37,7 +37,7 @@
     - deploy_user: flink
   roles:
     - { role: ../ansible/roles/flink,
-        tags: setup }
+        tags: [setup, setup-processing] }
     - { role: processing-deploy,
         tags: [deploy, deploy-processing] }
 
@@ -49,7 +49,7 @@
     - deploy_user: ptinsight
   roles:
     - { role: ../ansible/roles/python,
-        tags: setup }
+        tags: [setup, setup-ingest] }
     - { role: ingest-deploy,
         tags: [deploy, deploy-ingest] }
 
@@ -63,6 +63,6 @@
     PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
   roles:
     - { role: ../ansible/roles/python,
-        tags: setup }
+        tags: [setup, setup-ui] }
     - { role: ui-deploy,
         tags: [deploy, deploy-ui] }

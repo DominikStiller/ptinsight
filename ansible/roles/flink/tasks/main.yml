@@ -41,11 +41,18 @@
     
   when: >
     flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.10.1')
-- name: Copy Flink service file
+
+- name: Copy Flink job manager service file
   become: true
   template:
-    src: flink.service.j2
-    dest: /usr/lib/systemd/system/flink.service
+    src: flink-jobmanager.service.j2
+    dest: /usr/lib/systemd/system/flink-jobmanager.service
+
+- name: Copy Flink task manager service file
+  become: true
+  template:
+    src: flink-taskmanager.service.j2
+    dest: /usr/lib/systemd/system/flink-taskmanager.service
 
 - name: reload systemd
   become: true
@@ -58,13 +65,21 @@
     src: flink-conf.yaml.j2
     dest: '/opt/flink/conf/flink-conf.yaml'
   notify:
-    - restart Flink service
+    - restart the Flink job manager service
+    - restart the Flink task manager service
 
 - meta: flush_handlers
 
-- name: start the Flink service
+- name: start the Flink job manager service
   become: true
   service:
-    name: flink
+    name: flink-jobmanager
+    state: started
+    enabled: yes
+
+- name: start the Flink task manager service
+  become: true
+  service:
+    name: flink-taskmanager
     state: started
     enabled: yes

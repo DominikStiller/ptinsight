@@ -1,0 +1,18 @@
+[Unit]
+Description=Apache Flink Job Manager
+Documentation=https://flink.apache.org/
+Requires=network.target
+After=network.target
+
+[Service]
+Type=forking
+ExecStart=/opt/flink/bin/jobmanager.sh start
+ExecStop=/opt/flink/bin/jobmanager.sh stop
+User=flink
+Group=flink
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
+Alias=flink-jobmanager.service

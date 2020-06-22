@@ -15,4 +15,5 @@ init_file="${root}/../python/ptinsight/common/proto/__init__.py"
         package="${f%.*}"
         echo "from ${package//\//.}_pb2 import *" >> $init_file
     done
+    shopt -u globstar
 )

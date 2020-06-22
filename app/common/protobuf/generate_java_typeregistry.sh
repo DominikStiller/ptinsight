@@ -18,6 +18,7 @@ java_dir="$(realpath "$(dirname "$0")")/../java/src/main/java/com/dxc/ptinsight/
             adds+="    .add($file.getDescriptor().getMessageTypes())"$'\n'
         fi
     done
+    shopt -u globstar
 
     cat > $java_dir/Registry.java <<-EOF 
 // AUTO-GENERATED, DO NOT EDIT!
