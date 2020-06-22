@@ -25,6 +25,10 @@ public final class Flow {
     long getGeocellsEdge();
 
     /**
+     * <pre>
+     * Number of vehicles that traversed the edge
+     * </pre>
+     *
      * <code>int32 count = 2;</code>
      * @return The count.
      */
@@ -131,6 +135,10 @@ public final class Flow {
     public static final int COUNT_FIELD_NUMBER = 2;
     private int count_;
     /**
+     * <pre>
+     * Number of vehicles that traversed the edge
+     * </pre>
+     *
      * <code>int32 count = 2;</code>
      * @return The count.
      */
@@ -492,6 +500,10 @@ public final class Flow {
 
       private int count_ ;
       /**
+       * <pre>
+       * Number of vehicles that traversed the edge
+       * </pre>
+       *
        * <code>int32 count = 2;</code>
        * @return The count.
        */
@@ -500,6 +512,10 @@ public final class Flow {
         return count_;
       }
       /**
+       * <pre>
+       * Number of vehicles that traversed the edge
+       * </pre>
+       *
        * <code>int32 count = 2;</code>
        * @param value The count to set.
        * @return This builder for chaining.
@@ -511,6 +527,10 @@ public final class Flow {
         return this;
       }
       /**
+       * <pre>
+       * Number of vehicles that traversed the edge
+       * </pre>
+       *
        * <code>int32 count = 2;</code>
        * @return This builder for chaining.
        */

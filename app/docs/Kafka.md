@@ -5,11 +5,15 @@ Apache Kafka is used as event transport and storage backbone. Every topic only c
 
 ## Topics
 
-| Topic                   | Description                   | Source      |
-| ----------------------- | ----------------------------- | ----------- |
-| ingress.arrival         | Arrivals of vehicles at stops | HSL.fi MQTT |
-| ingress.departure       | Departures of vehicles from stops | HSL.fi MQTT |
-| ingess.vehicle-position | Positions of vehicles         | HSL.fi MQTT |
+| Topic                   | Description                        | Source                | Protobuf Type                                   |
+| ----------------------- | ---------------------------------- | --------------------- | ----------------------------------------------- |
+| ingress.arrival         | Arrival of vehicle at stop         | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Arrival         |
+| ingress.departure       | Departure of vehicle from stop     | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Departure       |
+| ingess.vehicle-position | Position and speed of vehicle      | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.VehiclePosition |
+| egress.arrival-count    | Number of arrivals by vehicle type | PT Insight Processing | com.dxc.ptinsight.proto.egress.ArrivalCount     |
+| egress.vehicle-count    | Number of vehicles per geocell     | PT Insight Processing | com.dxc.ptinsight.proto.egress.VehicleCount     |
+| egress.delay-statistics | Arrival delay statistics per cell  | PT Insight Processing | com.dxc.ptinsight.proto.egress.DelayStatistics  |
+| egress.flow-direction   | Flow direction betweenc ells       | PT Insight Processing | com.dxc.ptinsight.proto.egress.FlowDirection    |
 
 
 ## Addresses

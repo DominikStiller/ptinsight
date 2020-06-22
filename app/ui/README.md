@@ -20,7 +20,7 @@ Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shel
 ### Configuration
 
 Default: `config/ui.default.yaml`  
-Local: `config/ui.yaml`  (create a copy of default)
+Local: `config/ui.yaml`  (create a copy of default)  
 Deployed: `../ansible/roles/ui-deploy/templates/ui.yaml.j2`
 
 
@@ -33,5 +33,4 @@ Deployed: `../ansible/roles/ui-deploy/templates/ui.yaml.j2`
 
 ### Development
 
-Set up your development environment with `npm install` and start the Webpack bundler (to update the published assets
-) using `npm run build-watch`.
+Set up your development environment with `npm install` and start the Webpack bundler (to update the published assets) using `npm run build-watch`.

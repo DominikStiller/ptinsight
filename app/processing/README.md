@@ -17,5 +17,5 @@ Run via `./gradlew run` or create distribution jar via `./gradlew clean shadowJa
 ## Configuration
 
 Default: `config/processing.default.yaml`  
-Local: `config/processing.yaml`  (create a copy of default)
+Local: `config/processing.yaml`  (create a copy of default)  
 Deployed: `../ansible/roles/processing-deploy/templates/processing.yaml.j2`
