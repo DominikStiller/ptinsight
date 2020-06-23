@@ -1,3 +1,4 @@
 ---
-is_job_manager: false
+is_job_manager: true
 job_manager_address: localhost
+storage_root: file:///tmp/flink

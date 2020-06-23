@@ -6,8 +6,9 @@ import sys
 import os
 
 
-def ansible_list(instances, args):
+def ansible_list(tfstate, args):
     inventory = {"_meta": {"hostvars": {}}}
+    instances = _get_instances(tfstate)
 
     def add_host(group, ip_addr):
         if group not in inventory:
@@ -30,7 +31,9 @@ def ansible_list(instances, args):
 
                 # Extract private IP
                 if "private_ip" in sub_instance_attributes:
-                    inventory["_meta"]["hostvars"][public_ip_addr]["private_ip_addr"] = sub_instance_attributes["private_ip"]
+                    inventory["_meta"]["hostvars"][public_ip_addr][
+                        "private_ip_addr"
+                    ] = sub_instance_attributes["private_ip"]
 
                 # Add to all group and groups specified in tags
                 add_host("all", public_ip_addr)
@@ -41,8 +44,24 @@ def ansible_list(instances, args):
     print(json.dumps(inventory, indent=2))
 
 
-def ssh(instances, args):
+def resources(tfstate, args):
+    resources = {}
+
+    for resource in tfstate["resources"]:
+        name = resource["name"]
+        type = resource["type"]
+        instances = resource["instances"]
+
+        if not type in resources:
+            resources[type] = {}
+        resources[type][name] = [r["attributes"] for r in instances]
+
+    print(json.dumps(resources, indent=2))
+
+
+def ssh(tfstate, args):
     commands = []
+    instances = _get_instances(tfstate)
 
     for instance in instances:
         for sub_instance in instance["instances"]:
@@ -96,11 +115,21 @@ def ssh(instances, args):
         print(f"No host for group {args[0]} and index {index} found")
 
 
+def _get_instances(tfstate):
+    return (
+        instance
+        for instance in tfstate["resources"]
+        if instance["type"] == "aws_instance"
+    )
+
+
 def main():
     # Implementing --host is not necessary because _meta is populated in --list
     # https://docs.ansible.com/ansible/latest/dev_guide/developing_inventory.html#tuning-the-external-inventory-script
     if sys.argv[1] == "--list":
         command = ansible_list
+    elif sys.argv[1] == "--resources":
+        command = resources
     elif sys.argv[1] == "--ssh":
         command = ssh
     else:
@@ -119,13 +148,8 @@ def main():
     # Load EC2 instances
     with open(path, "r") as file:
         tfstate = json.load(file)
-    instances = (
-        instance
-        for instance in tfstate["resources"]
-        if instance["type"] == "aws_instance"
-    )
 
-    command(instances, sys.argv[2:])
+    command(tfstate, sys.argv[2:])
 
 
 if __name__ == "__main__":

@@ -31,6 +31,16 @@
         dest: /opt/flink
         state: link
 
+    - name: create s3-fs-presto plugin directory
+      file:
+        path: /opt/flink/plugins/s3-fs-presto
+        state: directory
+
+    - name: download s3-fs-presto plugin
+      get_url:
+        url: https://repo1.maven.org/maven2/org/apache/flink/flink-s3-fs-presto/1.10.1/flink-s3-fs-presto-1.10.1.jar
+        dest: /opt/flink/plugins/s3-fs-presto/flink-s3-fs-presto-1.10.1.jar
+
     - name: set Flink permissions
       file:
         path: /opt/flink

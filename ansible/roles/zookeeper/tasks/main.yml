@@ -58,6 +58,14 @@
   notify:
     - restart Zookeeper service
 
+- name: create Zookeeper data directory
+  become: true
+  file:
+    path: /tmp/zookeeper
+    state: directory
+    owner: zookeeper
+    group: zookeeper
+
 - name: set server id
   become: true
   copy:

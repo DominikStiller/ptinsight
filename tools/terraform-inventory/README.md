@@ -22,6 +22,11 @@ Usage (with Ansible): `ansible-playbook -i path/to/terraform_inventory.py playbo
 
 Prints the inventory as JSON.
 
+### Cloud Resources
+Usage: `path/to/terraform_inventory.py --resources`  
+
+Prints all cloud resources as JSON.
+
 ## SSH Command
 Usage (print): `path/to/terraform_inventory.py --ssh [group] [index]`  
 Usage (execute): `$(path/to/terraform_inventory.py --ssh [group] [index])`

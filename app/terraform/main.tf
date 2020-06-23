@@ -112,6 +112,29 @@ resource "aws_iam_role" "core" {
 EOF
 }
 
+resource "aws_iam_role_policy" "s3_read_write" {
+
+    role = aws_iam_role.core.name
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "${aws_s3_bucket.flink.arn}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "${aws_s3_bucket.flink.arn}/*"
+        }
+    ]
+}
+EOF
+}
+
 resource "aws_security_group" "core" {
 
     name   = "${local.name_prefix}core"
@@ -325,6 +348,17 @@ resource "aws_security_group" "ui" {
     }
 }
 # ---- << UI ---------------------------------
+
+
+
+# --------------------------------------------
+#      Storage
+# --------------------------------------------
+resource "aws_s3_bucket" "flink" {
+  bucket = "${local.name_prefix}flink"
+  acl    = "private"
+  force_destroy = true
+}
 
 
 

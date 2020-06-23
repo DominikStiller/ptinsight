@@ -7,6 +7,7 @@ import com.google.protobuf.Any;
 import com.google.protobuf.Message;
 import java.time.Instant;
 import java.util.Properties;
+import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
@@ -16,6 +17,7 @@ import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
+import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer.Semantic;
 
 public abstract class Job {
 
@@ -33,13 +35,16 @@ public abstract class Job {
 
   private void configureEnvironment() {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE)
+        .getCheckpointConfig();
   }
 
   private void configureKafka() {
     props.clear();
 
-    var config = EntryPoint.getConfiguration().kafka;
-    props.setProperty("bootstrap.servers", String.join(",", config.bootstrapServers));
+    var kafkaConfig = EntryPoint.getConfiguration().kafka;
+    props.setProperty("bootstrap.servers", String.join(",", kafkaConfig.bootstrapServers));
+    props.setProperty("group.id", "ptinsight_" + this.name.replace(' ', '_'));
   }
 
   protected final <T extends Message> SingleOutputStreamOperator<T> source(
@@ -59,10 +64,7 @@ public abstract class Job {
 
   protected final SinkFunction<Event> sink(String topic) {
     return new FlinkKafkaProducer<>(
-        topic,
-        new EventSerializationSchema(topic),
-        props,
-        FlinkKafkaProducer.Semantic.EXACTLY_ONCE);
+        topic, new EventSerializationSchema(topic), props, Semantic.AT_LEAST_ONCE);
   }
 
   protected static Event output(Message details) {

@@ -1,2 +1,3 @@
 ---
 server_id: 1
+zookeeper_hosts: [ localhost ]

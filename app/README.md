@@ -39,7 +39,7 @@ _Note: Steps 2-4 can be executed in a single command using `make all`_
 make apply
 ```
 
-3. Install platforms (Java, Python, Flink, Kafka...)
+3. Install platforms (Java, Python, Flink, Kafka...). Rerun this step when you change server configurations.
 ```
 make setup
 ```

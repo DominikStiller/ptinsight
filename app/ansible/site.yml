@@ -4,9 +4,24 @@
   tags: always
   run_once: true
   tasks:
+    - name: get Zookeeper hosts
+      set_fact:
+        zookeeper_hosts: "{{ groups['zookeeper'] | map('extract', hostvars, 'private_ip_addr') | list }}"
+    - name: get Zookeeper server addresses
+      set_fact:
+        zookeeper_servers: "{{ zookeeper_hosts | map('regex_replace', '$', ':2181') | list }}"
     - name: get Kafka server addresses
       set_fact:
         kafka_servers: "{{ groups['kafka'] | map('extract', hostvars, 'private_ip_addr') | map('regex_replace', '$', ':9092') | list }}"
+    - name: get cloud resources
+      command:
+        cmd: "{{ playbook_dir }}/../../tools/terraform-inventory/terraform_inventory.py --resources"
+        chdir: "{{ playbook_dir }}/.."
+      delegate_to: localhost
+      register: tmp
+    - name: get cloud resources
+      set_fact:
+        cloud_resources: "{{ tmp.stdout | from_json}}"
 
 - name: set up all hosts
   hosts: all
@@ -17,7 +32,6 @@
 - name: set up Zookeeper cluster
   hosts: zookeeper
   vars:
-    - zookeeper_hosts: "{{ groups['zookeeper'] | map('extract', hostvars, 'private_ip_addr') | list }}"
     - server_id: "{{ groups['zookeeper'].index(inventory_hostname) + 1 }}"
   roles:
     - role: ../ansible/roles/zookeeper
@@ -26,7 +40,6 @@
 - name: set up Kafka cluster
   hosts: kafka
   vars:
-    - zookeeper_hosts: "{{ groups['zookeeper'] | map('extract', hostvars, 'private_ip_addr') | list }}"
     - broker_id: "{{ groups['kafka'].index(inventory_hostname) }}"
   roles:
     - role: ../ansible/roles/kafka
@@ -40,18 +53,18 @@
     - source_path: "{{ playbook_dir }}/../processing"
     - deploy_path: /opt/ptinsight/processing
     - deploy_user: flink
-    - job_manager_address: "{{ ( groups['kafka'] | map('extract', hostvars, 'private_ip_addr') | list )[0] }}"
+    - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
   pre_tasks:
     - name: set job manager flag
       tags: setup, setup-processing, deploy, deploy-processing
       set_fact:
-        is_job_manager: "{{ inventory_hostname == groups['processing'][0] }}"
+        is_first_job_manager: "{{ inventory_hostname == groups['processing'][0] }}"
   roles:
     - role: ../ansible/roles/flink
       tags: [setup, setup-processing]
     - role: processing-deploy
       tags: [deploy, deploy-processing]
-      when: is_job_manager
+      when: is_first_job_manager
 
 - name: set up Ingest cluster
   hosts: ingest

@@ -80,6 +80,9 @@ offsets.topic.replication.factor=1
 transaction.state.log.replication.factor=1
 transaction.state.log.min.isr=1
 
+# Required for Flink's KafkaProducer exactly-once semantics
+transaction.max.timeout.ms=3600000
+
 ############################# Log Flush Policy #############################
 
 # Messages are immediately written to the filesystem but by default we only fsync() to sync
@@ -125,7 +128,7 @@ log.retention.check.interval.ms=300000
 # server. e.g. "127.0.0.1:3000,127.0.0.1:3001,127.0.0.1:3002".
 # You can also append an optional chroot string to the urls to specify the
 # root directory for all kafka znodes.
-zookeeper.connect={{ zookeeper_hosts | map('regex_replace', '$', ':2181') | list | join(',') }}
+zookeeper.connect={{ zookeeper_servers | join(',') }}
 
 # Timeout in ms for connecting to zookeeper
 zookeeper.connection.timeout.ms=18000
