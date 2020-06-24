@@ -35,8 +35,7 @@ public abstract class Job {
 
   private void configureEnvironment() {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE)
-        .getCheckpointConfig();
+    env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE).getCheckpointConfig();
   }
 
   private void configureKafka() {

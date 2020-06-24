@@ -44,6 +44,15 @@ socket.on("flow-direction", (msg: any) => {
   flowDirectionLayer.updateData(msg.edge, msg.count);
 });
 
+// Final stop counts layer
+const finalStopCountsLayer = new GeocellLayer(
+  "Final Stop Count",
+  (data) => `Vehicles bound for here in the last 5 min: ${data}`
+).addToLegend(legend);
+socket.on("final-stop-count", (msg: any) => {
+  finalStopCountsLayer.updateData(msg.geocell, msg.count);
+});
+
 // General maps
 var streetsLayerLite = tileLayer.provider("Stamen.TonerLite");
 var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
@@ -51,7 +60,7 @@ var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 const map = lmap("map-container", {
   center: [60.2199, 24.9284],
   zoom: 11.7,
-  layers: [streetsLayerLite, vehicleCountsLayer],
+  layers: [streetsLayerLite, finalStopCountsLayer],
 });
 
 control
@@ -69,6 +78,7 @@ control
       "Vehicle count": vehicleCountsLayer,
       "Delay statistics": delayStatisticsLayer,
       "Flow direction": flowDirectionLayer,
+      "Final stop count": finalStopCountsLayer,
     },
     {
       position: "bottomright",

@@ -679,6 +679,945 @@ public final class HslRealtime {
 
   }
 
+  public interface RouteInfoOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.dxc.ptinsight.ingress.RouteInfo)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>string id = 1;</code>
+     * @return The id.
+     */
+    java.lang.String getId();
+    /**
+     * <code>string id = 1;</code>
+     * @return The bytes for id.
+     */
+    com.google.protobuf.ByteString
+        getIdBytes();
+
+    /**
+     * <code>bool direction = 2;</code>
+     * @return The direction.
+     */
+    boolean getDirection();
+
+    /**
+     * <code>string operating_day = 3;</code>
+     * @return The operatingDay.
+     */
+    java.lang.String getOperatingDay();
+    /**
+     * <code>string operating_day = 3;</code>
+     * @return The bytes for operatingDay.
+     */
+    com.google.protobuf.ByteString
+        getOperatingDayBytes();
+
+    /**
+     * <code>string departure_time = 4;</code>
+     * @return The departureTime.
+     */
+    java.lang.String getDepartureTime();
+    /**
+     * <code>string departure_time = 4;</code>
+     * @return The bytes for departureTime.
+     */
+    com.google.protobuf.ByteString
+        getDepartureTimeBytes();
+  }
+  /**
+   * Protobuf type {@code com.dxc.ptinsight.ingress.RouteInfo}
+   */
+  public static final class RouteInfo extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:com.dxc.ptinsight.ingress.RouteInfo)
+      RouteInfoOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use RouteInfo.newBuilder() to construct.
+    private RouteInfo(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private RouteInfo() {
+      id_ = "";
+      operatingDay_ = "";
+      departureTime_ = "";
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new RouteInfo();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private RouteInfo(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 10: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              id_ = s;
+              break;
+            }
+            case 16: {
+
+              direction_ = input.readBool();
+              break;
+            }
+            case 26: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              operatingDay_ = s;
+              break;
+            }
+            case 34: {
+              java.lang.String s = input.readStringRequireUtf8();
+
+              departureTime_ = s;
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.dxc.ptinsight.proto.ingress.HslRealtime.internal_static_com_dxc_ptinsight_ingress_RouteInfo_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.dxc.ptinsight.proto.ingress.HslRealtime.internal_static_com_dxc_ptinsight_ingress_RouteInfo_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.class, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder.class);
+    }
+
+    public static final int ID_FIELD_NUMBER = 1;
+    private volatile java.lang.Object id_;
+    /**
+     * <code>string id = 1;</code>
+     * @return The id.
+     */
+    @java.lang.Override
+    public java.lang.String getId() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        id_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string id = 1;</code>
+     * @return The bytes for id.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getIdBytes() {
+      java.lang.Object ref = id_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        id_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DIRECTION_FIELD_NUMBER = 2;
+    private boolean direction_;
+    /**
+     * <code>bool direction = 2;</code>
+     * @return The direction.
+     */
+    @java.lang.Override
+    public boolean getDirection() {
+      return direction_;
+    }
+
+    public static final int OPERATING_DAY_FIELD_NUMBER = 3;
+    private volatile java.lang.Object operatingDay_;
+    /**
+     * <code>string operating_day = 3;</code>
+     * @return The operatingDay.
+     */
+    @java.lang.Override
+    public java.lang.String getOperatingDay() {
+      java.lang.Object ref = operatingDay_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        operatingDay_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string operating_day = 3;</code>
+     * @return The bytes for operatingDay.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getOperatingDayBytes() {
+      java.lang.Object ref = operatingDay_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        operatingDay_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    public static final int DEPARTURE_TIME_FIELD_NUMBER = 4;
+    private volatile java.lang.Object departureTime_;
+    /**
+     * <code>string departure_time = 4;</code>
+     * @return The departureTime.
+     */
+    @java.lang.Override
+    public java.lang.String getDepartureTime() {
+      java.lang.Object ref = departureTime_;
+      if (ref instanceof java.lang.String) {
+        return (java.lang.String) ref;
+      } else {
+        com.google.protobuf.ByteString bs = 
+            (com.google.protobuf.ByteString) ref;
+        java.lang.String s = bs.toStringUtf8();
+        departureTime_ = s;
+        return s;
+      }
+    }
+    /**
+     * <code>string departure_time = 4;</code>
+     * @return The bytes for departureTime.
+     */
+    @java.lang.Override
+    public com.google.protobuf.ByteString
+        getDepartureTimeBytes() {
+      java.lang.Object ref = departureTime_;
+      if (ref instanceof java.lang.String) {
+        com.google.protobuf.ByteString b = 
+            com.google.protobuf.ByteString.copyFromUtf8(
+                (java.lang.String) ref);
+        departureTime_ = b;
+        return b;
+      } else {
+        return (com.google.protobuf.ByteString) ref;
+      }
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (!getIdBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 1, id_);
+      }
+      if (direction_ != false) {
+        output.writeBool(2, direction_);
+      }
+      if (!getOperatingDayBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 3, operatingDay_);
+      }
+      if (!getDepartureTimeBytes().isEmpty()) {
+        com.google.protobuf.GeneratedMessageV3.writeString(output, 4, departureTime_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (!getIdBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(1, id_);
+      }
+      if (direction_ != false) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeBoolSize(2, direction_);
+      }
+      if (!getOperatingDayBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(3, operatingDay_);
+      }
+      if (!getDepartureTimeBytes().isEmpty()) {
+        size += com.google.protobuf.GeneratedMessageV3.computeStringSize(4, departureTime_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo)) {
+        return super.equals(obj);
+      }
+      com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo other = (com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo) obj;
+
+      if (!getId()
+          .equals(other.getId())) return false;
+      if (getDirection()
+          != other.getDirection()) return false;
+      if (!getOperatingDay()
+          .equals(other.getOperatingDay())) return false;
+      if (!getDepartureTime()
+          .equals(other.getDepartureTime())) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + ID_FIELD_NUMBER;
+      hash = (53 * hash) + getId().hashCode();
+      hash = (37 * hash) + DIRECTION_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashBoolean(
+          getDirection());
+      hash = (37 * hash) + OPERATING_DAY_FIELD_NUMBER;
+      hash = (53 * hash) + getOperatingDay().hashCode();
+      hash = (37 * hash) + DEPARTURE_TIME_FIELD_NUMBER;
+      hash = (53 * hash) + getDepartureTime().hashCode();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.dxc.ptinsight.ingress.RouteInfo}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.dxc.ptinsight.ingress.RouteInfo)
+        com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.dxc.ptinsight.proto.ingress.HslRealtime.internal_static_com_dxc_ptinsight_ingress_RouteInfo_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.dxc.ptinsight.proto.ingress.HslRealtime.internal_static_com_dxc_ptinsight_ingress_RouteInfo_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.class, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder.class);
+      }
+
+      // Construct using com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        id_ = "";
+
+        direction_ = false;
+
+        operatingDay_ = "";
+
+        departureTime_ = "";
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.dxc.ptinsight.proto.ingress.HslRealtime.internal_static_com_dxc_ptinsight_ingress_RouteInfo_descriptor;
+      }
+
+      @java.lang.Override
+      public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo getDefaultInstanceForType() {
+        return com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo build() {
+        com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo buildPartial() {
+        com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo result = new com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo(this);
+        result.id_ = id_;
+        result.direction_ = direction_;
+        result.operatingDay_ = operatingDay_;
+        result.departureTime_ = departureTime_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo) {
+          return mergeFrom((com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo other) {
+        if (other == com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.getDefaultInstance()) return this;
+        if (!other.getId().isEmpty()) {
+          id_ = other.id_;
+          onChanged();
+        }
+        if (other.getDirection() != false) {
+          setDirection(other.getDirection());
+        }
+        if (!other.getOperatingDay().isEmpty()) {
+          operatingDay_ = other.operatingDay_;
+          onChanged();
+        }
+        if (!other.getDepartureTime().isEmpty()) {
+          departureTime_ = other.departureTime_;
+          onChanged();
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private java.lang.Object id_ = "";
+      /**
+       * <code>string id = 1;</code>
+       * @return The id.
+       */
+      public java.lang.String getId() {
+        java.lang.Object ref = id_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          id_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string id = 1;</code>
+       * @return The bytes for id.
+       */
+      public com.google.protobuf.ByteString
+          getIdBytes() {
+        java.lang.Object ref = id_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          id_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string id = 1;</code>
+       * @param value The id to set.
+       * @return This builder for chaining.
+       */
+      public Builder setId(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        id_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string id = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearId() {
+        
+        id_ = getDefaultInstance().getId();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string id = 1;</code>
+       * @param value The bytes for id to set.
+       * @return This builder for chaining.
+       */
+      public Builder setIdBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        id_ = value;
+        onChanged();
+        return this;
+      }
+
+      private boolean direction_ ;
+      /**
+       * <code>bool direction = 2;</code>
+       * @return The direction.
+       */
+      @java.lang.Override
+      public boolean getDirection() {
+        return direction_;
+      }
+      /**
+       * <code>bool direction = 2;</code>
+       * @param value The direction to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDirection(boolean value) {
+        
+        direction_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>bool direction = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDirection() {
+        
+        direction_ = false;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object operatingDay_ = "";
+      /**
+       * <code>string operating_day = 3;</code>
+       * @return The operatingDay.
+       */
+      public java.lang.String getOperatingDay() {
+        java.lang.Object ref = operatingDay_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          operatingDay_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string operating_day = 3;</code>
+       * @return The bytes for operatingDay.
+       */
+      public com.google.protobuf.ByteString
+          getOperatingDayBytes() {
+        java.lang.Object ref = operatingDay_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          operatingDay_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string operating_day = 3;</code>
+       * @param value The operatingDay to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOperatingDay(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        operatingDay_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string operating_day = 3;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearOperatingDay() {
+        
+        operatingDay_ = getDefaultInstance().getOperatingDay();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string operating_day = 3;</code>
+       * @param value The bytes for operatingDay to set.
+       * @return This builder for chaining.
+       */
+      public Builder setOperatingDayBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        operatingDay_ = value;
+        onChanged();
+        return this;
+      }
+
+      private java.lang.Object departureTime_ = "";
+      /**
+       * <code>string departure_time = 4;</code>
+       * @return The departureTime.
+       */
+      public java.lang.String getDepartureTime() {
+        java.lang.Object ref = departureTime_;
+        if (!(ref instanceof java.lang.String)) {
+          com.google.protobuf.ByteString bs =
+              (com.google.protobuf.ByteString) ref;
+          java.lang.String s = bs.toStringUtf8();
+          departureTime_ = s;
+          return s;
+        } else {
+          return (java.lang.String) ref;
+        }
+      }
+      /**
+       * <code>string departure_time = 4;</code>
+       * @return The bytes for departureTime.
+       */
+      public com.google.protobuf.ByteString
+          getDepartureTimeBytes() {
+        java.lang.Object ref = departureTime_;
+        if (ref instanceof String) {
+          com.google.protobuf.ByteString b = 
+              com.google.protobuf.ByteString.copyFromUtf8(
+                  (java.lang.String) ref);
+          departureTime_ = b;
+          return b;
+        } else {
+          return (com.google.protobuf.ByteString) ref;
+        }
+      }
+      /**
+       * <code>string departure_time = 4;</code>
+       * @param value The departureTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDepartureTime(
+          java.lang.String value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  
+        departureTime_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string departure_time = 4;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearDepartureTime() {
+        
+        departureTime_ = getDefaultInstance().getDepartureTime();
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>string departure_time = 4;</code>
+       * @param value The bytes for departureTime to set.
+       * @return This builder for chaining.
+       */
+      public Builder setDepartureTimeBytes(
+          com.google.protobuf.ByteString value) {
+        if (value == null) {
+    throw new NullPointerException();
+  }
+  checkByteStringIsUtf8(value);
+        
+        departureTime_ = value;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:com.dxc.ptinsight.ingress.RouteInfo)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.dxc.ptinsight.ingress.RouteInfo)
+    private static final com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo();
+    }
+
+    public static com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<RouteInfo>
+        PARSER = new com.google.protobuf.AbstractParser<RouteInfo>() {
+      @java.lang.Override
+      public RouteInfo parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new RouteInfo(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<RouteInfo> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<RouteInfo> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   public interface VehiclePositionOrBuilder extends
       // @@protoc_insertion_point(interface_extends:com.dxc.ptinsight.ingress.VehiclePosition)
       com.google.protobuf.MessageOrBuilder {
@@ -699,31 +1638,46 @@ public final class HslRealtime {
     com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfoOrBuilder getVehicleOrBuilder();
 
     /**
-     * <code>float latitude = 2;</code>
+     * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+     * @return Whether the route field is set.
+     */
+    boolean hasRoute();
+    /**
+     * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+     * @return The route.
+     */
+    com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo getRoute();
+    /**
+     * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+     */
+    com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder getRouteOrBuilder();
+
+    /**
+     * <code>float latitude = 3;</code>
      * @return The latitude.
      */
     float getLatitude();
 
     /**
-     * <code>float longitude = 3;</code>
+     * <code>float longitude = 4;</code>
      * @return The longitude.
      */
     float getLongitude();
 
     /**
-     * <code>int32 heading = 4;</code>
+     * <code>int32 heading = 5;</code>
      * @return The heading.
      */
     int getHeading();
 
     /**
-     * <code>float speed = 5;</code>
+     * <code>float speed = 6;</code>
      * @return The speed.
      */
     float getSpeed();
 
     /**
-     * <code>float acceleration = 6;</code>
+     * <code>float acceleration = 7;</code>
      * @return The acceleration.
      */
     float getAcceleration();
@@ -786,27 +1740,40 @@ public final class HslRealtime {
 
               break;
             }
-            case 21: {
+            case 18: {
+              com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder subBuilder = null;
+              if (route_ != null) {
+                subBuilder = route_.toBuilder();
+              }
+              route_ = input.readMessage(com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(route_);
+                route_ = subBuilder.buildPartial();
+              }
 
-              latitude_ = input.readFloat();
               break;
             }
             case 29: {
 
+              latitude_ = input.readFloat();
+              break;
+            }
+            case 37: {
+
               longitude_ = input.readFloat();
               break;
             }
-            case 32: {
+            case 40: {
 
               heading_ = input.readInt32();
               break;
             }
-            case 45: {
+            case 53: {
 
               speed_ = input.readFloat();
               break;
             }
-            case 53: {
+            case 61: {
 
               acceleration_ = input.readFloat();
               break;
@@ -869,10 +1836,36 @@ public final class HslRealtime {
       return getVehicle();
     }
 
-    public static final int LATITUDE_FIELD_NUMBER = 2;
+    public static final int ROUTE_FIELD_NUMBER = 2;
+    private com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo route_;
+    /**
+     * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+     * @return Whether the route field is set.
+     */
+    @java.lang.Override
+    public boolean hasRoute() {
+      return route_ != null;
+    }
+    /**
+     * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+     * @return The route.
+     */
+    @java.lang.Override
+    public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo getRoute() {
+      return route_ == null ? com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.getDefaultInstance() : route_;
+    }
+    /**
+     * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+     */
+    @java.lang.Override
+    public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder getRouteOrBuilder() {
+      return getRoute();
+    }
+
+    public static final int LATITUDE_FIELD_NUMBER = 3;
     private float latitude_;
     /**
-     * <code>float latitude = 2;</code>
+     * <code>float latitude = 3;</code>
      * @return The latitude.
      */
     @java.lang.Override
@@ -880,10 +1873,10 @@ public final class HslRealtime {
       return latitude_;
     }
 
-    public static final int LONGITUDE_FIELD_NUMBER = 3;
+    public static final int LONGITUDE_FIELD_NUMBER = 4;
     private float longitude_;
     /**
-     * <code>float longitude = 3;</code>
+     * <code>float longitude = 4;</code>
      * @return The longitude.
      */
     @java.lang.Override
@@ -891,10 +1884,10 @@ public final class HslRealtime {
       return longitude_;
     }
 
-    public static final int HEADING_FIELD_NUMBER = 4;
+    public static final int HEADING_FIELD_NUMBER = 5;
     private int heading_;
     /**
-     * <code>int32 heading = 4;</code>
+     * <code>int32 heading = 5;</code>
      * @return The heading.
      */
     @java.lang.Override
@@ -902,10 +1895,10 @@ public final class HslRealtime {
       return heading_;
     }
 
-    public static final int SPEED_FIELD_NUMBER = 5;
+    public static final int SPEED_FIELD_NUMBER = 6;
     private float speed_;
     /**
-     * <code>float speed = 5;</code>
+     * <code>float speed = 6;</code>
      * @return The speed.
      */
     @java.lang.Override
@@ -913,10 +1906,10 @@ public final class HslRealtime {
       return speed_;
     }
 
-    public static final int ACCELERATION_FIELD_NUMBER = 6;
+    public static final int ACCELERATION_FIELD_NUMBER = 7;
     private float acceleration_;
     /**
-     * <code>float acceleration = 6;</code>
+     * <code>float acceleration = 7;</code>
      * @return The acceleration.
      */
     @java.lang.Override
@@ -941,20 +1934,23 @@ public final class HslRealtime {
       if (vehicle_ != null) {
         output.writeMessage(1, getVehicle());
       }
+      if (route_ != null) {
+        output.writeMessage(2, getRoute());
+      }
       if (latitude_ != 0F) {
-        output.writeFloat(2, latitude_);
+        output.writeFloat(3, latitude_);
       }
       if (longitude_ != 0F) {
-        output.writeFloat(3, longitude_);
+        output.writeFloat(4, longitude_);
       }
       if (heading_ != 0) {
-        output.writeInt32(4, heading_);
+        output.writeInt32(5, heading_);
       }
       if (speed_ != 0F) {
-        output.writeFloat(5, speed_);
+        output.writeFloat(6, speed_);
       }
       if (acceleration_ != 0F) {
-        output.writeFloat(6, acceleration_);
+        output.writeFloat(7, acceleration_);
       }
       unknownFields.writeTo(output);
     }
@@ -969,25 +1965,29 @@ public final class HslRealtime {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(1, getVehicle());
       }
+      if (route_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(2, getRoute());
+      }
       if (latitude_ != 0F) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(2, latitude_);
+          .computeFloatSize(3, latitude_);
       }
       if (longitude_ != 0F) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(3, longitude_);
+          .computeFloatSize(4, longitude_);
       }
       if (heading_ != 0) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt32Size(4, heading_);
+          .computeInt32Size(5, heading_);
       }
       if (speed_ != 0F) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(5, speed_);
+          .computeFloatSize(6, speed_);
       }
       if (acceleration_ != 0F) {
         size += com.google.protobuf.CodedOutputStream
-          .computeFloatSize(6, acceleration_);
+          .computeFloatSize(7, acceleration_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -1008,6 +2008,11 @@ public final class HslRealtime {
       if (hasVehicle()) {
         if (!getVehicle()
             .equals(other.getVehicle())) return false;
+      }
+      if (hasRoute() != other.hasRoute()) return false;
+      if (hasRoute()) {
+        if (!getRoute()
+            .equals(other.getRoute())) return false;
       }
       if (java.lang.Float.floatToIntBits(getLatitude())
           != java.lang.Float.floatToIntBits(
@@ -1037,6 +2042,10 @@ public final class HslRealtime {
       if (hasVehicle()) {
         hash = (37 * hash) + VEHICLE_FIELD_NUMBER;
         hash = (53 * hash) + getVehicle().hashCode();
+      }
+      if (hasRoute()) {
+        hash = (37 * hash) + ROUTE_FIELD_NUMBER;
+        hash = (53 * hash) + getRoute().hashCode();
       }
       hash = (37 * hash) + LATITUDE_FIELD_NUMBER;
       hash = (53 * hash) + java.lang.Float.floatToIntBits(
@@ -1191,6 +2200,12 @@ public final class HslRealtime {
           vehicle_ = null;
           vehicleBuilder_ = null;
         }
+        if (routeBuilder_ == null) {
+          route_ = null;
+        } else {
+          route_ = null;
+          routeBuilder_ = null;
+        }
         latitude_ = 0F;
 
         longitude_ = 0F;
@@ -1231,6 +2246,11 @@ public final class HslRealtime {
           result.vehicle_ = vehicle_;
         } else {
           result.vehicle_ = vehicleBuilder_.build();
+        }
+        if (routeBuilder_ == null) {
+          result.route_ = route_;
+        } else {
+          result.route_ = routeBuilder_.build();
         }
         result.latitude_ = latitude_;
         result.longitude_ = longitude_;
@@ -1287,6 +2307,9 @@ public final class HslRealtime {
         if (other == com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition.getDefaultInstance()) return this;
         if (other.hasVehicle()) {
           mergeVehicle(other.getVehicle());
+        }
+        if (other.hasRoute()) {
+          mergeRoute(other.getRoute());
         }
         if (other.getLatitude() != 0F) {
           setLatitude(other.getLatitude());
@@ -1451,9 +2474,128 @@ public final class HslRealtime {
         return vehicleBuilder_;
       }
 
+      private com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo route_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder> routeBuilder_;
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       * @return Whether the route field is set.
+       */
+      public boolean hasRoute() {
+        return routeBuilder_ != null || route_ != null;
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       * @return The route.
+       */
+      public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo getRoute() {
+        if (routeBuilder_ == null) {
+          return route_ == null ? com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.getDefaultInstance() : route_;
+        } else {
+          return routeBuilder_.getMessage();
+        }
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      public Builder setRoute(com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo value) {
+        if (routeBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          route_ = value;
+          onChanged();
+        } else {
+          routeBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      public Builder setRoute(
+          com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder builderForValue) {
+        if (routeBuilder_ == null) {
+          route_ = builderForValue.build();
+          onChanged();
+        } else {
+          routeBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      public Builder mergeRoute(com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo value) {
+        if (routeBuilder_ == null) {
+          if (route_ != null) {
+            route_ =
+              com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.newBuilder(route_).mergeFrom(value).buildPartial();
+          } else {
+            route_ = value;
+          }
+          onChanged();
+        } else {
+          routeBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      public Builder clearRoute() {
+        if (routeBuilder_ == null) {
+          route_ = null;
+          onChanged();
+        } else {
+          route_ = null;
+          routeBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder getRouteBuilder() {
+        
+        onChanged();
+        return getRouteFieldBuilder().getBuilder();
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      public com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder getRouteOrBuilder() {
+        if (routeBuilder_ != null) {
+          return routeBuilder_.getMessageOrBuilder();
+        } else {
+          return route_ == null ?
+              com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.getDefaultInstance() : route_;
+        }
+      }
+      /**
+       * <code>.com.dxc.ptinsight.ingress.RouteInfo route = 2;</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder> 
+          getRouteFieldBuilder() {
+        if (routeBuilder_ == null) {
+          routeBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo.Builder, com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfoOrBuilder>(
+                  getRoute(),
+                  getParentForChildren(),
+                  isClean());
+          route_ = null;
+        }
+        return routeBuilder_;
+      }
+
       private float latitude_ ;
       /**
-       * <code>float latitude = 2;</code>
+       * <code>float latitude = 3;</code>
        * @return The latitude.
        */
       @java.lang.Override
@@ -1461,7 +2603,7 @@ public final class HslRealtime {
         return latitude_;
       }
       /**
-       * <code>float latitude = 2;</code>
+       * <code>float latitude = 3;</code>
        * @param value The latitude to set.
        * @return This builder for chaining.
        */
@@ -1472,7 +2614,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>float latitude = 2;</code>
+       * <code>float latitude = 3;</code>
        * @return This builder for chaining.
        */
       public Builder clearLatitude() {
@@ -1484,7 +2626,7 @@ public final class HslRealtime {
 
       private float longitude_ ;
       /**
-       * <code>float longitude = 3;</code>
+       * <code>float longitude = 4;</code>
        * @return The longitude.
        */
       @java.lang.Override
@@ -1492,7 +2634,7 @@ public final class HslRealtime {
         return longitude_;
       }
       /**
-       * <code>float longitude = 3;</code>
+       * <code>float longitude = 4;</code>
        * @param value The longitude to set.
        * @return This builder for chaining.
        */
@@ -1503,7 +2645,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>float longitude = 3;</code>
+       * <code>float longitude = 4;</code>
        * @return This builder for chaining.
        */
       public Builder clearLongitude() {
@@ -1515,7 +2657,7 @@ public final class HslRealtime {
 
       private int heading_ ;
       /**
-       * <code>int32 heading = 4;</code>
+       * <code>int32 heading = 5;</code>
        * @return The heading.
        */
       @java.lang.Override
@@ -1523,7 +2665,7 @@ public final class HslRealtime {
         return heading_;
       }
       /**
-       * <code>int32 heading = 4;</code>
+       * <code>int32 heading = 5;</code>
        * @param value The heading to set.
        * @return This builder for chaining.
        */
@@ -1534,7 +2676,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>int32 heading = 4;</code>
+       * <code>int32 heading = 5;</code>
        * @return This builder for chaining.
        */
       public Builder clearHeading() {
@@ -1546,7 +2688,7 @@ public final class HslRealtime {
 
       private float speed_ ;
       /**
-       * <code>float speed = 5;</code>
+       * <code>float speed = 6;</code>
        * @return The speed.
        */
       @java.lang.Override
@@ -1554,7 +2696,7 @@ public final class HslRealtime {
         return speed_;
       }
       /**
-       * <code>float speed = 5;</code>
+       * <code>float speed = 6;</code>
        * @param value The speed to set.
        * @return This builder for chaining.
        */
@@ -1565,7 +2707,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>float speed = 5;</code>
+       * <code>float speed = 6;</code>
        * @return This builder for chaining.
        */
       public Builder clearSpeed() {
@@ -1577,7 +2719,7 @@ public final class HslRealtime {
 
       private float acceleration_ ;
       /**
-       * <code>float acceleration = 6;</code>
+       * <code>float acceleration = 7;</code>
        * @return The acceleration.
        */
       @java.lang.Override
@@ -1585,7 +2727,7 @@ public final class HslRealtime {
         return acceleration_;
       }
       /**
-       * <code>float acceleration = 6;</code>
+       * <code>float acceleration = 7;</code>
        * @param value The acceleration to set.
        * @return This builder for chaining.
        */
@@ -1596,7 +2738,7 @@ public final class HslRealtime {
         return this;
       }
       /**
-       * <code>float acceleration = 6;</code>
+       * <code>float acceleration = 7;</code>
        * @return This builder for chaining.
        */
       public Builder clearAcceleration() {
@@ -4146,6 +5288,11 @@ public final class HslRealtime {
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_dxc_ptinsight_ingress_VehicleInfo_fieldAccessorTable;
   private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_dxc_ptinsight_ingress_RouteInfo_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_dxc_ptinsight_ingress_RouteInfo_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_dxc_ptinsight_ingress_VehiclePosition_descriptor;
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
@@ -4175,23 +5322,27 @@ public final class HslRealtime {
       "e/protobuf/timestamp.proto\"]\n\013VehicleInf" +
       "o\022,\n\004type\030\001 \001(\0162\036.com.dxc.ptinsight.Vehi" +
       "cleType\022\020\n\010operator\030\002 \001(\005\022\016\n\006number\030\003 \001(" +
-      "\005\"\245\001\n\017VehiclePosition\0227\n\007vehicle\030\001 \001(\0132&" +
-      ".com.dxc.ptinsight.ingress.VehicleInfo\022\020" +
-      "\n\010latitude\030\002 \001(\002\022\021\n\tlongitude\030\003 \001(\002\022\017\n\007h" +
-      "eading\030\004 \001(\005\022\r\n\005speed\030\005 \001(\002\022\024\n\014accelerat" +
-      "ion\030\006 \001(\002\"\345\001\n\007Arrival\0227\n\007vehicle\030\001 \001(\0132&" +
-      ".com.dxc.ptinsight.ingress.VehicleInfo\022\020" +
-      "\n\010latitude\030\002 \001(\002\022\021\n\tlongitude\030\003 \001(\002\022\014\n\004s" +
-      "top\030\004 \001(\005\0225\n\021scheduled_arrival\030\005 \001(\0132\032.g" +
-      "oogle.protobuf.Timestamp\0227\n\023scheduled_de" +
-      "parture\030\006 \001(\0132\032.google.protobuf.Timestam" +
-      "p\"\347\001\n\tDeparture\0227\n\007vehicle\030\001 \001(\0132&.com.d" +
-      "xc.ptinsight.ingress.VehicleInfo\022\020\n\010lati" +
-      "tude\030\002 \001(\002\022\021\n\tlongitude\030\003 \001(\002\022\014\n\004stop\030\004 " +
-      "\001(\005\0225\n\021scheduled_arrival\030\005 \001(\0132\032.google." +
-      "protobuf.Timestamp\0227\n\023scheduled_departur" +
-      "e\030\006 \001(\0132\032.google.protobuf.TimestampB!\n\037c" +
-      "om.dxc.ptinsight.proto.ingressb\006proto3"
+      "\005\"Y\n\tRouteInfo\022\n\n\002id\030\001 \001(\t\022\021\n\tdirection\030" +
+      "\002 \001(\010\022\025\n\roperating_day\030\003 \001(\t\022\026\n\016departur" +
+      "e_time\030\004 \001(\t\"\332\001\n\017VehiclePosition\0227\n\007vehi" +
+      "cle\030\001 \001(\0132&.com.dxc.ptinsight.ingress.Ve" +
+      "hicleInfo\0223\n\005route\030\002 \001(\0132$.com.dxc.ptins" +
+      "ight.ingress.RouteInfo\022\020\n\010latitude\030\003 \001(\002" +
+      "\022\021\n\tlongitude\030\004 \001(\002\022\017\n\007heading\030\005 \001(\005\022\r\n\005" +
+      "speed\030\006 \001(\002\022\024\n\014acceleration\030\007 \001(\002\"\345\001\n\007Ar" +
+      "rival\0227\n\007vehicle\030\001 \001(\0132&.com.dxc.ptinsig" +
+      "ht.ingress.VehicleInfo\022\020\n\010latitude\030\002 \001(\002" +
+      "\022\021\n\tlongitude\030\003 \001(\002\022\014\n\004stop\030\004 \001(\005\0225\n\021sch" +
+      "eduled_arrival\030\005 \001(\0132\032.google.protobuf.T" +
+      "imestamp\0227\n\023scheduled_departure\030\006 \001(\0132\032." +
+      "google.protobuf.Timestamp\"\347\001\n\tDeparture\022" +
+      "7\n\007vehicle\030\001 \001(\0132&.com.dxc.ptinsight.ing" +
+      "ress.VehicleInfo\022\020\n\010latitude\030\002 \001(\002\022\021\n\tlo" +
+      "ngitude\030\003 \001(\002\022\014\n\004stop\030\004 \001(\005\0225\n\021scheduled" +
+      "_arrival\030\005 \001(\0132\032.google.protobuf.Timesta" +
+      "mp\0227\n\023scheduled_departure\030\006 \001(\0132\032.google" +
+      ".protobuf.TimestampB!\n\037com.dxc.ptinsight" +
+      ".proto.ingressb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -4205,20 +5356,26 @@ public final class HslRealtime {
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_ingress_VehicleInfo_descriptor,
         new java.lang.String[] { "Type", "Operator", "Number", });
-    internal_static_com_dxc_ptinsight_ingress_VehiclePosition_descriptor =
+    internal_static_com_dxc_ptinsight_ingress_RouteInfo_descriptor =
       getDescriptor().getMessageTypes().get(1);
+    internal_static_com_dxc_ptinsight_ingress_RouteInfo_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_dxc_ptinsight_ingress_RouteInfo_descriptor,
+        new java.lang.String[] { "Id", "Direction", "OperatingDay", "DepartureTime", });
+    internal_static_com_dxc_ptinsight_ingress_VehiclePosition_descriptor =
+      getDescriptor().getMessageTypes().get(2);
     internal_static_com_dxc_ptinsight_ingress_VehiclePosition_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_ingress_VehiclePosition_descriptor,
-        new java.lang.String[] { "Vehicle", "Latitude", "Longitude", "Heading", "Speed", "Acceleration", });
+        new java.lang.String[] { "Vehicle", "Route", "Latitude", "Longitude", "Heading", "Speed", "Acceleration", });
     internal_static_com_dxc_ptinsight_ingress_Arrival_descriptor =
-      getDescriptor().getMessageTypes().get(2);
+      getDescriptor().getMessageTypes().get(3);
     internal_static_com_dxc_ptinsight_ingress_Arrival_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_ingress_Arrival_descriptor,
         new java.lang.String[] { "Vehicle", "Latitude", "Longitude", "Stop", "ScheduledArrival", "ScheduledDeparture", });
     internal_static_com_dxc_ptinsight_ingress_Departure_descriptor =
-      getDescriptor().getMessageTypes().get(3);
+      getDescriptor().getMessageTypes().get(4);
     internal_static_com_dxc_ptinsight_ingress_Departure_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_ingress_Departure_descriptor,

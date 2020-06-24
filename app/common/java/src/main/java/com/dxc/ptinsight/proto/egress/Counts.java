@@ -1574,6 +1574,565 @@ public final class Counts {
 
   }
 
+  public interface FinalStopCountOrBuilder extends
+      // @@protoc_insertion_point(interface_extends:com.dxc.ptinsight.egress.FinalStopCount)
+      com.google.protobuf.MessageOrBuilder {
+
+    /**
+     * <code>int64 geocell = 1;</code>
+     * @return The geocell.
+     */
+    long getGeocell();
+
+    /**
+     * <code>int32 count = 2;</code>
+     * @return The count.
+     */
+    int getCount();
+  }
+  /**
+   * Protobuf type {@code com.dxc.ptinsight.egress.FinalStopCount}
+   */
+  public static final class FinalStopCount extends
+      com.google.protobuf.GeneratedMessageV3 implements
+      // @@protoc_insertion_point(message_implements:com.dxc.ptinsight.egress.FinalStopCount)
+      FinalStopCountOrBuilder {
+  private static final long serialVersionUID = 0L;
+    // Use FinalStopCount.newBuilder() to construct.
+    private FinalStopCount(com.google.protobuf.GeneratedMessageV3.Builder<?> builder) {
+      super(builder);
+    }
+    private FinalStopCount() {
+    }
+
+    @java.lang.Override
+    @SuppressWarnings({"unused"})
+    protected java.lang.Object newInstance(
+        UnusedPrivateParameter unused) {
+      return new FinalStopCount();
+    }
+
+    @java.lang.Override
+    public final com.google.protobuf.UnknownFieldSet
+    getUnknownFields() {
+      return this.unknownFields;
+    }
+    private FinalStopCount(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      this();
+      if (extensionRegistry == null) {
+        throw new java.lang.NullPointerException();
+      }
+      com.google.protobuf.UnknownFieldSet.Builder unknownFields =
+          com.google.protobuf.UnknownFieldSet.newBuilder();
+      try {
+        boolean done = false;
+        while (!done) {
+          int tag = input.readTag();
+          switch (tag) {
+            case 0:
+              done = true;
+              break;
+            case 8: {
+
+              geocell_ = input.readInt64();
+              break;
+            }
+            case 16: {
+
+              count_ = input.readInt32();
+              break;
+            }
+            default: {
+              if (!parseUnknownField(
+                  input, unknownFields, extensionRegistry, tag)) {
+                done = true;
+              }
+              break;
+            }
+          }
+        }
+      } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+        throw e.setUnfinishedMessage(this);
+      } catch (java.io.IOException e) {
+        throw new com.google.protobuf.InvalidProtocolBufferException(
+            e).setUnfinishedMessage(this);
+      } finally {
+        this.unknownFields = unknownFields.build();
+        makeExtensionsImmutable();
+      }
+    }
+    public static final com.google.protobuf.Descriptors.Descriptor
+        getDescriptor() {
+      return com.dxc.ptinsight.proto.egress.Counts.internal_static_com_dxc_ptinsight_egress_FinalStopCount_descriptor;
+    }
+
+    @java.lang.Override
+    protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+        internalGetFieldAccessorTable() {
+      return com.dxc.ptinsight.proto.egress.Counts.internal_static_com_dxc_ptinsight_egress_FinalStopCount_fieldAccessorTable
+          .ensureFieldAccessorsInitialized(
+              com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.class, com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.Builder.class);
+    }
+
+    public static final int GEOCELL_FIELD_NUMBER = 1;
+    private long geocell_;
+    /**
+     * <code>int64 geocell = 1;</code>
+     * @return The geocell.
+     */
+    @java.lang.Override
+    public long getGeocell() {
+      return geocell_;
+    }
+
+    public static final int COUNT_FIELD_NUMBER = 2;
+    private int count_;
+    /**
+     * <code>int32 count = 2;</code>
+     * @return The count.
+     */
+    @java.lang.Override
+    public int getCount() {
+      return count_;
+    }
+
+    private byte memoizedIsInitialized = -1;
+    @java.lang.Override
+    public final boolean isInitialized() {
+      byte isInitialized = memoizedIsInitialized;
+      if (isInitialized == 1) return true;
+      if (isInitialized == 0) return false;
+
+      memoizedIsInitialized = 1;
+      return true;
+    }
+
+    @java.lang.Override
+    public void writeTo(com.google.protobuf.CodedOutputStream output)
+                        throws java.io.IOException {
+      if (geocell_ != 0L) {
+        output.writeInt64(1, geocell_);
+      }
+      if (count_ != 0) {
+        output.writeInt32(2, count_);
+      }
+      unknownFields.writeTo(output);
+    }
+
+    @java.lang.Override
+    public int getSerializedSize() {
+      int size = memoizedSize;
+      if (size != -1) return size;
+
+      size = 0;
+      if (geocell_ != 0L) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt64Size(1, geocell_);
+      }
+      if (count_ != 0) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeInt32Size(2, count_);
+      }
+      size += unknownFields.getSerializedSize();
+      memoizedSize = size;
+      return size;
+    }
+
+    @java.lang.Override
+    public boolean equals(final java.lang.Object obj) {
+      if (obj == this) {
+       return true;
+      }
+      if (!(obj instanceof com.dxc.ptinsight.proto.egress.Counts.FinalStopCount)) {
+        return super.equals(obj);
+      }
+      com.dxc.ptinsight.proto.egress.Counts.FinalStopCount other = (com.dxc.ptinsight.proto.egress.Counts.FinalStopCount) obj;
+
+      if (getGeocell()
+          != other.getGeocell()) return false;
+      if (getCount()
+          != other.getCount()) return false;
+      if (!unknownFields.equals(other.unknownFields)) return false;
+      return true;
+    }
+
+    @java.lang.Override
+    public int hashCode() {
+      if (memoizedHashCode != 0) {
+        return memoizedHashCode;
+      }
+      int hash = 41;
+      hash = (19 * hash) + getDescriptor().hashCode();
+      hash = (37 * hash) + GEOCELL_FIELD_NUMBER;
+      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
+          getGeocell());
+      hash = (37 * hash) + COUNT_FIELD_NUMBER;
+      hash = (53 * hash) + getCount();
+      hash = (29 * hash) + unknownFields.hashCode();
+      memoizedHashCode = hash;
+      return hash;
+    }
+
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        java.nio.ByteBuffer data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        java.nio.ByteBuffer data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        com.google.protobuf.ByteString data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        com.google.protobuf.ByteString data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(byte[] data)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        byte[] data,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws com.google.protobuf.InvalidProtocolBufferException {
+      return PARSER.parseFrom(data, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseDelimitedFrom(java.io.InputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseDelimitedFrom(
+        java.io.InputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseDelimitedWithIOException(PARSER, input, extensionRegistry);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        com.google.protobuf.CodedInputStream input)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input);
+    }
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parseFrom(
+        com.google.protobuf.CodedInputStream input,
+        com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+        throws java.io.IOException {
+      return com.google.protobuf.GeneratedMessageV3
+          .parseWithIOException(PARSER, input, extensionRegistry);
+    }
+
+    @java.lang.Override
+    public Builder newBuilderForType() { return newBuilder(); }
+    public static Builder newBuilder() {
+      return DEFAULT_INSTANCE.toBuilder();
+    }
+    public static Builder newBuilder(com.dxc.ptinsight.proto.egress.Counts.FinalStopCount prototype) {
+      return DEFAULT_INSTANCE.toBuilder().mergeFrom(prototype);
+    }
+    @java.lang.Override
+    public Builder toBuilder() {
+      return this == DEFAULT_INSTANCE
+          ? new Builder() : new Builder().mergeFrom(this);
+    }
+
+    @java.lang.Override
+    protected Builder newBuilderForType(
+        com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+      Builder builder = new Builder(parent);
+      return builder;
+    }
+    /**
+     * Protobuf type {@code com.dxc.ptinsight.egress.FinalStopCount}
+     */
+    public static final class Builder extends
+        com.google.protobuf.GeneratedMessageV3.Builder<Builder> implements
+        // @@protoc_insertion_point(builder_implements:com.dxc.ptinsight.egress.FinalStopCount)
+        com.dxc.ptinsight.proto.egress.Counts.FinalStopCountOrBuilder {
+      public static final com.google.protobuf.Descriptors.Descriptor
+          getDescriptor() {
+        return com.dxc.ptinsight.proto.egress.Counts.internal_static_com_dxc_ptinsight_egress_FinalStopCount_descriptor;
+      }
+
+      @java.lang.Override
+      protected com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+          internalGetFieldAccessorTable() {
+        return com.dxc.ptinsight.proto.egress.Counts.internal_static_com_dxc_ptinsight_egress_FinalStopCount_fieldAccessorTable
+            .ensureFieldAccessorsInitialized(
+                com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.class, com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.Builder.class);
+      }
+
+      // Construct using com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.newBuilder()
+      private Builder() {
+        maybeForceBuilderInitialization();
+      }
+
+      private Builder(
+          com.google.protobuf.GeneratedMessageV3.BuilderParent parent) {
+        super(parent);
+        maybeForceBuilderInitialization();
+      }
+      private void maybeForceBuilderInitialization() {
+        if (com.google.protobuf.GeneratedMessageV3
+                .alwaysUseFieldBuilders) {
+        }
+      }
+      @java.lang.Override
+      public Builder clear() {
+        super.clear();
+        geocell_ = 0L;
+
+        count_ = 0;
+
+        return this;
+      }
+
+      @java.lang.Override
+      public com.google.protobuf.Descriptors.Descriptor
+          getDescriptorForType() {
+        return com.dxc.ptinsight.proto.egress.Counts.internal_static_com_dxc_ptinsight_egress_FinalStopCount_descriptor;
+      }
+
+      @java.lang.Override
+      public com.dxc.ptinsight.proto.egress.Counts.FinalStopCount getDefaultInstanceForType() {
+        return com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.getDefaultInstance();
+      }
+
+      @java.lang.Override
+      public com.dxc.ptinsight.proto.egress.Counts.FinalStopCount build() {
+        com.dxc.ptinsight.proto.egress.Counts.FinalStopCount result = buildPartial();
+        if (!result.isInitialized()) {
+          throw newUninitializedMessageException(result);
+        }
+        return result;
+      }
+
+      @java.lang.Override
+      public com.dxc.ptinsight.proto.egress.Counts.FinalStopCount buildPartial() {
+        com.dxc.ptinsight.proto.egress.Counts.FinalStopCount result = new com.dxc.ptinsight.proto.egress.Counts.FinalStopCount(this);
+        result.geocell_ = geocell_;
+        result.count_ = count_;
+        onBuilt();
+        return result;
+      }
+
+      @java.lang.Override
+      public Builder clone() {
+        return super.clone();
+      }
+      @java.lang.Override
+      public Builder setField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.setField(field, value);
+      }
+      @java.lang.Override
+      public Builder clearField(
+          com.google.protobuf.Descriptors.FieldDescriptor field) {
+        return super.clearField(field);
+      }
+      @java.lang.Override
+      public Builder clearOneof(
+          com.google.protobuf.Descriptors.OneofDescriptor oneof) {
+        return super.clearOneof(oneof);
+      }
+      @java.lang.Override
+      public Builder setRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          int index, java.lang.Object value) {
+        return super.setRepeatedField(field, index, value);
+      }
+      @java.lang.Override
+      public Builder addRepeatedField(
+          com.google.protobuf.Descriptors.FieldDescriptor field,
+          java.lang.Object value) {
+        return super.addRepeatedField(field, value);
+      }
+      @java.lang.Override
+      public Builder mergeFrom(com.google.protobuf.Message other) {
+        if (other instanceof com.dxc.ptinsight.proto.egress.Counts.FinalStopCount) {
+          return mergeFrom((com.dxc.ptinsight.proto.egress.Counts.FinalStopCount)other);
+        } else {
+          super.mergeFrom(other);
+          return this;
+        }
+      }
+
+      public Builder mergeFrom(com.dxc.ptinsight.proto.egress.Counts.FinalStopCount other) {
+        if (other == com.dxc.ptinsight.proto.egress.Counts.FinalStopCount.getDefaultInstance()) return this;
+        if (other.getGeocell() != 0L) {
+          setGeocell(other.getGeocell());
+        }
+        if (other.getCount() != 0) {
+          setCount(other.getCount());
+        }
+        this.mergeUnknownFields(other.unknownFields);
+        onChanged();
+        return this;
+      }
+
+      @java.lang.Override
+      public final boolean isInitialized() {
+        return true;
+      }
+
+      @java.lang.Override
+      public Builder mergeFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws java.io.IOException {
+        com.dxc.ptinsight.proto.egress.Counts.FinalStopCount parsedMessage = null;
+        try {
+          parsedMessage = PARSER.parsePartialFrom(input, extensionRegistry);
+        } catch (com.google.protobuf.InvalidProtocolBufferException e) {
+          parsedMessage = (com.dxc.ptinsight.proto.egress.Counts.FinalStopCount) e.getUnfinishedMessage();
+          throw e.unwrapIOException();
+        } finally {
+          if (parsedMessage != null) {
+            mergeFrom(parsedMessage);
+          }
+        }
+        return this;
+      }
+
+      private long geocell_ ;
+      /**
+       * <code>int64 geocell = 1;</code>
+       * @return The geocell.
+       */
+      @java.lang.Override
+      public long getGeocell() {
+        return geocell_;
+      }
+      /**
+       * <code>int64 geocell = 1;</code>
+       * @param value The geocell to set.
+       * @return This builder for chaining.
+       */
+      public Builder setGeocell(long value) {
+        
+        geocell_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int64 geocell = 1;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearGeocell() {
+        
+        geocell_ = 0L;
+        onChanged();
+        return this;
+      }
+
+      private int count_ ;
+      /**
+       * <code>int32 count = 2;</code>
+       * @return The count.
+       */
+      @java.lang.Override
+      public int getCount() {
+        return count_;
+      }
+      /**
+       * <code>int32 count = 2;</code>
+       * @param value The count to set.
+       * @return This builder for chaining.
+       */
+      public Builder setCount(int value) {
+        
+        count_ = value;
+        onChanged();
+        return this;
+      }
+      /**
+       * <code>int32 count = 2;</code>
+       * @return This builder for chaining.
+       */
+      public Builder clearCount() {
+        
+        count_ = 0;
+        onChanged();
+        return this;
+      }
+      @java.lang.Override
+      public final Builder setUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.setUnknownFields(unknownFields);
+      }
+
+      @java.lang.Override
+      public final Builder mergeUnknownFields(
+          final com.google.protobuf.UnknownFieldSet unknownFields) {
+        return super.mergeUnknownFields(unknownFields);
+      }
+
+
+      // @@protoc_insertion_point(builder_scope:com.dxc.ptinsight.egress.FinalStopCount)
+    }
+
+    // @@protoc_insertion_point(class_scope:com.dxc.ptinsight.egress.FinalStopCount)
+    private static final com.dxc.ptinsight.proto.egress.Counts.FinalStopCount DEFAULT_INSTANCE;
+    static {
+      DEFAULT_INSTANCE = new com.dxc.ptinsight.proto.egress.Counts.FinalStopCount();
+    }
+
+    public static com.dxc.ptinsight.proto.egress.Counts.FinalStopCount getDefaultInstance() {
+      return DEFAULT_INSTANCE;
+    }
+
+    private static final com.google.protobuf.Parser<FinalStopCount>
+        PARSER = new com.google.protobuf.AbstractParser<FinalStopCount>() {
+      @java.lang.Override
+      public FinalStopCount parsePartialFrom(
+          com.google.protobuf.CodedInputStream input,
+          com.google.protobuf.ExtensionRegistryLite extensionRegistry)
+          throws com.google.protobuf.InvalidProtocolBufferException {
+        return new FinalStopCount(input, extensionRegistry);
+      }
+    };
+
+    public static com.google.protobuf.Parser<FinalStopCount> parser() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.google.protobuf.Parser<FinalStopCount> getParserForType() {
+      return PARSER;
+    }
+
+    @java.lang.Override
+    public com.dxc.ptinsight.proto.egress.Counts.FinalStopCount getDefaultInstanceForType() {
+      return DEFAULT_INSTANCE;
+    }
+
+  }
+
   private static final com.google.protobuf.Descriptors.Descriptor
     internal_static_com_dxc_ptinsight_egress_ArrivalCount_descriptor;
   private static final 
@@ -1584,6 +2143,11 @@ public final class Counts {
   private static final 
     com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
       internal_static_com_dxc_ptinsight_egress_VehicleCount_fieldAccessorTable;
+  private static final com.google.protobuf.Descriptors.Descriptor
+    internal_static_com_dxc_ptinsight_egress_FinalStopCount_descriptor;
+  private static final 
+    com.google.protobuf.GeneratedMessageV3.FieldAccessorTable
+      internal_static_com_dxc_ptinsight_egress_FinalStopCount_fieldAccessorTable;
 
   public static com.google.protobuf.Descriptors.FileDescriptor
       getDescriptor() {
@@ -1602,8 +2166,9 @@ public final class Counts {
       ".protobuf.Timestamp\022.\n\nwindow_end\030\003 \001(\0132" +
       "\032.google.protobuf.Timestamp\022\r\n\005count\030\004 \001" +
       "(\005\".\n\014VehicleCount\022\017\n\007geocell\030\001 \001(\003\022\r\n\005c" +
-      "ount\030\002 \001(\005B \n\036com.dxc.ptinsight.proto.eg" +
-      "ressb\006proto3"
+      "ount\030\002 \001(\005\"0\n\016FinalStopCount\022\017\n\007geocell\030" +
+      "\001 \001(\003\022\r\n\005count\030\002 \001(\005B \n\036com.dxc.ptinsigh" +
+      "t.proto.egressb\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -1622,6 +2187,12 @@ public final class Counts {
     internal_static_com_dxc_ptinsight_egress_VehicleCount_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_com_dxc_ptinsight_egress_VehicleCount_descriptor,
+        new java.lang.String[] { "Geocell", "Count", });
+    internal_static_com_dxc_ptinsight_egress_FinalStopCount_descriptor =
+      getDescriptor().getMessageTypes().get(2);
+    internal_static_com_dxc_ptinsight_egress_FinalStopCount_fieldAccessorTable = new
+      com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
+        internal_static_com_dxc_ptinsight_egress_FinalStopCount_descriptor,
         new java.lang.String[] { "Geocell", "Count", });
     com.dxc.ptinsight.proto.Base.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();

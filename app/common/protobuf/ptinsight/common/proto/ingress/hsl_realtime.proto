@@ -14,13 +14,21 @@ message VehicleInfo {
   int32 number = 3;
 }
 
+message RouteInfo {
+  string id = 1;
+  bool direction = 2;
+  string operating_day = 3;
+  string departure_time = 4;
+}
+
 message VehiclePosition {
   VehicleInfo vehicle = 1;
-  float latitude = 2;
-  float longitude = 3;
-  int32 heading = 4;
-  float speed = 5;
-  float acceleration = 6;
+  RouteInfo route = 2;
+  float latitude = 3;
+  float longitude = 4;
+  int32 heading = 5;
+  float speed = 6;
+  float acceleration = 7;
 }
 
 message Arrival {

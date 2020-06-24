@@ -4,9 +4,7 @@ import h3
 from flask_socketio import SocketIO
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
-from ptinsight.common import Event, FlowDirection
-from ptinsight.common.proto.egress.counts_pb2 import VehicleCount
-from ptinsight.common.proto.egress.delays_pb2 import DelayStatistics
+from ptinsight.common import Event, FlowDirection, FinalStopCount, DelayStatistics, VehicleCount
 from ptinsight.common.serialize import deserialize
 
 logger = logging.getLogger(__name__)
@@ -29,6 +27,7 @@ class KafkaToSocketioBridge:
                     "egress.vehicle-count",
                     "egress.delay-statistics",
                     "egress.flow-direction",
+                    "egress.final-stop-count",
                 ]
             )
             for message in self.consumer:
@@ -76,5 +75,16 @@ class KafkaToSocketioBridge:
                 {
                     "edge": h3.h3_to_string(flow_direction.geocells_edge),
                     "count": flow_direction.count,
+                },
+            )
+        elif topic == "egress.final-stop-count":
+            final_stop_count = FinalStopCount()
+            event.details.Unpack(final_stop_count)
+
+            self.socketio.emit(
+                "final-stop-count",
+                {
+                    "geocell": h3.h3_to_string(final_stop_count.geocell),
+                    "count": final_stop_count.count,
                 },
             )

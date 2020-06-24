@@ -75,18 +75,25 @@ class HSLRealtimeProcessor(MQTTProcessor):
         if event_type == "ars":
             target_topic = "ingress.arrival"
             event = Arrival()
+
             event.stop = int(payload["stop"])
             event.scheduled_arrival.FromJsonString(payload["ttarr"])
             event.scheduled_departure.FromJsonString(payload["ttdep"])
         elif event_type == "dep":
             target_topic = "ingress.departure"
             event = Departure()
+
             event.stop = int(payload["stop"])
             event.scheduled_arrival.FromJsonString(payload["ttarr"])
             event.scheduled_departure.FromJsonString(payload["ttdep"])
         elif event_type == "vp":
             target_topic = "ingress.vehicle-position"
             event = VehiclePosition()
+
+            event.route.id = payload["route"]
+            event.route.direction = bool(int(payload["dir"]) - 1)
+            event.route.operating_day = payload["oday"]
+            event.route.departure_time = payload["start"]
             if payload["hdg"]:
                 event.heading = int(payload["hdg"])
             if payload["spd"]:

@@ -27,15 +27,18 @@ public class GeocellKeySelector<T> implements KeySelector<T, Long> {
         .geoToH3(coordinates.f0, coordinates.f1, EntryPoint.getConfiguration().h3.resolution);
   }
 
-  public static GeocellKeySelector<Tuple3<Float, Float, Long>> ofTuple3() {
+  public static GeocellKeySelector<Tuple2<Double, Double>> ofTuple2() {
     return new GeocellKeySelector<>(
-        (MapFunction<Tuple3<Float, Float, Long>, Tuple2<Float, Float>>)
-            tuple -> Tuple2.of(tuple.getField(0), tuple.getField(1)));
+        tuple ->
+            Tuple2.of(
+                tuple.<Double>getField(0).floatValue(), tuple.<Double>getField(1).floatValue()));
+  }
+
+  public static GeocellKeySelector<Tuple3<Float, Float, Long>> ofTuple3() {
+    return new GeocellKeySelector<>(tuple -> Tuple2.of(tuple.getField(0), tuple.getField(1)));
   }
 
   public static GeocellKeySelector<VehiclePosition> ofVehiclePosition() {
-    return new GeocellKeySelector<>(
-        (MapFunction<VehiclePosition, Tuple2<Float, Float>>)
-            pos -> Tuple2.of(pos.getLatitude(), pos.getLongitude()));
+    return new GeocellKeySelector<>(pos -> Tuple2.of(pos.getLatitude(), pos.getLongitude()));
   }
 }

@@ -38,7 +38,7 @@ public class FlowDirectionJob extends Job {
   @Override
   protected void setup() {
     source("ingress.vehicle-position", VehiclePosition.class)
-        .keyBy(new UniqueVehicleIdKeySelector())
+        .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
         .process(new CellChangeDetectionProcessFunction())
         .keyBy(value -> value.f0)
         .window(SlidingEventTimeWindows.of(Time.minutes(5), Time.seconds(5)))

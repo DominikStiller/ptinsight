@@ -21,7 +21,7 @@ DESCRIPTOR = _descriptor.FileDescriptor(
   syntax='proto3',
   serialized_options=b'\n\036com.dxc.ptinsight.proto.egress',
   create_key=_descriptor._internal_create_key,
-  serialized_pb=b'\n*ptinsight/common/proto/egress/counts.proto\x12\x18\x63om.dxc.ptinsight.egress\x1a!ptinsight/common/proto/base.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb5\x01\n\x0c\x41rrivalCount\x12\x34\n\x0cvehicle_type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x30\n\x0cwindow_start\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nwindow_end\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\r\n\x05\x63ount\x18\x04 \x01(\x05\".\n\x0cVehicleCount\x12\x0f\n\x07geocell\x18\x01 \x01(\x03\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x42 \n\x1e\x63om.dxc.ptinsight.proto.egressb\x06proto3'
+  serialized_pb=b'\n*ptinsight/common/proto/egress/counts.proto\x12\x18\x63om.dxc.ptinsight.egress\x1a!ptinsight/common/proto/base.proto\x1a\x1fgoogle/protobuf/timestamp.proto\"\xb5\x01\n\x0c\x41rrivalCount\x12\x34\n\x0cvehicle_type\x18\x01 \x01(\x0e\x32\x1e.com.dxc.ptinsight.VehicleType\x12\x30\n\x0cwindow_start\x18\x02 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12.\n\nwindow_end\x18\x03 \x01(\x0b\x32\x1a.google.protobuf.Timestamp\x12\r\n\x05\x63ount\x18\x04 \x01(\x05\".\n\x0cVehicleCount\x12\x0f\n\x07geocell\x18\x01 \x01(\x03\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\"0\n\x0e\x46inalStopCount\x12\x0f\n\x07geocell\x18\x01 \x01(\x03\x12\r\n\x05\x63ount\x18\x02 \x01(\x05\x42 \n\x1e\x63om.dxc.ptinsight.proto.egressb\x06proto3'
   ,
   dependencies=[ptinsight_dot_common_dot_proto_dot_base__pb2.DESCRIPTOR,google_dot_protobuf_dot_timestamp__pb2.DESCRIPTOR,])
 
@@ -119,11 +119,51 @@ _VEHICLECOUNT = _descriptor.Descriptor(
   serialized_end=370,
 )
 
+
+_FINALSTOPCOUNT = _descriptor.Descriptor(
+  name='FinalStopCount',
+  full_name='com.dxc.ptinsight.egress.FinalStopCount',
+  filename=None,
+  file=DESCRIPTOR,
+  containing_type=None,
+  create_key=_descriptor._internal_create_key,
+  fields=[
+    _descriptor.FieldDescriptor(
+      name='geocell', full_name='com.dxc.ptinsight.egress.FinalStopCount.geocell', index=0,
+      number=1, type=3, cpp_type=2, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+    _descriptor.FieldDescriptor(
+      name='count', full_name='com.dxc.ptinsight.egress.FinalStopCount.count', index=1,
+      number=2, type=5, cpp_type=1, label=1,
+      has_default_value=False, default_value=0,
+      message_type=None, enum_type=None, containing_type=None,
+      is_extension=False, extension_scope=None,
+      serialized_options=None, file=DESCRIPTOR,  create_key=_descriptor._internal_create_key),
+  ],
+  extensions=[
+  ],
+  nested_types=[],
+  enum_types=[
+  ],
+  serialized_options=None,
+  is_extendable=False,
+  syntax='proto3',
+  extension_ranges=[],
+  oneofs=[
+  ],
+  serialized_start=372,
+  serialized_end=420,
+)
+
 _ARRIVALCOUNT.fields_by_name['vehicle_type'].enum_type = ptinsight_dot_common_dot_proto_dot_base__pb2._VEHICLETYPE
 _ARRIVALCOUNT.fields_by_name['window_start'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 _ARRIVALCOUNT.fields_by_name['window_end'].message_type = google_dot_protobuf_dot_timestamp__pb2._TIMESTAMP
 DESCRIPTOR.message_types_by_name['ArrivalCount'] = _ARRIVALCOUNT
 DESCRIPTOR.message_types_by_name['VehicleCount'] = _VEHICLECOUNT
+DESCRIPTOR.message_types_by_name['FinalStopCount'] = _FINALSTOPCOUNT
 _sym_db.RegisterFileDescriptor(DESCRIPTOR)
 
 ArrivalCount = _reflection.GeneratedProtocolMessageType('ArrivalCount', (_message.Message,), {
@@ -139,6 +179,13 @@ VehicleCount = _reflection.GeneratedProtocolMessageType('VehicleCount', (_messag
   # @@protoc_insertion_point(class_scope:com.dxc.ptinsight.egress.VehicleCount)
   })
 _sym_db.RegisterMessage(VehicleCount)
+
+FinalStopCount = _reflection.GeneratedProtocolMessageType('FinalStopCount', (_message.Message,), {
+  'DESCRIPTOR' : _FINALSTOPCOUNT,
+  '__module__' : 'ptinsight.common.proto.egress.counts_pb2'
+  # @@protoc_insertion_point(class_scope:com.dxc.ptinsight.egress.FinalStopCount)
+  })
+_sym_db.RegisterMessage(FinalStopCount)
 
 
 DESCRIPTOR._options = None

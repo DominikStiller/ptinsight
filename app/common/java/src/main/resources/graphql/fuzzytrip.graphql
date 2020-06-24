@@ -1,0 +1,13 @@
+{
+    fuzzyTrip(
+        route: "HSL:$ROUTE",
+        direction: $DIRECTION,
+        date: "$DATE",
+        time: $TIME
+    ) {
+        stops {
+            lat
+            lon
+        }
+    }
+}

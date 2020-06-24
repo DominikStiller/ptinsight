@@ -12,3 +12,4 @@
     - egress.vehicle-count
     - egress.delay-statistics
     - egress.flow-direction
+    - egress.final-stop-count

@@ -33,7 +33,7 @@ export default class GeocellLayer<T> extends Layer {
   ) {
     super();
     this.colorbar = new ColorBar(
-      name.replace(" ", "-").toLowerCase(),
+      name.split(" ").join("-").toLowerCase(),
       // @ts-ignore
       schemeOrRd[8]
     );
