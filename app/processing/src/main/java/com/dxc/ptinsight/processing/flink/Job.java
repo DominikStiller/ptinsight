@@ -26,16 +26,24 @@ public abstract class Job {
   private static final Properties props = new Properties();
 
   public Job(String name) {
+    this(name, true);
+  }
+
+  public Job(String name, boolean withCheckpointing) {
     this.name = name;
 
     env = StreamExecutionEnvironment.getExecutionEnvironment();
-    configureEnvironment();
+    configureEnvironment(withCheckpointing);
     configureKafka();
   }
 
-  private void configureEnvironment() {
+  private void configureEnvironment(boolean withCheckpointing) {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
-    env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE).getCheckpointConfig();
+    if (withCheckpointing) {
+      env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE)
+          .getCheckpointConfig()
+          .setMinPauseBetweenCheckpoints(5000);
+    }
   }
 
   private void configureKafka() {

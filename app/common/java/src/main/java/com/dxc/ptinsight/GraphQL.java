@@ -11,10 +11,15 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Executor;
 
 public class GraphQL {
 
-  private static final transient HttpClient client = HttpClient.newHttpClient();
+  private static transient HttpClient client = HttpClient.newHttpClient();
+
+  public static void withExecutor(Executor executor) {
+    client = HttpClient.newBuilder().executor(executor).build();
+  }
 
   public static CompletableFuture<Map<String, Object>> get(
       String endpoint, String queryPath, Map<String, String> data) throws IOException {
@@ -47,7 +52,7 @@ public class GraphQL {
             data -> {
               var fuzzyTrip = (Map<String, Object>) data.get("fuzzyTrip");
               var stops = (List<Map<String, Double>>) fuzzyTrip.get("stops");
-              var last = stops.get(stops.size()-1);
+              var last = stops.get(stops.size() - 1);
               System.out.println(last.get("lon").floatValue());
             })
         .get();
