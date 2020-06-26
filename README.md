@@ -2,12 +2,12 @@
 
 This is the repository for the bachelor's thesis project of Dominik Stiller (dominik.stiller@hpe.com). Meeting notes, presentations and formalia can be found in [this repo](https://github.dxc.com/bgloss/dhbw-eda).
 
-Goal of the project is the setup of an example application based on an event-driven architecture to gain experience with this technology.
+Goal of the project is the setup of an example application for complex event processing on real-time streams based on an event-driven architecture to gain experience with this technology.
 
 
 ## Repository Structure
 * `ansible`: Ansible roles for common platforms and applications (e.g., Java, Python, Flink)
-* `app`: The main proof of concept application
+* `app`: The main proof of concept application "PT Insight"
 * `litreview`: A review of literature for EDA and CPE in smart cities
 * `playground`: Testing ground for different platforms and applications
     * `1_vagrant-ansible`: Setup of an EC2 instance with an httpd using Vagrant and Ansible
