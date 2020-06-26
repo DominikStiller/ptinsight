@@ -79,7 +79,7 @@ public abstract class Job {
   }
 
   protected static Event output(Message details, TimeWindow window) {
-    return output(details, Instant.ofEpochMilli(window.getStart()));
+    return output(details, Instant.ofEpochMilli(window.getEnd()));
   }
 
   protected static Event output(Message details, Instant eventTimestamp) {

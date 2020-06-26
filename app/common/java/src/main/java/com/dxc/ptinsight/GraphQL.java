@@ -7,6 +7,7 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
@@ -16,10 +17,6 @@ import java.util.concurrent.Executor;
 public class GraphQL {
 
   private static transient HttpClient client = HttpClient.newHttpClient();
-
-  public static void withExecutor(Executor executor) {
-    client = HttpClient.newBuilder().executor(executor).build();
-  }
 
   public static CompletableFuture<Map<String, Object>> get(
       String endpoint, String queryPath, Map<String, String> data) throws IOException {
@@ -44,17 +41,21 @@ public class GraphQL {
 
   public static void main(String[] args)
       throws IOException, InterruptedException, ExecutionException {
+    var start = System.currentTimeMillis();
     get(
             "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql",
             "fuzzytrip",
-            Map.of("route", "2158", "direction", "1", "date", "2020-06-24", "time", "52560"))
+            Map.of("route", "1097", "direction", "0", "date", "2020-06-26", "time", "70560"))
         .thenAccept(
             data -> {
               var fuzzyTrip = (Map<String, Object>) data.get("fuzzyTrip");
               var stops = (List<Map<String, Double>>) fuzzyTrip.get("stops");
-              var last = stops.get(stops.size() - 1);
-              System.out.println(last.get("lon").floatValue());
+              var lastStop = stops.get(stops.size() - 1);
+              var geocell = Geocells.h3()
+                  .geoToH3(lastStop.get("lat"), lastStop.get("lon"), 8);
+              System.out.println(geocell);
             })
         .get();
+    System.out.println((System.currentTimeMillis() - start));
   }
 }

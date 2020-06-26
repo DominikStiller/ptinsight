@@ -13,7 +13,7 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
-import org.apache.flink.metrics.Meter;
+import org.apache.flink.metrics.Counter;
 import org.apache.flink.metrics.MeterView;
 import org.apache.flink.shaded.guava18.com.google.common.cache.Cache;
 import org.apache.flink.shaded.guava18.com.google.common.cache.CacheBuilder;
@@ -32,7 +32,8 @@ public class FuzzyTripFinalStopLookupAsyncFunction
   private transient Cache<String, Long> cache;
 
   private transient long currentCacheSize = 0;
-  private transient Meter cacheHits;
+  private transient Counter cacheHits;
+  private transient Counter cacheMisses;
 
   @Override
   public void open(Configuration parameters) {
@@ -40,19 +41,17 @@ public class FuzzyTripFinalStopLookupAsyncFunction
     cache =
         CacheBuilder.newBuilder()
             .expireAfterAccess(1, TimeUnit.HOURS)
-            .maximumSize(1000)
+            .maximumSize(1500)
             .removalListener(x -> currentCacheSize = cache.size())
             .build();
 
     getRuntimeContext().getMetricGroup().gauge("cacheSize", () -> currentCacheSize);
-    this.cacheHits = getRuntimeContext().getMetricGroup().meter("cacheHits", new MeterView(60));
-  }
-
-  @Override
-  public void timeout(
-      Tuple2<Instant, VehiclePosition> input,
-      ResultFuture<Tuple2<VehiclePosition, Long>> resultFuture) {
-    resultFuture.complete(Collections.emptyList());
+    this.cacheHits = getRuntimeContext().getMetricGroup().counter("cacheHits");
+    getRuntimeContext().getMetricGroup().meter("cacheHitsPerSecond", new MeterView(this.cacheHits));
+    this.cacheMisses = getRuntimeContext().getMetricGroup().counter("cacheMisses");
+    getRuntimeContext()
+        .getMetricGroup()
+        .meter("cacheMissesPerSecond", new MeterView(this.cacheMisses));
   }
 
   @Override
@@ -75,15 +74,19 @@ public class FuzzyTripFinalStopLookupAsyncFunction
     var route = input.f1.getRoute().getId();
     var direction = input.f1.getRoute().getDirection() ? "1" : "0";
 
-    // Do not use RouteInfo directly since protobuf hashcode is contains other fields
+    // Do not use RouteInfo directly since protobuf hashcode includes other fields as well
     var cacheKey = route + direction + operatingDay + seconds;
     var cached = cache.getIfPresent(cacheKey);
     if (cached != null) {
       resultFuture.complete(Collections.singleton(Tuple2.of(input.f1, cached)));
-      this.cacheHits.markEvent();
+      this.cacheHits.inc();
       return;
     }
+    this.cacheMisses.inc();
 
+    // Use direct executor only for callbacks, not for async request itself, otherwise it is
+    // single-threaded
+    // https://ci.apache.org/projects/flink/flink-docs-release-1.10/dev/stream/operators/asyncio.html#implementation-tips
     GraphQL.get(
             "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql",
             "fuzzytrip",
@@ -100,11 +103,6 @@ public class FuzzyTripFinalStopLookupAsyncFunction
             data -> {
               try {
                 var fuzzyTrip = (Map<String, Object>) data.get("fuzzyTrip");
-                if (fuzzyTrip == null) {
-                  resultFuture.complete(Collections.emptyList());
-                  return;
-                }
-
                 var stops = (List<Map<String, Double>>) fuzzyTrip.get("stops");
                 var lastStop = stops.get(stops.size() - 1);
                 var geocell =
@@ -117,5 +115,12 @@ public class FuzzyTripFinalStopLookupAsyncFunction
                 resultFuture.complete(Collections.emptyList());
               }
             });
+  }
+
+  @Override
+  public void timeout(
+      Tuple2<Instant, VehiclePosition> input,
+      ResultFuture<Tuple2<VehiclePosition, Long>> resultFuture) {
+    resultFuture.complete(Collections.emptyList());
   }
 }

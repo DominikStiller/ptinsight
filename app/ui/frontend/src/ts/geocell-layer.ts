@@ -108,5 +108,6 @@ export default class GeocellLayer<T> extends Layer {
     this.minData = Math.min(...values);
     this.maxData = Math.max(...values);
     this.colorbar.updateDomain([this.minData, this.maxData]);
+    // TODO recalculate limits if not too compute-heavy
   }
 }

@@ -47,7 +47,9 @@ socket.on("flow-direction", (msg: any) => {
 // Final stop counts layer
 const finalStopCountsLayer = new GeocellLayer(
   "Final Stop Count",
-  (data) => `Vehicles bound for here in the last 5 min: ${data}`
+  (data) => `Vehicles bound for here in the last 5 min: ${data}`,
+  undefined,
+  15000
 ).addToLegend(legend);
 socket.on("final-stop-count", (msg: any) => {
   finalStopCountsLayer.updateData(msg.geocell, msg.count);
