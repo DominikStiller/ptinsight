@@ -84,8 +84,8 @@ public class FuzzyTripFinalStopLookupAsyncFunction
     }
     this.cacheMisses.inc();
 
-    // Use direct executor only for callbacks, not for async request itself, otherwise it is
-    // single-threaded
+    // Use direct executor only for callbacks, not for async request itself, otherwise all requests
+    // will be executed on a single thread
     // https://ci.apache.org/projects/flink/flink-docs-release-1.10/dev/stream/operators/asyncio.html#implementation-tips
     GraphQL.get(
             "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql",

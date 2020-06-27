@@ -26,7 +26,7 @@ public class FinalStopCountJob extends Job {
   private static final Logger LOG = LoggerFactory.getLogger(FinalStopCountJob.class);
 
   public FinalStopCountJob() {
-    super("Final Stop Count");
+    super("Final Stop Counter");
   }
 
   @Override
