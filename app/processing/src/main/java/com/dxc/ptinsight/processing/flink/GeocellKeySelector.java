@@ -27,6 +27,11 @@ public class GeocellKeySelector<T> implements KeySelector<T, Long> {
         .geoToH3(coordinates.f0, coordinates.f1, EntryPoint.getConfiguration().h3.resolution);
   }
 
+  public static <S> GeocellKeySelector<S> of(
+      MapFunction<S, Tuple2<Float, Float>> coordinateSelector) {
+    return new GeocellKeySelector<>(coordinateSelector);
+  }
+
   public static GeocellKeySelector<Tuple2<Double, Double>> ofTuple2() {
     return new GeocellKeySelector<>(
         tuple ->

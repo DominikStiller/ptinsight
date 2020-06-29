@@ -22,6 +22,11 @@ public class UniqueVehicleIdKeySelector<T> implements KeySelector<T, Long> {
     return (((long) vehicle.getOperator()) << 32) | (vehicle.getNumber() & 0xffffffffL);
   }
 
+  public static <T> UniqueVehicleIdKeySelector<T> of(
+      MapFunction<T, VehicleInfo> vehicleInfoSelector) {
+    return new UniqueVehicleIdKeySelector<>(vehicleInfoSelector);
+  }
+
   public static UniqueVehicleIdKeySelector<VehiclePosition> ofVehiclePosition() {
     return new UniqueVehicleIdKeySelector<>(VehiclePosition::getVehicle);
   }

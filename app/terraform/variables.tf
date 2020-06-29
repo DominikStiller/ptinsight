@@ -5,7 +5,7 @@ variable "ssh_key" {
 
 variable "trusted_cidr" {
     description = "CIDRs which are allowed to access security groups"
-    default = ["46.223.0.0/16", "77.182.0.0/16"]
+    default = ["46.223.0.0/16"]
 }
 
 variable "deployment" {
@@ -14,5 +14,5 @@ variable "deployment" {
 }
 
 locals {
-    name_prefix   = "${var.deployment != "" ? "${var.deployment}-" : ""}ptinsight-"
+    name_prefix = "${var.deployment != "" ? "${var.deployment}-" : ""}ptinsight-"
 }

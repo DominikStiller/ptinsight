@@ -7,18 +7,16 @@ import java.net.http.HttpRequest;
 import java.net.http.HttpRequest.BodyPublishers;
 import java.net.http.HttpResponse;
 import java.net.http.HttpResponse.BodyHandlers;
-import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 
-public class GraphQL {
+public class GraphQLClient {
 
-  private static transient HttpClient client = HttpClient.newHttpClient();
+  private transient HttpClient client = HttpClient.newHttpClient();
 
-  public static CompletableFuture<Map<String, Object>> get(
+  public CompletableFuture<Map<String, Object>> get(
       String endpoint, String queryPath, Map<String, String> data) throws IOException {
     var query = Resources.getContents("graphql/" + queryPath + ".graphql");
     for (var entry : data.entrySet()) {
@@ -42,12 +40,13 @@ public class GraphQL {
   public static void main(String[] args)
       throws IOException, InterruptedException, ExecutionException {
     var start = System.currentTimeMillis();
-    get(
+    new GraphQLClient().get(
             "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql",
             "fuzzytrip",
             Map.of("route", "1097", "direction", "0", "date", "2020-06-26", "time", "70560"))
         .thenAccept(
             data -> {
+              System.out.println(data);
               var fuzzyTrip = (Map<String, Object>) data.get("fuzzyTrip");
               var stops = (List<Map<String, Double>>) fuzzyTrip.get("stops");
               var lastStop = stops.get(stops.size() - 1);

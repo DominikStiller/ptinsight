@@ -1,6 +1,6 @@
 package com.dxc.ptinsight.processing.flink;
 
-import com.dxc.ptinsight.GraphQL;
+import com.dxc.ptinsight.GraphQLClient;
 import com.dxc.ptinsight.Timestamps;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.time.Duration;
@@ -22,12 +22,14 @@ import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/** Load the final stop of a route in a vehicle position message from the HSL routing API */
 public class FuzzyTripFinalStopLookupAsyncFunction
     extends RichAsyncFunction<Tuple2<Instant, VehiclePosition>, Tuple2<VehiclePosition, Long>> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(FuzzyTripFinalStopLookupAsyncFunction.class);
 
+  private transient GraphQLClient client;
   private transient GeocellKeySelector<Tuple2<Double, Double>> cellSelector;
   private transient Cache<String, Long> cache;
 
@@ -37,6 +39,7 @@ public class FuzzyTripFinalStopLookupAsyncFunction
 
   @Override
   public void open(Configuration parameters) {
+    client = new GraphQLClient();
     cellSelector = GeocellKeySelector.ofTuple2();
     cache =
         CacheBuilder.newBuilder()
@@ -87,7 +90,8 @@ public class FuzzyTripFinalStopLookupAsyncFunction
     // Use direct executor only for callbacks, not for async request itself, otherwise all requests
     // will be executed on a single thread
     // https://ci.apache.org/projects/flink/flink-docs-release-1.10/dev/stream/operators/asyncio.html#implementation-tips
-    GraphQL.get(
+    client
+        .get(
             "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql",
             "fuzzytrip",
             Map.of(

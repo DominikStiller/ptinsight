@@ -26,7 +26,7 @@ public class FinalStopCountJob extends Job {
   private static final Logger LOG = LoggerFactory.getLogger(FinalStopCountJob.class);
 
   public FinalStopCountJob() {
-    super("Final Stop Counter");
+    super("Final Stop Counter", true, 30000);
   }
 
   @Override
@@ -38,7 +38,7 @@ public class FinalStopCountJob extends Job {
     // Requests usually take between 2 and 3 s, but can be up to 15 s
     // There are about 1000 requests per second
     // Capacity of 1000 is only required initially when cache is not yet filled
-    AsyncDataStream.unorderedWait(
+    AsyncDataStream.orderedWait(
             input, new FuzzyTripFinalStopLookupAsyncFunction(), 5, TimeUnit.SECONDS, 1000)
         // For some reason, event time window triggers are not executed after an async function
         // Sliding windows with intervals < 10 s create too much backpressure

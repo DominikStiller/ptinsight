@@ -26,21 +26,21 @@ public abstract class Job {
   private static final Properties props = new Properties();
 
   public Job(String name) {
-    this(name, true);
+    this(name, true, 10000);
   }
 
-  public Job(String name, boolean withCheckpointing) {
+  public Job(String name, boolean withCheckpointing, int checkpointingInterval) {
     this.name = name;
 
     env = StreamExecutionEnvironment.getExecutionEnvironment();
-    configureEnvironment(withCheckpointing);
+    configureEnvironment(withCheckpointing, checkpointingInterval);
     configureKafka();
   }
 
-  private void configureEnvironment(boolean withCheckpointing) {
+  private void configureEnvironment(boolean withCheckpointing, int checkpointingInterval) {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     if (withCheckpointing) {
-      env.enableCheckpointing(10000, CheckpointingMode.EXACTLY_ONCE)
+      env.enableCheckpointing(checkpointingInterval, CheckpointingMode.EXACTLY_ONCE)
           .getCheckpointConfig()
           .setMinPauseBetweenCheckpoints(5000);
     }
