@@ -42,7 +42,7 @@ public class DelayDetectionJob extends Job {
         .addSink(sink("egress.delay-statistics"));
   }
 
-  private static class DelayCalculatorProcessFunction
+  protected static class DelayCalculatorProcessFunction
       extends ProcessFunction<Arrival, Tuple3<Float, Float, Long>> {
 
     @Override
@@ -51,13 +51,13 @@ public class DelayDetectionJob extends Job {
       var scheduled = Timestamps.toInstant(value.getScheduledArrival());
       // Calulations are in minutes because that is the schedule resolution
       var actual = Instant.ofEpochMilli(ctx.timestamp()).truncatedTo(ChronoUnit.MINUTES);
-      var delay = Duration.between(actual, scheduled).toMinutes();
+      var delay = Duration.between(scheduled, actual).toMinutes();
 
       out.collect(Tuple3.of(value.getLatitude(), value.getLongitude(), delay));
     }
   }
 
-  private static class DelayStatisticsProcessFunction
+  protected static class DelayStatisticsProcessFunction
       extends ProcessWindowFunction<Tuple3<Float, Float, Long>, Event, Long, TimeWindow> {
 
     @Override

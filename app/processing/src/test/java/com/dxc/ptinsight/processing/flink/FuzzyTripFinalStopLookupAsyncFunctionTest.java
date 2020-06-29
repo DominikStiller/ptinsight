@@ -4,6 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
 import com.dxc.ptinsight.GraphQLClient;
+import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.time.Instant;
@@ -21,6 +22,7 @@ import org.apache.flink.streaming.api.operators.async.AsyncWaitOperatorFactory;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
 import org.apache.flink.streaming.util.TestHarnessUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mockito;
 import org.mockito.internal.util.reflection.FieldSetter;
@@ -30,6 +32,11 @@ import org.mockito.internal.util.reflection.FieldSetter;
 class FuzzyTripFinalStopLookupAsyncFunctionTest {
 
   private static final int TIMEOUT = 2000;
+
+  @BeforeEach
+  void setUp() {
+    EntryPoint.getConfiguration().h3.resolution = 5;
+  }
 
   @Test
   void shouldGetCorrectFinalStopButIgnoreTimeouts() throws Exception {
@@ -74,23 +81,19 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
         function, function.getClass().getDeclaredField("client"), mockGraphQLClient);
 
     // Run test
-    ConcurrentLinkedQueue<Object> expectedOutput = new ConcurrentLinkedQueue<>();
-    synchronized (harness.getCheckpointLock()) {
-      // Should timeout
-      harness.processElement(
-          new StreamRecord<>(Tuple2.of(timestamp1, vehiclePosition1), timestamp1.toEpochMilli()));
+    var expectedOutput = new ConcurrentLinkedQueue<>();
+    // Should timeout
+    harness.processElement(Tuple2.of(timestamp1, vehiclePosition1), timestamp1.toEpochMilli());
 
-      harness.setProcessingTime(TIMEOUT / 2);
-      // Should be processed normally
-      harness.processElement(
-          new StreamRecord<>(Tuple2.of(timestamp2, vehiclePosition2), timestamp2.toEpochMilli()));
-      expectedOutput.add(
-          new StreamRecord<>(
-              Tuple2.of(vehiclePosition2, 599718752904282111L), timestamp2.toEpochMilli()));
+    harness.setProcessingTime(TIMEOUT / 2);
+    // Should be processed normally
+    harness.processElement(Tuple2.of(timestamp2, vehiclePosition2), timestamp2.toEpochMilli());
+    expectedOutput.add(
+        new StreamRecord<>(
+            Tuple2.of(vehiclePosition2, 599718752904282111L), timestamp2.toEpochMilli()));
 
-      harness.setProcessingTime(TIMEOUT + 1);
-      harness.close();
-    }
+    harness.setProcessingTime(TIMEOUT + 1);
+    harness.close();
 
     // Check output
     TestHarnessUtil.assertOutputEquals(
@@ -119,11 +122,8 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
         function, function.getClass().getDeclaredField("client"), mockGraphQLClient);
 
     // Run test
-    synchronized (harness.getCheckpointLock()) {
-      harness.processElement(
-          new StreamRecord<>(Tuple2.of(timestamp, vehiclePosition), timestamp.toEpochMilli()));
-      harness.close();
-    }
+    harness.processElement(Tuple2.of(timestamp, vehiclePosition), timestamp.toEpochMilli());
+    harness.close();
 
     // Check if 24 h in seconds were added to the "time" field
     verify(mockGraphQLClient)

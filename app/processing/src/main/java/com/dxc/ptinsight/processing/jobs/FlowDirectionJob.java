@@ -46,7 +46,7 @@ public class FlowDirectionJob extends Job {
         .addSink(sink("egress.flow-direction"));
   }
 
-  private static class CellChangeDetectionProcessFunction
+  protected static class CellChangeDetectionProcessFunction
       extends KeyedProcessFunction<Long, VehiclePosition, Tuple2<Long, Long>> {
     private transient ValueState<Long> lastCellState;
     private transient GeocellKeySelector<VehiclePosition> cellSelector;
@@ -67,6 +67,7 @@ public class FlowDirectionJob extends Job {
 
       if (lastCell != null
           && !lastCell.equals(currentCell)
+          // H3 edges only allow neighboring cells
           && Geocells.h3().h3IndexesAreNeighbors(lastCell, currentCell)) {
         out.collect(Tuple2.of(lastCell, currentCell));
       }
@@ -75,7 +76,7 @@ public class FlowDirectionJob extends Job {
     }
   }
 
-  private static class FindMostTraversedEdgeProcessFunction
+  protected static class FindMostTraversedEdgeProcessFunction
       extends ProcessWindowFunction<Tuple2<Long, Long>, Event, Long, TimeWindow> {
     @Override
     public void process(

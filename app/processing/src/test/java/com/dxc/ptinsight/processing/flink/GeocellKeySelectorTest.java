@@ -2,12 +2,19 @@ package com.dxc.ptinsight.processing.flink;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 class GeocellKeySelectorTest {
+
+  @BeforeEach
+  void setUp() {
+    EntryPoint.getConfiguration().h3.resolution = 5;
+  }
 
   @Test
   void shouldReturnCorrectGeocell() throws Exception {
