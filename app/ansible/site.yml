@@ -25,9 +25,13 @@
 
 - name: set up all hosts
   hosts: all
+  vars:
+    - common_path: "{{ playbook_dir }}/../common"
   roles:
     - role: ../../ansible/roles/common
       tags: setup
+    - role: common-build
+      tags: always
 
 - name: set up Zookeeper cluster
   hosts: zookeeper

@@ -1,0 +1,7 @@
+---
+- name: generate protobuf files
+  run_once: true
+  command:
+    cmd: make proto
+    chdir: "{{ common_path }}"
+  delegate_to: localhost
