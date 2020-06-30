@@ -1,5 +1,5 @@
 variable "ssh_key" {
-    default = "~/.ssh/id_rsa_eda_deployer"
+    default = "~/.ssh/id_rsa_eda_deploy"
 }
 
 provider "aws" {

@@ -24,7 +24,7 @@ Goal of the project is the setup of an example application for complex event pro
 
 ### Environment Setup
 
-Follow these steps to set up your development environment on Ubuntu 18.04. Adapt the `apt` commands to your package manager for other Linux distributions.
+Follow these steps to set up your development environment on Ubuntu 18.04. Adapt to your package manager for other Linux distributions.
 
 1. Install common packages
 ```
@@ -42,23 +42,37 @@ sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt install -y python3.8
 ```
 
-3. Install Ansible (https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html)
+1. Install Ansible
 ```
 sudo apt-add-repository -y ppa:ansible/ansible
 sudo apt install -y ansible
 ```
 
-4. Install Terraform to local bin (https://www.terraform.io/downloads.html)
+1. Install Terraform
 ```
-wget https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
-unzip terraform_0.12.24_linux_amd64.zip
-sudo mv terraform /usr/local/bin
-rm terraform_0.12.24_linux_amd64.zip
+wget -P /tmp https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
+sudo unzip -d /usr/local/bin /tmp/terraform_*.zip
+rm /tmp/terraform_*.zip
 ```
 
-5. Set up AWS credentials (https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+5. Install Node.js using Node Version Manager
 ```
-mkdir ~/.aws
+wget -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
+nvm install --lts
+```
+
+6. Install protoc
+```
+wget -P /tmp https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
+sudo unzip -d /opt/protoc /tmp/protoc-*.zip
+rm /tmp/protoc-*.zip
+sudo chmod -R 755 /opt/protoc
+sudo ln -s /opt/protoc/bin/protoc /usr/local/bin
+```
+
+7. Set up AWS credentials (see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+```
+mkdir -p ~/.aws
 echo "[default]
 aws_access_key_id = ACCESS_KEY_ID
 aws_secret_access_key = SECRET_ACCESS_KEY" >> ~/.aws/credentials
@@ -69,24 +83,9 @@ The user needs following policies attached:
 * `IAMFullAccess`
 * `AWSLambdaFullAccess`
 
-6. Generate an SSH key to use for EC2 instances
+8. Generate an SSH key to use for EC2 instances
 ```
-ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deployer
-```
-
-7. Install Node.js using Node Version Manager
-```
-wget -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
-nvm install --lts
-```
-
-8. Install protoc
-```
-wget -P /tmp https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
-sudo unzip -d /opt/protoc /tmp/protoc-*.zip
-rm /tmp/protoc-*.zip
-sudo chmod -R 755 /opt/protoc
-sudo ln -s /opt/protoc/bin/protoc /usr/local/bin
+ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deploy
 ```
 
 ### Java
