@@ -36,32 +36,32 @@ sudo apt install -y make software-properties-common
 sudo apt install -y openjdk-11-jdk
 ```
 
-2. Install Python 3.8
+3. Install Python 3.8
 ```
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt install -y python3.8
 ```
 
-1. Install Ansible
+4. Install Ansible
 ```
 sudo apt-add-repository -y ppa:ansible/ansible
 sudo apt install -y ansible
 ```
 
-1. Install Terraform
+5. Install Terraform
 ```
 wget -P /tmp https://releases.hashicorp.com/terraform/0.12.24/terraform_0.12.24_linux_amd64.zip
 sudo unzip -d /usr/local/bin /tmp/terraform_*.zip
 rm /tmp/terraform_*.zip
 ```
 
-5. Install Node.js using Node Version Manager
+6. Install Node.js using Node Version Manager
 ```
 wget -O- https://raw.githubusercontent.com/nvm-sh/nvm/v0.35.3/install.sh | bash
 nvm install --lts
 ```
 
-6. Install protoc
+7. Install protoc
 ```
 wget -P /tmp https://github.com/protocolbuffers/protobuf/releases/download/v3.12.3/protoc-3.12.3-linux-x86_64.zip
 sudo unzip -d /opt/protoc /tmp/protoc-*.zip
@@ -70,7 +70,7 @@ sudo chmod -R 755 /opt/protoc
 sudo ln -s /opt/protoc/bin/protoc /usr/local/bin
 ```
 
-7. Set up AWS credentials (see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
+8. Set up AWS credentials (see https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-files.html)
 ```
 mkdir -p ~/.aws
 echo "[default]
@@ -83,24 +83,25 @@ The user needs following policies attached:
 * `IAMFullAccess`
 * `AWSLambdaFullAccess`
 
-8. Generate an SSH key to use for EC2 instances
+9. Generate an SSH key to use for EC2 instances
 ```
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deploy
 ```
 
-### Java
-We use Gradle for dependency management. No environment setup is necessary.
+### Common Tools
+We use common tools for consistency. Execute the commands below in the project's folder.
 
-### Python
-We use `pipenv` for dependency management and virtual environments. Run `pipenv install --dev` in the project folder to set up the environment.
+#### Java
+* Build & dependency management: [Gradle](https://gradle.org/). No environment setup is necessary, just use the `gradlew` scripts.
+* Code style: [Google Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` to format all .java files.
 
-### TypeScript
-We use `npm` for dependency management. Run `npm install` in the project folder to set up the environment.
+#### Python
+* Build & dependency management: [pipenv](https://pipenv-fork.readthedocs.io/en/latest/). Run `pipenv install --dev` to set up the environment.
+* Code style: [black](https://black.readthedocs.io/en/stable/). Run `pipenv run black .` to format all .py files.
 
-### Code Style
-* Python: [black](https://black.readthedocs.io/en/stable/). Run `pipenv run black .` in the project folder to format all .py files.
-* Java: [Google Java Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` in the project folder to format all .java files.
-* TypeScript: [Prettier](https://prettier.io/). Run `npm run format` in the project folder to format all .ts/.json files.
+#### TypeScript
+* Build & dependency management: [npm](https://www.npmjs.com/). Run `npm install` to set up the environment.
+* Code style: [Prettier](https://prettier.io/). Run `npm run format` to format all web frontend files.
 
 
 ## Abbreviations
