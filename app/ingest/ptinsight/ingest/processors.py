@@ -48,15 +48,20 @@ class HSLRealtimeProcessor(MQTTProcessor):
     @property
     def topics(self):
         return [
-            f"/hfp/v2/journey/ongoing/{e}/{v}/#"
-            for e, v in itertools.product(self.event_types, self.vehicle_types)
+            f"/hfp/v2/journey/ongoing/{event}/{vehicle}/#"
+            for event, vehicle in itertools.product(
+                self.event_types, self.vehicle_types
+            )
         ]
 
     @functools.lru_cache(256)
     def _get_vehicle_type(self, topic: str):
-        for type in self.vehicle_types:
-            if mqtt.topic_matches_sub(f"/hfp/v2/journey/ongoing/+/{type}/#", topic):
-                return type
+        # Make sure we only ingest desired event and vehicle types
+        for event, vehicle in itertools.product(self.event_types, self.vehicle_types):
+            if mqtt.topic_matches_sub(
+                f"/hfp/v2/journey/ongoing/{event}/{vehicle}/#", topic
+            ):
+                return vehicle
 
     def process(
         self, source: str, payload: dict

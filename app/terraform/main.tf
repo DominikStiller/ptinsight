@@ -102,17 +102,16 @@ resource "aws_iam_role" "core" {
         {
             "Action": "sts:AssumeRole",
             "Principal": {
-            "Service": "ec2.amazonaws.com"
+                "Service": "ec2.amazonaws.com"
             },
-            "Effect": "Allow",
-            "Sid": ""
+            "Effect": "Allow"
         }
     ]
 }
 EOF
 }
 
-resource "aws_iam_role_policy" "s3_read_write" {
+resource "aws_iam_role_policy" "core_s3_read_write_flink" {
 
     role = aws_iam_role.core.name
 
@@ -220,10 +219,38 @@ resource "aws_iam_role" "ingest" {
         {
             "Action": "sts:AssumeRole",
             "Principal": {
-            "Service": "ec2.amazonaws.com"
+                "Service": "ec2.amazonaws.com"
             },
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "ingest_s3_read_recordings" {
+
+    role = aws_iam_role.ingest.name
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
             "Effect": "Allow",
-            "Sid": ""
+            "Action": [
+                "s3:ListBucket",
+                "s3:ListObjectsV2"
+            ],
+            "Resource": "arn:aws:s3:::mqtt-recordings"
+        },
+        {
+            "Effect": "Allow",
+            "Action": [
+                "s3:HeadObject",
+                "s3:GetObject"
+            ],
+            "Resource": "arn:aws:s3:::mqtt-recordings/*"
         }
     ]
 }
@@ -301,10 +328,9 @@ resource "aws_iam_role" "ui" {
         {
             "Action": "sts:AssumeRole",
             "Principal": {
-            "Service": "ec2.amazonaws.com"
+                "Service": "ec2.amazonaws.com"
             },
-            "Effect": "Allow",
-            "Sid": ""
+            "Effect": "Allow"
         }
     ]
 }

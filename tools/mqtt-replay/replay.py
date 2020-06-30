@@ -46,7 +46,7 @@ class Replayer:
         scheduler = sched.scheduler(time.perf_counter, time.sleep)
 
         # Custom run method is necessary to prevent scheduler from exiting early because no events are scheduled yet
-        # Only returns when no events are in the queue but there wes at least one earlier
+        # Only returns when no events are in the queue but there was at least one earlier
         def run_scheduler():
             ran_once = False
             while True:

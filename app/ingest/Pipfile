@@ -12,6 +12,7 @@ python-dateutil = "*"
 kafka-python = "*"
 pyyaml = "*"
 ptinsight-common = {editable = true,path = "./../common/python"}
+boto3 = "*"
 
 [requires]
 python_version = "3.8"

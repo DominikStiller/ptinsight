@@ -1,9 +1,16 @@
 import abc
+import base64
 import datetime
+import functools
 import json
 import logging
+import re
+import sched
+import threading
+import time
 from typing import final
 
+import boto3
 import paho.mqtt.client as mqtt
 from kafka import KafkaProducer
 from ptinsight.common import Event
@@ -86,6 +93,80 @@ class MQTTIngestor(Ingestor):
         # self.client.disconnect()
 
         if processed := self.processor.process(msg.topic, json.loads(msg.payload)):
+            target_topic, event_timestamp, details = processed
+
+            event = Event()
+            event.event_timestamp.FromDatetime(event_timestamp or ingestion_timestamp)
+            event.ingestion_timestamp.FromDatetime(ingestion_timestamp)
+            event.details.Pack(details)
+
+            self._ingest(target_topic, event)
+
+
+class MQTTRecordingIngestor(Ingestor):
+    def __init__(self, bucket: str, key: str, processor: MQTTProcessor):
+        super().__init__()
+        self.bucket = bucket
+        self.key = key
+        self.processor = processor
+
+        self.file = boto3.resource("s3").Object(bucket, key)
+
+    def start(self):
+        logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
+
+        lines = map(lambda l: l.decode(), self.file.get()["Body"].iter_lines())
+
+        original_broker = next(lines)[8:]
+        original_topics = next(lines)[8:]
+        original_t_start = datetime.datetime.fromisoformat(next(lines)[12:]).replace(
+            microsecond=0
+        )
+        next(lines)
+
+        logger.info(f"Recorded from {original_broker} at {str(original_t_start)}")
+        logger.info(f"Topics: {original_topics}\n")
+
+        self._start_scheduler(lines)
+
+    def _start_scheduler(self, lines):
+        # Scheduler is used to replay messages with original relative timing
+        scheduler = sched.scheduler(time.perf_counter, time.sleep)
+        done = False
+
+        # Custom run method is necessary to prevent scheduler from exiting early because no events are scheduled yet
+        def run_scheduler():
+            while not done:
+                scheduler.run()
+
+        thread = threading.Thread(target=run_scheduler)
+        thread.start()
+        t_start = time.perf_counter()
+
+        message_regex = re.compile(r'(\S+) "(.+)" (\d) (\d) (\S*)')
+        for line in lines:
+            # Prevent queue from growing too fast
+            if len(scheduler._queue) > 1000:
+                time.sleep(0.5)
+                continue
+
+            t_offset, topic, _, _, payload = message_regex.match(line).groups()
+            t_offset = float(t_offset)
+            payload = base64.b64decode(payload)
+
+            scheduler.enterabs(
+                t_start + t_offset,
+                1,
+                functools.partial(self._process_and_ingest, topic, payload),
+            )
+
+        done = True
+        thread.join()
+
+    def _process_and_ingest(self, topic: str, payload: str):
+        ingestion_timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+        if processed := self.processor.process(topic, json.loads(payload)):
             target_topic, event_timestamp, details = processed
 
             event = Event()

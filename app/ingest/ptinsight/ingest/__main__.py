@@ -7,7 +7,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 import kafka.errors
 import yaml
 
-from ptinsight.ingest.ingestor import MQTTIngestor, Ingestor
+from ptinsight.ingest.ingestor import MQTTIngestor, Ingestor, MQTTRecordingIngestor
 from ptinsight.ingest.processors import MQTTProcessor
 
 logger = logging.getLogger(__name__)
@@ -39,6 +39,7 @@ if __name__ == "__main__":
 
     processors = {}
     for type in [MQTTProcessor]:
+        # Only finds direct subclasses
         classes = type.__subclasses__()
         for cls in classes:
             processors[cls.name()] = cls
@@ -49,6 +50,11 @@ if __name__ == "__main__":
             broker = source["broker"]
             processor = processors[source["processor"]](source["config"])
             ingestor = MQTTIngestor(broker["host"], int(broker["port"]), processor)
+            ingestors.append(ingestor)
+        elif source["type"] == "mqtt-recording":
+            file = source["file"]
+            processor = processors[source["processor"]](source["config"])
+            ingestor = MQTTRecordingIngestor(file["bucket"], file["key"], processor)
             ingestors.append(ingestor)
 
     with ThreadPoolExecutor() as executor:
