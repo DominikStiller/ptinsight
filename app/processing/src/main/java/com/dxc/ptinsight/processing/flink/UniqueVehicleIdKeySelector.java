@@ -31,6 +31,10 @@ public class UniqueVehicleIdKeySelector<T> implements KeySelector<T, Long> {
     return new UniqueVehicleIdKeySelector<>(VehiclePosition::getVehicle);
   }
 
+  public static UniqueVehicleIdKeySelector<VehicleInfo> ofVehicleInfo() {
+    return new UniqueVehicleIdKeySelector<>(x -> x);
+  }
+
   public UniqueVehicleIdKeySelector<Tuple2<?, ?>> inTuple(int index) {
     return new UniqueVehicleIdKeySelector<>(
         value -> vehicleInfoSelector.map(value.getField(index)));

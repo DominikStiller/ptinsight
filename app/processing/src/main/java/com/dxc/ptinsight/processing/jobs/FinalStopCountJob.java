@@ -7,6 +7,7 @@ import com.dxc.ptinsight.processing.flink.TimestampTupleProcessFunction;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
 import com.dxc.ptinsight.proto.egress.Counts.FinalStopCount;
+import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
@@ -45,18 +46,18 @@ public class FinalStopCountJob extends Job {
         .windowAll(SlidingProcessingTimeWindows.of(Time.minutes(5), Time.seconds(10)))
         .evictor(
             new MostRecentDeduplicationEvictor<>(
-                UniqueVehicleIdKeySelector.ofVehiclePosition().inTuple(0)))
+                UniqueVehicleIdKeySelector.ofVehicleInfo().inTuple(0)))
         .process(new FinalStopCounterProcessFunction())
         .addSink(sink("egress.final-stop-count"));
     // TODO restructure to aggregate function to keep state small
   }
 
   private static class FinalStopCounterProcessFunction
-      extends ProcessAllWindowFunction<Tuple2<VehiclePosition, Long>, Event, TimeWindow> {
+      extends ProcessAllWindowFunction<Tuple2<VehicleInfo, Long>, Event, TimeWindow> {
 
     @Override
     public void process(
-        Context context, Iterable<Tuple2<VehiclePosition, Long>> elements, Collector<Event> out) {
+        Context context, Iterable<Tuple2<VehicleInfo, Long>> elements, Collector<Event> out) {
       var counts = new HashMap<Long, Integer>();
       elements.forEach(e -> counts.merge(e.f1, 1, Integer::sum));
 
@@ -66,6 +67,7 @@ public class FinalStopCountJob extends Job {
                 .setGeocell(entry.getKey())
                 .setCount(entry.getValue())
                 .build();
+        System.out.println(entry.getKey());
         out.collect(output(details, context.window()));
       }
     }

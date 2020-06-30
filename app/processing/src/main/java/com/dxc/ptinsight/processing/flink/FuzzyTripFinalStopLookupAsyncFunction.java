@@ -2,6 +2,7 @@ package com.dxc.ptinsight.processing.flink;
 
 import com.dxc.ptinsight.GraphQLClient;
 import com.dxc.ptinsight.Timestamps;
+import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.time.Duration;
 import java.time.Instant;
@@ -22,9 +23,13 @@ import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Load the final stop of a route in a vehicle position message from the HSL routing API */
+/**
+ * Load the final stop of a route in a vehicle position message from the HSL routing API
+ *
+ * <p>A fuzzy trip allows retrieving trip information without the trip id but other trip information
+ */
 public class FuzzyTripFinalStopLookupAsyncFunction
-    extends RichAsyncFunction<Tuple2<Instant, VehiclePosition>, Tuple2<VehiclePosition, Long>> {
+    extends RichAsyncFunction<Tuple2<Instant, VehiclePosition>, Tuple2<VehicleInfo, Long>> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(FuzzyTripFinalStopLookupAsyncFunction.class);
@@ -59,8 +64,7 @@ public class FuzzyTripFinalStopLookupAsyncFunction
 
   @Override
   public void asyncInvoke(
-      Tuple2<Instant, VehiclePosition> input,
-      ResultFuture<Tuple2<VehiclePosition, Long>> resultFuture)
+      Tuple2<Instant, VehiclePosition> input, ResultFuture<Tuple2<VehicleInfo, Long>> resultFuture)
       throws Exception {
     var timestamp = input.f0.atZone(Timestamps.TIMEZONE_HELSINKI);
     var operatingDay = LocalDate.parse(input.f1.getRoute().getOperatingDay());
@@ -81,7 +85,7 @@ public class FuzzyTripFinalStopLookupAsyncFunction
     var cacheKey = route + direction + operatingDay + seconds;
     var cached = cache.getIfPresent(cacheKey);
     if (cached != null) {
-      resultFuture.complete(Collections.singleton(Tuple2.of(input.f1, cached)));
+      resultFuture.complete(Collections.singleton(Tuple2.of(input.f1.getVehicle(), cached)));
       this.cacheHits.inc();
       return;
     }
@@ -111,7 +115,8 @@ public class FuzzyTripFinalStopLookupAsyncFunction
                 var lastStop = stops.get(stops.size() - 1);
                 var geocell =
                     cellSelector.getKey(Tuple2.of(lastStop.get("lat"), lastStop.get("lon")));
-                resultFuture.complete(Collections.singleton(Tuple2.of(input.f1, geocell)));
+                resultFuture.complete(
+                    Collections.singleton(Tuple2.of(input.f1.getVehicle(), geocell)));
                 cache.put(cacheKey, geocell);
                 currentCacheSize = cache.size();
               } catch (Exception e) {
@@ -124,7 +129,7 @@ public class FuzzyTripFinalStopLookupAsyncFunction
   @Override
   public void timeout(
       Tuple2<Instant, VehiclePosition> input,
-      ResultFuture<Tuple2<VehiclePosition, Long>> resultFuture) {
+      ResultFuture<Tuple2<VehicleInfo, Long>> resultFuture) {
     resultFuture.complete(Collections.emptyList());
   }
 }
