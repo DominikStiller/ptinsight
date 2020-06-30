@@ -16,7 +16,7 @@ For general documentations, see `docs/`. For component-specific documentation, s
 
 ## Requirements
 * Resiliency to failures:
-    * Requires state checkpoints and re-deployment of app to new server (Docker can aid fast deployment)
+    * Requires state checkpoints
 
 
 ## Architecture
@@ -37,7 +37,8 @@ For general documentations, see `docs/`. For component-specific documentation, s
 ## Development
 
 ### Environment Setup
-Set up your environment as described in the [top-level README](../README.md), and set up the individual components as desribed in their READMEs. Then add your IP address block to the `trusted_cidr` variable in `terraform/variables.tf` to grant access to EC2 instances from your computer.
+Set up your environment as described in the [top-level README](../README.md), and set up the individual components as desribed in their READMEs.
+Then add your IP address block to the `trusted_cidr` variable in `terraform/variables.tf` to grant access to EC2 instances from your computer.
 
 ### Deployment
 
@@ -46,26 +47,42 @@ Set up your environment as described in the [top-level README](../README.md), an
 make init
 ```
 
-_Note: Steps 2-4 can be executed in a single command using `make all`_
+_Note: Steps 2-4 can be executed in a single command using `make all`, which is equivalent to `make apply setup deploy`_
 
-2. Set up infrastructure using Terraform
+2. Set up infrastructure using Terraform. Rerun this step when you change the AWS setup in the .tf files.
 ```
 make apply
+
+# Alternatively when you want to rebuild an existing infrastructure
+make reapply  # equivalent to "make destroy apply"
 ```
 
 3. Install platforms (Java, Python, Flink, Kafka...). Rerun this step when you change server configurations.
 ```
 make setup
+
+# Alternatively for individual components:
+make setup-zookeeper
+make setup-kafka
+make setup-processing
+make setup-ingest
+make setup-ui
 ```
 
-4. Deploy applications
+4. Deploy applications. Rerun this step when you change application code.
 ```
 make deploy
+
+# Alternatively for individual components:
+make deploy-kafka
+make deploy-processing
+make deploy-ingest
+make deploy-ui
 ```
 
 5. Open the UI in your browser
 ```
-make show-hosts # get UI host
+make show-hosts  # get UI host
 Navigate to http://ui-host:8080/
 ```
 
@@ -78,25 +95,10 @@ Navigate to http://ui-host:8080/
 ./ssh.sh ui
 ```
 
-
-## Makefile Targets
-
-* `all`: apply, setup, deploy
-* `apply`: Set up AWS infrastructure
-* `destroy`: Destroy AWS infrastructure
-* `reapply`: Destroy, then set up AWS infrastructure
-* `setup`: Install platforms
-* `setup-zookeeper`: Setup Zookeeper
-* `setup-kafka`: Setup Kafka
-* `setup-processing`: Setup processing
-* `setup-ingest`: Setup ingest
-* `setup-ui`: Setup UI
-* `deploy`: Deploy everything
-* `deploy-kafka`: Deploy Kafka
-* `deploy-processing`: Deploy processing
-* `deploy-ingest`: Deploy ingest
-* `deploy-ui`: Deploy UI
-* `show-hosts`: Show addresses of hosts
+7. Destroy infrastructure when it is not needed anymore
+```
+make destroy
+```
 
 ## Links
 * List of Helsinki APIs: https://www.notion.so/faa753c34e1f469d92750c13f7f9d0d8?v=ba0f9f25b9a34d31afba6d05db2ffa96

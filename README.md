@@ -92,7 +92,7 @@ ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deploy
 We use common tools for consistency. Execute the commands below in the project's folder.
 
 #### Java
-* Build & dependency management: [Gradle](https://gradle.org/). No environment setup is necessary, just use the `gradlew` scripts.
+* Build & dependency management: [Gradle](https://gradle.org/). No environment setup is necessary.
 * Code style: [Google Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` to format all .java files.
 
 #### Python
