@@ -2,8 +2,7 @@ package com.dxc.ptinsight.processing.jobs;
 
 import static com.dxc.ptinsight.proto.Base.Event;
 
-import com.dxc.ptinsight.Geocells;
-import com.dxc.ptinsight.processing.EntryPoint;
+import com.dxc.ptinsight.processing.flink.GeocellKeySelector;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
@@ -11,6 +10,7 @@ import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.io.IOException;
 import java.util.HashMap;
+import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -46,23 +46,27 @@ public class VehicleCountJob extends Job {
   private static class VehicleCounterProcessFunction
       extends ProcessAllWindowFunction<VehiclePosition, Event, TimeWindow> {
 
+    private transient GeocellKeySelector<VehiclePosition> cellSelector;
+
+    @Override
+    public void open(Configuration parameters) throws Exception {
+      cellSelector = GeocellKeySelector.ofVehiclePosition();
+    }
+
     @Override
     public void process(Context context, Iterable<VehiclePosition> elements, Collector<Event> out) {
       var counts = new HashMap<Long, Integer>();
       elements.forEach(
           e -> {
-            var geocell =
-                Geocells.h3()
-                    .geoToH3(
-                        e.getLatitude(),
-                        e.getLongitude(),
-                        EntryPoint.getConfiguration().h3.resolution);
-            counts.merge(geocell, 1, Integer::sum);
+            try {
+              var geocell = cellSelector.getKey(e);
+              counts.merge(geocell, 1, Integer::sum);
+            } catch (Exception exception) {
+              LOG.error("Could not extract geocell", exception);
+            }
           });
 
       for (var entry : counts.entrySet()) {
-        //        System.out.println(String.format("H3: %s   Cnt: %d", entry.getKey(),
-        // entry.getValue()));
         var details =
             VehicleCount.newBuilder().setGeocell(entry.getKey()).setCount(entry.getValue()).build();
         out.collect(output(details, context.window()));

@@ -39,6 +39,10 @@ public class FinalStopCountJob extends Job {
     // Requests usually take between 2 and 3 s, but can be up to 15 s
     // There are about 1000 requests per second
     // Capacity of 1000 is only required initially when cache is not yet filled
+    // However, a lower capacity means initial backpressure that the job might not recover from
+    // A higher capacity means more in-flight requests, diminishing initial cache effects and
+    // increasing state size and therefore
+    // checkpointing duration which increases backpressure
     AsyncDataStream.orderedWait(
             input, new FuzzyTripFinalStopLookupAsyncFunction(), 5, TimeUnit.SECONDS, 1000)
         // For some reason, event time window triggers are not executed after an async function
@@ -49,7 +53,6 @@ public class FinalStopCountJob extends Job {
                 UniqueVehicleIdKeySelector.ofVehicleInfo().inTuple(0)))
         .process(new FinalStopCounterProcessFunction())
         .addSink(sink("egress.final-stop-count"));
-    // TODO restructure to aggregate function to keep state small
   }
 
   private static class FinalStopCounterProcessFunction
@@ -67,7 +70,6 @@ public class FinalStopCountJob extends Job {
                 .setGeocell(entry.getKey())
                 .setCount(entry.getValue())
                 .build();
-        System.out.println(entry.getKey());
         out.collect(output(details, context.window()));
       }
     }

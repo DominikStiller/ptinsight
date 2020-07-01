@@ -35,7 +35,8 @@ public class MostRecentDeduplicationEvictor<T, KEY, W extends Window> implements
     // Second iteration: remove elements which are not most recent
     for (var iterator = elements.iterator(); iterator.hasNext(); ) {
       var e = iterator.next();
-      if (e.getTimestamp() < mostRecentTimestamps.get(getKey(e))) {
+      var key = getKey(e);
+      if (key != null && e.getTimestamp() < mostRecentTimestamps.get(key)) {
         iterator.remove();
       }
     }

@@ -32,6 +32,28 @@ class MostRecentDeduplicationEvictorTest {
   }
 
   @Test
+  void shouldKeepElementsWithKeyException() {
+    var elements = new ArrayList<TimestampedValue<String>>(5);
+    elements.add(new TimestampedValue<>("foo", 500));
+    elements.add(new TimestampedValue<>("bar", 1000));
+    elements.add(new TimestampedValue<>("foo", 1500));
+    elements.add(new TimestampedValue<>("foobar", 2000));
+    elements.add(new TimestampedValue<>("bar", 2500));
+
+    var expected = List.copyOf(elements);
+
+    var evictor =
+        new MostRecentDeduplicationEvictor<String, String, TimeWindow>(
+            v -> {
+              throw new Exception();
+            });
+    evictor.evictBefore(
+        elements, elements.size(), new TimeWindow(0, 3000), Mockito.mock(EvictorContext.class));
+
+    assertIterableEquals(expected, elements);
+  }
+
+  @Test
   void shouldNotEvictAfterWindowing() {
     var elements = new ArrayList<TimestampedValue<String>>(5);
     elements.add(new TimestampedValue<>("foo", 500));

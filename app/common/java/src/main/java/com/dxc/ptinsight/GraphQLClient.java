@@ -40,7 +40,8 @@ public class GraphQLClient {
   public static void main(String[] args)
       throws IOException, InterruptedException, ExecutionException {
     var start = System.currentTimeMillis();
-    new GraphQLClient().get(
+    new GraphQLClient()
+        .get(
             "https://api.digitransit.fi/routing/v1/routers/hsl/index/graphql",
             "fuzzytrip",
             Map.of("route", "1097", "direction", "0", "date", "2020-06-26", "time", "70560"))
@@ -50,8 +51,7 @@ public class GraphQLClient {
               var fuzzyTrip = (Map<String, Object>) data.get("fuzzyTrip");
               var stops = (List<Map<String, Double>>) fuzzyTrip.get("stops");
               var lastStop = stops.get(stops.size() - 1);
-              var geocell = Geocells.h3()
-                  .geoToH3(lastStop.get("lat"), lastStop.get("lon"), 8);
+              var geocell = Geocells.h3().geoToH3(lastStop.get("lat"), lastStop.get("lon"), 8);
               System.out.println(geocell);
             })
         .get();
