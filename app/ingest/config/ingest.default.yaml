@@ -1,9 +1,9 @@
 ---
 logging:
   level: info
-  console_producer: true
 
-kafka:
+producer:
+  type: console
   protobuf_format: json
   bootstrap_servers:
     - kafka-public-ip:9093

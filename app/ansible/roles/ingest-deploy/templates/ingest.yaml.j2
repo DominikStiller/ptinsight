@@ -1,9 +1,9 @@
 ---
 logging:
   level: warning
-  console_producer: false
 
-kafka:
+producer:
+  type: kafka
   protobuf_format: json
   bootstrap_servers:
     {{ kafka_servers | to_nice_yaml | indent(4) }}

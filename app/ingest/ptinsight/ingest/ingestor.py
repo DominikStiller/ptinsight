@@ -8,7 +8,7 @@ import re
 import sched
 import threading
 import time
-from typing import final
+from typing import final, Literal
 
 import boto3
 import paho.mqtt.client as mqtt
@@ -22,6 +22,7 @@ logger = logging.getLogger(__name__)
 
 
 class Ingestor(abc.ABC):
+    """Receives messages and publishes them to Kafka after transforming using a Processor"""
 
     _protobuf_format = "binary"
     _producer = None
@@ -31,23 +32,22 @@ class Ingestor(abc.ABC):
 
     @abc.abstractmethod
     def start(self):
+        """Starts the ingestor"""
         pass
 
     @classmethod
     @final
-    def create_kafka_producer(cls, config: dict):
+    def setup_producer(cls, producer_type: Literal["kafka", "console"], config: dict):
         if "protobuf_format" in config:
             Ingestor._protobuf_format = config.pop("protobuf_format")
-        cls._producer = KafkaProducer(**config)
+        if producer_type == "kafka":
+            cls._producer = KafkaProducer(**config)
+        elif producer_type == "console":
+            cls._producer = cls._ConsoleProducer()
+        else:
+            raise ValueError("Invalid producer type")
 
-    @classmethod
-    @final
-    def create_debug_producer(cls, config: dict):
-        if "protobuf_format" in config:
-            Ingestor._protobuf_format = config.pop("protobuf_format")
-        cls._producer = cls._DebugProducer()
-
-    class _DebugProducer:
+    class _ConsoleProducer:
         def send(self, topic, value):
             print(f"{topic}: {value}")
 
@@ -63,6 +63,8 @@ class Ingestor(abc.ABC):
 
 
 class MQTTIngestor(Ingestor):
+    """Receives messages from an MQTT broker"""
+
     def __init__(self, host: str, port: int, processor: MQTTProcessor):
         super().__init__()
         self.host = host
@@ -89,9 +91,6 @@ class MQTTIngestor(Ingestor):
     def _mqtt_on_message(self, client, userdata, msg: mqtt.MQTTMessage):
         ingestion_timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        # print(json.dumps(json.loads(msg.payload), indent=2))
-        # self.client.disconnect()
-
         if processed := self.processor.process(msg.topic, json.loads(msg.payload)):
             target_topic, event_timestamp, details = processed
 
@@ -104,6 +103,8 @@ class MQTTIngestor(Ingestor):
 
 
 class MQTTRecordingIngestor(Ingestor):
+    """Receives messages from an MQTT recording located in S3"""
+
     def __init__(self, bucket: str, key: str, processor: MQTTProcessor):
         super().__init__()
         self.bucket = bucket

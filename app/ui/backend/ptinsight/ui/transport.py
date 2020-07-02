@@ -4,13 +4,21 @@ import h3
 from flask_socketio import SocketIO
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
-from ptinsight.common import Event, FlowDirection, FinalStopCount, DelayStatistics, VehicleCount
+from ptinsight.common import (
+    Event,
+    FlowDirection,
+    FinalStopCount,
+    DelayStatistics,
+    VehicleCount,
+)
 from ptinsight.common.serialize import deserialize
 
 logger = logging.getLogger(__name__)
 
 
 class KafkaToSocketioBridge:
+    """A relay for Kafka protobuf messages to socket.io JSON messages"""
+
     def __init__(self, socketio: SocketIO, kafkaConfig: dict):
         if "protobuf_format" in kafkaConfig:
             self.protobuf_format = kafkaConfig.pop("protobuf_format")

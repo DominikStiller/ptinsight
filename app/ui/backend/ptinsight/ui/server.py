@@ -7,6 +7,8 @@ from ptinsight.ui.transport import KafkaToSocketioBridge
 
 
 class Server:
+    """A wrapper around the web server and socket.io server"""
+
     def __init__(self, config: dict):
         self.app = Flask(
             __name__, static_folder="../../../frontend/dist", static_url_path="/"

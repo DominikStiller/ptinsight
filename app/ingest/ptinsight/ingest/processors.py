@@ -13,18 +13,31 @@ from ptinsight.common import Arrival, Departure, VehiclePosition, VehicleType
 
 
 class Processor(abc.ABC):
+    """Transforms received messages to the appropriate protobuf message for a Kafka topic"""
+
     def __init__(self, config: dict):
         pass
 
     @staticmethod
     @abc.abstractmethod
     def name():
+        """Defines the name under which the processor can be referred to in the config file"""
         pass
 
     @abc.abstractmethod
     def process(
         self, source: str, payload: dict
     ) -> Optional[Tuple[str, datetime, Message]]:
+        """
+        Filters and transforms message from the raw format and the internal event format
+
+        Args:
+            source: The source of the message, e.g., an MQTT topic
+            payload: The payload that contains the event data
+
+        Returns:
+            A tuple of the Kafka topic, the event time and the protobuf message, or None if the message should be dismissed
+        """
         pass
 
 
@@ -32,6 +45,7 @@ class MQTTProcessor(Processor, abc.ABC):
     @property
     @abc.abstractmethod
     def topics(self):
+        """Defines the topics an MQTT ingestor should subscribe to"""
         pass
 
 
