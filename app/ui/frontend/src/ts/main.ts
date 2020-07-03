@@ -55,6 +55,25 @@ socket.on("final-stop-count", (msg: any) => {
   finalStopCountsLayer.updateData(msg.geocell, msg.count);
 });
 
+// Emergency stop counts layer
+const emergencyStopCountsLayer = new GeocellLayer<{
+  count: number;
+  max_deceleration: number;
+  average_speed_diff: number;
+}>(
+  "Emergency Stop Count",
+  (data) =>
+    `Vehicles emergency-stopping here in the last 5 min: ${data.count}<br>
+      Average speed difference between cruising and stop: ${data.average_speed_diff.toFixed(
+        1
+      )} m/s<br>
+      Maximum deceleration: ${data.max_deceleration.toFixed(1)} m/s^2`,
+  (data) => data.count
+).addToLegend(legend);
+socket.on("emergency-stop-count", (msg: any) => {
+  emergencyStopCountsLayer.updateData(msg.geocell, msg);
+});
+
 // General maps
 var streetsLayerLite = tileLayer.provider("Stamen.TonerLite");
 var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
@@ -62,7 +81,7 @@ var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 const map = lmap("map-container", {
   center: [60.2199, 24.9284],
   zoom: 11.7,
-  layers: [streetsLayerLite, finalStopCountsLayer],
+  layers: [streetsLayerLite, emergencyStopCountsLayer],
 });
 
 control
@@ -81,6 +100,7 @@ control
       "Delay statistics": delayStatisticsLayer,
       "Flow direction": flowDirectionLayer,
       "Final stop count": finalStopCountsLayer,
+      "Emergency stop count": emergencyStopCountsLayer,
     },
     {
       position: "bottomright",

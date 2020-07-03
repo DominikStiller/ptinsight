@@ -2,6 +2,7 @@ package com.dxc.ptinsight.processing;
 
 import com.dxc.ptinsight.Resources;
 import com.dxc.ptinsight.YamlSerializer;
+import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionJob;
 import com.dxc.ptinsight.processing.jobs.DelayDetectionJob;
 import com.dxc.ptinsight.processing.jobs.FinalStopCountJob;
 import com.dxc.ptinsight.processing.jobs.FlowDirectionJob;
@@ -21,6 +22,7 @@ public class EntryPoint {
     new DelayDetectionJob().execute();
     new FlowDirectionJob().execute();
     new FinalStopCountJob().execute();
+    new EmergencyStopDetectionJob().execute();
   }
 
   public static Configuration getConfiguration() {

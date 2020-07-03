@@ -13,3 +13,4 @@
     - egress.delay-statistics
     - egress.flow-direction
     - egress.final-stop-count
+    - egress.emergency-stop-count

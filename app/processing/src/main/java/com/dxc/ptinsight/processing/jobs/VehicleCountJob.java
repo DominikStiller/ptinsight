@@ -8,7 +8,6 @@ import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
-import java.io.IOException;
 import java.util.HashMap;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
@@ -27,7 +26,7 @@ public class VehicleCountJob extends Job {
 
   private static final Logger LOG = LoggerFactory.getLogger(VehicleCountJob.class);
 
-  public VehicleCountJob() throws IOException {
+  public VehicleCountJob() {
     super("Vehicle Counter");
   }
 
@@ -49,7 +48,7 @@ public class VehicleCountJob extends Job {
     private transient GeocellKeySelector<VehiclePosition> cellSelector;
 
     @Override
-    public void open(Configuration parameters) throws Exception {
+    public void open(Configuration parameters) {
       cellSelector = GeocellKeySelector.ofVehiclePosition();
     }
 

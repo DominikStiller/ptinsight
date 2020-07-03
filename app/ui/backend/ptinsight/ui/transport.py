@@ -10,6 +10,7 @@ from ptinsight.common import (
     FinalStopCount,
     DelayStatistics,
     VehicleCount,
+    EmergencyStopCount,
 )
 from ptinsight.common.serialize import deserialize
 
@@ -36,6 +37,7 @@ class KafkaToSocketioBridge:
                     "egress.delay-statistics",
                     "egress.flow-direction",
                     "egress.final-stop-count",
+                    "egress.emergency-stop-count",
                 ]
             )
             for message in self.consumer:
@@ -94,5 +96,18 @@ class KafkaToSocketioBridge:
                 {
                     "geocell": h3.h3_to_string(final_stop_count.geocell),
                     "count": final_stop_count.count,
+                },
+            )
+        elif topic == "egress.emergency-stop-count":
+            emergency_stop_count = EmergencyStopCount()
+            event.details.Unpack(emergency_stop_count)
+
+            self.socketio.emit(
+                "emergency-stop-count",
+                {
+                    "geocell": h3.h3_to_string(emergency_stop_count.geocell),
+                    "count": emergency_stop_count.count,
+                    "max_deceleration": emergency_stop_count.max_deceleration,
+                    "average_speed_diff": emergency_stop_count.average_speed_diff,
                 },
             )

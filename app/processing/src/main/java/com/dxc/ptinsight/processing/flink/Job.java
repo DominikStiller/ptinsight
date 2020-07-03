@@ -18,11 +18,14 @@ import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer.Semantic;
+import org.apache.flink.table.api.EnvironmentSettings;
+import org.apache.flink.table.api.java.StreamTableEnvironment;
 
 public abstract class Job {
 
   private final String name;
   private final StreamExecutionEnvironment env;
+  private StreamTableEnvironment tableEnv;
   private static final Properties props = new Properties();
 
   public Job(String name) {
@@ -52,6 +55,14 @@ public abstract class Job {
     var kafkaConfig = EntryPoint.getConfiguration().kafka;
     props.setProperty("bootstrap.servers", String.join(",", kafkaConfig.bootstrapServers));
     props.setProperty("group.id", "ptinsight_" + this.name.replace(' ', '_'));
+  }
+
+  protected StreamTableEnvironment getTableEnvironment() {
+    if (tableEnv == null) {
+      var settings = EnvironmentSettings.newInstance().useBlinkPlanner().inStreamingMode().build();
+      tableEnv = StreamTableEnvironment.create(env, settings);
+    }
+    return tableEnv;
   }
 
   protected final <T extends Message> SingleOutputStreamOperator<T> source(
@@ -98,5 +109,5 @@ public abstract class Job {
     env.execute(this.name);
   }
 
-  protected abstract void setup();
+  protected abstract void setup() throws Exception;
 }
