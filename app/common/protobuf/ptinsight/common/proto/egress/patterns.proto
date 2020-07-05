@@ -5,9 +5,9 @@ package com.dxc.ptinsight.egress;
 option java_package = "com.dxc.ptinsight.proto.egress";
 
 
-message EmergencyStopCount {
-  int64 geocell = 1;
-  int32 count = 2;
-  float average_speed_diff = 3;
+message EmergencyStop {
+  float latitude = 1;
+  float longitude = 2;
+  float speed_diff = 3;
   float max_deceleration = 4;
 }

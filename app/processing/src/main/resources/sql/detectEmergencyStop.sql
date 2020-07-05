@@ -1,11 +1,12 @@
-SELECT *
+SELECT stop_time, lat, lon, speed_diff, max_deceleration
 FROM vehicle_position
 MATCH_RECOGNIZE (
     PARTITION by vehicle_id
     ORDER BY event_time
     MEASURES
         MATCH_ROWTIME() as stop_time,
-        stopped.geocell as geocell,
+        stopped.lat as lat,
+        stopped.lon as lon,
         cruising.speed - stopped.speed AS speed_diff,
         MIN(braking.acceleration) as max_deceleration
     ONE ROW PER MATCH

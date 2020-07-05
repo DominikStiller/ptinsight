@@ -5,6 +5,7 @@ import GeocellLayer from "./geocell-layer";
 import GeoedgeLayer from "./geoedge-layer";
 import { LegendUi } from "./legend-ui";
 import "./styles";
+import GeopointLayer from "./geopoint-layer";
 
 const socket = socketio();
 const legend = new LegendUi();
@@ -55,23 +56,24 @@ socket.on("final-stop-count", (msg: any) => {
   finalStopCountsLayer.updateData(msg.geocell, msg.count);
 });
 
-// Emergency stop counts layer
-const emergencyStopCountsLayer = new GeocellLayer<{
-  count: number;
+// Emergency stop layer
+const emergencyStopLayer = new GeopointLayer<{
+  lat: number;
+  lon: number;
   max_deceleration: number;
-  average_speed_diff: number;
+  speed_diff: number;
 }>(
   "Emergency Stop Count",
   (data) =>
-    `Vehicles emergency-stopping here in the last 5 min: ${data.count}<br>
-      Average speed difference between cruising and stop: ${data.average_speed_diff.toFixed(
-        1
-      )} m/s<br>
+    `Speed difference between cruising and stop: ${data.speed_diff.toFixed(
+      1
+    )} m/s<br>
       Maximum deceleration: ${data.max_deceleration.toFixed(1)} m/s^2`,
-  (data) => data.count
+  (data) => -data.max_deceleration,
+  30000
 ).addToLegend(legend);
-socket.on("emergency-stop-count", (msg: any) => {
-  emergencyStopCountsLayer.updateData(msg.geocell, msg);
+socket.on("emergency-stop", (msg: any) => {
+  emergencyStopLayer.updateData([msg.lat, msg.lon], msg);
 });
 
 // General maps
@@ -81,7 +83,7 @@ var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 const map = lmap("map-container", {
   center: [60.2199, 24.9284],
   zoom: 11.7,
-  layers: [streetsLayerLite, emergencyStopCountsLayer],
+  layers: [streetsLayerLite, emergencyStopLayer],
 });
 
 control
@@ -100,7 +102,7 @@ control
       "Delay statistics": delayStatisticsLayer,
       "Flow direction": flowDirectionLayer,
       "Final stop count": finalStopCountsLayer,
-      "Emergency stop count": emergencyStopCountsLayer,
+      "Emergency stop": emergencyStopLayer,
     },
     {
       position: "bottomright",

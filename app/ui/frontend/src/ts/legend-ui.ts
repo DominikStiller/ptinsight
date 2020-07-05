@@ -83,8 +83,20 @@ export class ColorBar {
 
   public updateDomain(domain: [number, number]): void {
     this.scale.domain(domain);
-    this.minText.text(domain[0] == Number.NEGATIVE_INFINITY ? 0 : domain[0]);
-    this.maxText.text(domain[1] == Number.POSITIVE_INFINITY ? 0 : domain[1]);
+    this.minText.text(
+      domain[0] == Number.NEGATIVE_INFINITY ? 0 : this.formatLimit(domain[0])
+    );
+    this.maxText.text(
+      domain[1] == Number.POSITIVE_INFINITY ? 0 : this.formatLimit(domain[1])
+    );
+  }
+
+  private formatLimit(limit: number): string {
+    if (Number.isInteger(limit)) {
+      return limit.toString();
+    } else {
+      return limit.toFixed(1);
+    }
   }
 
   public getColor(value: number): string {
