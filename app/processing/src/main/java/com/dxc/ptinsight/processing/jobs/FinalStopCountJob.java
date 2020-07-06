@@ -48,6 +48,7 @@ public class FinalStopCountJob extends Job {
         // For some reason, event time window triggers are not executed after an async function
         // Sliding windows with intervals < 10 s create too much backpressure
         .windowAll(SlidingProcessingTimeWindows.of(Time.minutes(5), Time.seconds(10)))
+        .allowedLateness(Time.seconds(5))
         .evictor(
             new MostRecentDeduplicationEvictor<>(
                 UniqueVehicleIdKeySelector.ofVehicleInfo().inTuple(0)))

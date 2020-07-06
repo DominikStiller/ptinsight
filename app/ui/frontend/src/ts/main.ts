@@ -11,12 +11,15 @@ const socket = socketio();
 const legend = new LegendUi();
 
 // Vehicle counts layer
-const vehicleCountsLayer = new GeocellLayer(
+const vehicleCountsLayer = new GeocellLayer<{
+  count: number;
+}>(
   "Vehicle Count",
-  (data) => `Vehicles in the last 30 s: ${data}`
+  (data) => `Vehicles in the last 30 s: ${data.count}`,
+  (data) => data.count
 ).addToLegend(legend);
-socket.on("vehicle-count", (msg: any) => {
-  vehicleCountsLayer.updateData(msg.geocell, msg.count);
+socket.on("egress.vehicle-count", (msg: any) => {
+  vehicleCountsLayer.updateData(msg.data.geocell, msg.timestamp, msg.data);
 });
 
 // Delay statistics layer
@@ -32,8 +35,8 @@ const delayStatisticsLayer = new GeocellLayer<{
       Arrival delay in the last 5 min (99th percentile): ${data.p99} min`,
   (data) => data.p90
 ).addToLegend(legend);
-socket.on("delay-statistics", (msg: any) => {
-  delayStatisticsLayer.updateData(msg.geocell, msg);
+socket.on("egress.delay-statistics", (msg: any) => {
+  delayStatisticsLayer.updateData(msg.data.geocell, msg.timestamp, msg.data);
 });
 
 // Flow direction layer
@@ -41,19 +44,21 @@ const flowDirectionLayer = new GeoedgeLayer(
   "Flow direction",
   (data) => `Vehicles in the last 5 min: ${data}`
 );
-socket.on("flow-direction", (msg: any) => {
-  flowDirectionLayer.updateData(msg.edge, msg.count);
+socket.on("egress.flow-direction", (msg: any) => {
+  flowDirectionLayer.updateData(msg.data.edge, msg.data.count);
 });
 
 // Final stop counts layer
-const finalStopCountsLayer = new GeocellLayer(
+const finalStopCountsLayer = new GeocellLayer<{
+  count: number;
+}>(
   "Final Stop Count",
-  (data) => `Vehicles bound for here in the last 5 min: ${data}`,
-  undefined,
+  (data) => `Vehicles bound for here in the last 5 min: ${data.count}`,
+  (data) => data.count,
   15000
 ).addToLegend(legend);
-socket.on("final-stop-count", (msg: any) => {
-  finalStopCountsLayer.updateData(msg.geocell, msg.count);
+socket.on("egress.final-stop-count", (msg: any) => {
+  finalStopCountsLayer.updateData(msg.data.geocell, msg.timestamp, msg.data);
 });
 
 // Emergency stop layer
@@ -72,8 +77,8 @@ const emergencyStopLayer = new GeopointLayer<{
   (data) => -data.max_deceleration,
   30000
 ).addToLegend(legend);
-socket.on("emergency-stop", (msg: any) => {
-  emergencyStopLayer.updateData([msg.lat, msg.lon], msg);
+socket.on("egress.emergency-stop", (msg: any) => {
+  emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg.data);
 });
 
 // General maps
@@ -83,7 +88,7 @@ var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 const map = lmap("map-container", {
   center: [60.2199, 24.9284],
   zoom: 11.7,
-  layers: [streetsLayerLite, emergencyStopLayer],
+  layers: [streetsLayerLite, vehicleCountsLayer],
 });
 
 control

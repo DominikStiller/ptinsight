@@ -8,28 +8,31 @@ export class ExpiringMap<K, V> extends Map<K, Record<V>> {
   ) {
     var record = new Record(value, duration);
     super.set(key, record);
-    if (duration) {
-      setTimeout(
-        (key: K) => {
-          const record = super.get(key);
-          if (record && record.expired) {
-            // Check is necessary since value might have been updated with newer expiration date
-            this.delete(key);
-            if (expireCallback) {
-              expireCallback(key, record.data);
-            }
-          }
-        },
-        duration,
-        key
-      );
+    setTimeout((key: K) => this.evictEntry(key, expireCallback), duration, key);
+  }
+
+  private evictEntry(
+    key: K,
+    expireCallback: (key: K, value: V) => void = undefined
+  ): void {
+    const record = super.get(key);
+    if (record && record.expired) {
+      // Check is necessary since value might have been updated with newer expiration date
+      this.delete(key);
+      if (expireCallback) {
+        expireCallback(key, record.data);
+      }
     }
   }
 
   // @ts-ignore
   get(key: K) {
-    var record = super.get(key);
+    const record = super.get(key);
     return record === undefined || record.expired ? undefined : record.data;
+  }
+
+  has(key: K) {
+    return super.has(key) ? !super.get(key).expired : false;
   }
 
   // @ts-ignore

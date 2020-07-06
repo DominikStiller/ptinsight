@@ -53,26 +53,20 @@ class KafkaToSocketioBridge:
             vehicle_count = VehicleCount()
             event.details.Unpack(vehicle_count)
 
-            self.socketio.emit(
-                "vehicle-count",
-                {
-                    "geocell": h3.h3_to_string(vehicle_count.geocell),
-                    "count": vehicle_count.count,
-                },
-            )
+            data = {
+                "geocell": h3.h3_to_string(vehicle_count.geocell),
+                "count": vehicle_count.count,
+            }
         elif topic == "egress.delay-statistics":
             delay_statistics = DelayStatistics()
             event.details.Unpack(delay_statistics)
 
-            self.socketio.emit(
-                "delay-statistics",
-                {
-                    "geocell": h3.h3_to_string(delay_statistics.geocell),
-                    "p50": delay_statistics.percentile50th,
-                    "p90": delay_statistics.percentile90th,
-                    "p99": delay_statistics.percentile99th,
-                },
-            )
+            data = {
+                "geocell": h3.h3_to_string(delay_statistics.geocell),
+                "p50": delay_statistics.percentile50th,
+                "p90": delay_statistics.percentile90th,
+                "p99": delay_statistics.percentile99th,
+            }
         elif topic == "egress.flow-direction":
             flow_direction = FlowDirection()
             event.details.Unpack(flow_direction)
@@ -80,34 +74,31 @@ class KafkaToSocketioBridge:
             # if flow_direction.count < 3:
             #     return
 
-            self.socketio.emit(
-                "flow-direction",
-                {
-                    "edge": h3.h3_to_string(flow_direction.geocells_edge),
-                    "count": flow_direction.count,
-                },
-            )
+            data = {
+                "edge": h3.h3_to_string(flow_direction.geocells_edge),
+                "count": flow_direction.count,
+            }
         elif topic == "egress.final-stop-count":
             final_stop_count = FinalStopCount()
             event.details.Unpack(final_stop_count)
 
-            self.socketio.emit(
-                "final-stop-count",
-                {
-                    "geocell": h3.h3_to_string(final_stop_count.geocell),
-                    "count": final_stop_count.count,
-                },
-            )
+            data = {
+                "geocell": h3.h3_to_string(final_stop_count.geocell),
+                "count": final_stop_count.count,
+            }
         elif topic == "egress.emergency-stop":
             emergency_stop = EmergencyStop()
             event.details.Unpack(emergency_stop)
 
-            self.socketio.emit(
-                "emergency-stop",
-                {
-                    "lat": emergency_stop.latitude,
-                    "lon": emergency_stop.longitude,
-                    "max_deceleration": emergency_stop.max_deceleration,
-                    "speed_diff": emergency_stop.speed_diff,
-                },
-            )
+            data = {
+                "lat": emergency_stop.latitude,
+                "lon": emergency_stop.longitude,
+                "max_deceleration": emergency_stop.max_deceleration,
+                "speed_diff": emergency_stop.speed_diff,
+            }
+        else:
+            return
+
+        self.socketio.emit(
+            topic, {"timestamp": event.event_timestamp.ToMilliseconds(), "data": data}
+        )

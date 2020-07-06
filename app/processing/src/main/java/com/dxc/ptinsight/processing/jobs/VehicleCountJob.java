@@ -2,16 +2,17 @@ package com.dxc.ptinsight.processing.jobs;
 
 import static com.dxc.ptinsight.proto.Base.Event;
 
+import com.dxc.ptinsight.processing.flink.CountAggregateFunction;
 import com.dxc.ptinsight.processing.flink.GeocellKeySelector;
+import com.dxc.ptinsight.processing.flink.IdentityProcessFunction;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
-import java.util.HashMap;
-import org.apache.flink.configuration.Configuration;
-import org.apache.flink.streaming.api.functions.windowing.ProcessAllWindowFunction;
+import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
+import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -19,8 +20,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Count the number of vehicles in each cell If a vehicle was in multiple cells for a window, use
- * only the last cell
+ * Count the number of vehicles in each cell
+ *
+ * <p>If a vehicle was in multiple cells for a window, use only the last cell
  */
 public class VehicleCountJob extends Job {
 
@@ -32,44 +34,37 @@ public class VehicleCountJob extends Job {
 
   @Override
   protected void setup() {
-    // Cannot use keyed window because deduplication needs to be applied to all cells
+    // See documentation for consecutive window operations:
+    // https://ci.apache.org/projects/flink/flink-docs-release-1.10/dev/stream/operators/windows.html#consecutive-windowed-operations
     source("ingress.vehicle-position", VehiclePosition.class)
-        .windowAll(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5)))
-        .evictor(
-            new MostRecentDeduplicationEvictor<>(UniqueVehicleIdKeySelector.ofVehiclePosition()))
-        .process(new VehicleCounterProcessFunction())
+        // First, key by vehicle to select only most recent position of each vehicle
+        .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
+        .window(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5)))
+        .allowedLateness(Time.seconds(5))
+        // Since stream is already keyed, use evict without specifying key
+        .evictor(new MostRecentDeduplicationEvictor<>(value -> 0))
+        .process(new IdentityProcessFunction<>())
+        // Then, key by geocell to count vehicles
+        // TODO fix vehicle is not unique if late element arrives with
+        // Multiwindowing/Latedatahandling
+        .keyBy(GeocellKeySelector.ofVehiclePosition())
+        .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+        .allowedLateness(Time.seconds(5))
+        .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
         .addSink(sink("egress.vehicle-count"));
-    // TODO use staggered window when available: https://github.com/apache/flink/pull/12297
   }
 
-  private static class VehicleCounterProcessFunction
-      extends ProcessAllWindowFunction<VehiclePosition, Event, TimeWindow> {
-
-    private transient GeocellKeySelector<VehiclePosition> cellSelector;
+  private static class OutputProcessFunction
+      extends ProcessWindowFunction<Integer, Event, Long, TimeWindow> {
 
     @Override
-    public void open(Configuration parameters) {
-      cellSelector = GeocellKeySelector.ofVehiclePosition();
-    }
-
-    @Override
-    public void process(Context context, Iterable<VehiclePosition> elements, Collector<Event> out) {
-      var counts = new HashMap<Long, Integer>();
-      elements.forEach(
-          e -> {
-            try {
-              var geocell = cellSelector.getKey(e);
-              counts.merge(geocell, 1, Integer::sum);
-            } catch (Exception exception) {
-              LOG.error("Could not extract geocell", exception);
-            }
-          });
-
-      for (var entry : counts.entrySet()) {
-        var details =
-            VehicleCount.newBuilder().setGeocell(entry.getKey()).setCount(entry.getValue()).build();
-        out.collect(output(details, context.window()));
-      }
+    public void process(
+        Long geocell, Context context, Iterable<Integer> elements, Collector<Event> out) {
+      // Iterable only contains the result of the aggregate function as single element
+      var count = elements.iterator().next();
+      var details = VehicleCount.newBuilder().setGeocell(geocell).setCount(count).build();
+      out.collect(output(details, context.window()));
+      System.out.println(details);
     }
   }
 }

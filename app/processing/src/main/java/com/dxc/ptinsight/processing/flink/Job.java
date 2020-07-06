@@ -68,16 +68,14 @@ public abstract class Job {
   protected final <T extends Message> SingleOutputStreamOperator<T> source(
       String topic, Class<T> clazz) {
     var consumer = new FlinkKafkaConsumer<>(topic, new EventDeserializationSchema(), Job.props);
-    return env.addSource(consumer)
-        .assignTimestampsAndWatermarks(
-            new BoundedOutOfOrdernessTimestampExtractor<>(Time.seconds(1)) {
-              @Override
-              public long extractTimestamp(Event element) {
-                return Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli();
-              }
-            })
-        .map(new ExtractDetailMapFunction<T>(clazz))
-        .returns(clazz);
+    consumer.assignTimestampsAndWatermarks(
+        new BoundedOutOfOrdernessTimestampExtractor<Event>(Time.seconds(1)) {
+          @Override
+          public long extractTimestamp(Event element) {
+            return Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli();
+          }
+        });
+    return env.addSource(consumer).map(new ExtractDetailMapFunction<T>(clazz)).returns(clazz);
   }
 
   protected final SinkFunction<Event> sink(String topic) {

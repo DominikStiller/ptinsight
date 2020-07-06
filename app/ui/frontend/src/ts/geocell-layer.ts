@@ -12,7 +12,7 @@ import { schemeOrRd } from "d3-scale-chromatic";
  * The hexagon overlays are cleared at most every two seconds based on the available data
  */
 export default class GeocellLayer<T> extends Layer {
-  private data = new ExpiringMap<string, T>();
+  private data = new ExpiringMap<string, { data: T; timestamp: number }>();
   private cells = new Map<string, Polygon>();
 
   private active = false;
@@ -27,8 +27,8 @@ export default class GeocellLayer<T> extends Layer {
 
   constructor(
     private name: string,
-    private popupTextSelector: (data: T) => string = undefined,
-    private displayDataSelector: (data: T) => number = (data) => Number(data),
+    private popupTextSelector: (data: T) => string,
+    private displayDataSelector: (data: T) => number,
     private timeout: number = 10000
   ) {
     super();
@@ -64,12 +64,28 @@ export default class GeocellLayer<T> extends Layer {
     return this;
   }
 
-  public updateData(geocell: H3Index, data: T): void {
+  public updateData(geocell: H3Index, timestamp: number, data: T): void {
+    // Do not accept data for inactive layer
     if (!this.active) {
       return;
     }
 
-    this.data.set(geocell, data, this.timeout, (key, value) => {
+    // Do not accept outdated data
+    // Data with the same timestamp are okay, since they are refinements using late data
+    if (
+      this.data.has(geocell) &&
+      timestamp < this.data.get(geocell).timestamp
+    ) {
+      console.log("old");
+      return;
+    }
+    if (
+      this.data.has(geocell) &&
+      timestamp == this.data.get(geocell).timestamp
+    ) {
+      console.log("refinement");
+    }
+    this.data.set(geocell, { data, timestamp }, this.timeout, (key) => {
       // Clean up map cell when data expires
       this.cells.get(key).removeFrom(this.map);
       this.cells.delete(key);
@@ -81,30 +97,28 @@ export default class GeocellLayer<T> extends Layer {
       this.updateLimitsDebounced();
     }
 
-    let hexagon;
-    if (!this.cells.has(geocell)) {
+    let hexagon = this.cells.get(geocell);
+    if (hexagon == undefined) {
       // @ts-ignore
       hexagon = polygon(h3ToGeoBoundary(geocell)).addTo(this.map);
       this.cells.set(geocell, hexagon);
-    } else {
-      hexagon = this.cells.get(geocell);
     }
     hexagon.setStyle({
       stroke: false,
       fillColor: this.colorbar.getColor(this.displayDataSelector(data)),
       fillOpacity: 0.7,
     });
-    if (this.popupTextSelector) {
-      hexagon.bindPopup(() => {
-        return this.popupTextSelector(data);
-      });
-    }
+    hexagon.bindPopup(() => {
+      return this.popupTextSelector(data);
+    });
   }
 
   private updateLimits(): void {
     // Limits are calculated regularly from all data instead of for every data update
     // because the limits cannot shrink otherwise
-    let values = Array.from(this.data.values()).map(this.displayDataSelector);
+    let values = Array.from(this.data.values())
+      .map((value) => value.data)
+      .map(this.displayDataSelector);
     this.minData = Math.min(...values);
     this.maxData = Math.max(...values);
     this.colorbar.updateDomain([this.minData, this.maxData]);

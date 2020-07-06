@@ -42,6 +42,7 @@ public class FlowDirectionJob extends Job {
         .process(new CellChangeDetectionProcessFunction())
         .keyBy(value -> value.f0)
         .window(SlidingEventTimeWindows.of(Time.minutes(5), Time.seconds(5)))
+        .allowedLateness(Time.seconds(5))
         .process(new FindMostTraversedEdgeProcessFunction())
         .addSink(sink("egress.flow-direction"));
   }
@@ -80,7 +81,7 @@ public class FlowDirectionJob extends Job {
       extends ProcessWindowFunction<Tuple2<Long, Long>, Event, Long, TimeWindow> {
     @Override
     public void process(
-        Long key, Context ctx, Iterable<Tuple2<Long, Long>> elements, Collector<Event> out) {
+        Long key, Context context, Iterable<Tuple2<Long, Long>> elements, Collector<Event> out) {
       var counts = new HashMap<Long, Integer>();
       elements.forEach(e -> counts.merge(e.f1, 1, Integer::sum));
 
@@ -94,7 +95,7 @@ public class FlowDirectionJob extends Job {
                         .setGeocellsEdge(edge)
                         .setCount(targetCell.getValue())
                         .build();
-                out.collect(output(details, ctx.window()));
+                out.collect(output(details, context.window()));
               });
     }
   }

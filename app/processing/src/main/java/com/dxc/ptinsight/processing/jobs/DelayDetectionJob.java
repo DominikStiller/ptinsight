@@ -38,6 +38,7 @@ public class DelayDetectionJob extends Job {
         .process(new DelayCalculatorProcessFunction())
         .keyBy(GeocellKeySelector.ofTuple3())
         .window(SlidingEventTimeWindows.of(Time.minutes(5), Time.seconds(5)))
+        .allowedLateness(Time.seconds(5))
         .process(new DelayStatisticsProcessFunction())
         .addSink(sink("egress.delay-statistics"));
   }

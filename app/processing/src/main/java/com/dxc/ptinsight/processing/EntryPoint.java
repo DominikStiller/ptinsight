@@ -2,8 +2,8 @@ package com.dxc.ptinsight.processing;
 
 import com.dxc.ptinsight.Resources;
 import com.dxc.ptinsight.YamlSerializer;
-import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionJob;
 import com.dxc.ptinsight.processing.jobs.DelayDetectionJob;
+import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionJob;
 import com.dxc.ptinsight.processing.jobs.FinalStopCountJob;
 import com.dxc.ptinsight.processing.jobs.FlowDirectionJob;
 import com.dxc.ptinsight.processing.jobs.VehicleCountJob;
