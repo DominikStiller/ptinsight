@@ -4,7 +4,7 @@ import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
-import org.apache.flink.api.java.tuple.Tuple2;
+import org.apache.flink.api.java.tuple.Tuple;
 
 /** Selector for the unique identifier of a vehicle */
 public class UniqueVehicleIdKeySelector<T> implements KeySelector<T, Long> {
@@ -35,7 +35,7 @@ public class UniqueVehicleIdKeySelector<T> implements KeySelector<T, Long> {
     return new UniqueVehicleIdKeySelector<>(x -> x);
   }
 
-  public UniqueVehicleIdKeySelector<Tuple2<?, ?>> inTuple(int index) {
+  public UniqueVehicleIdKeySelector<Tuple> inTuple(int index) {
     return new UniqueVehicleIdKeySelector<>(
         value -> vehicleInfoSelector.map(value.getField(index)));
   }

@@ -5,6 +5,7 @@ import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
+import org.apache.flink.api.java.tuple.Tuple;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.api.java.tuple.Tuple3;
 import org.slf4j.Logger;
@@ -45,5 +46,9 @@ public class GeocellKeySelector<T> implements KeySelector<T, Long> {
 
   public static GeocellKeySelector<VehiclePosition> ofVehiclePosition() {
     return new GeocellKeySelector<>(pos -> Tuple2.of(pos.getLatitude(), pos.getLongitude()));
+  }
+
+  public GeocellKeySelector<Tuple> inTuple(int index) {
+    return new GeocellKeySelector<>(value -> coordinateSelector.map(value.getField(index)));
   }
 }

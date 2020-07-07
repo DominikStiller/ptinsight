@@ -39,6 +39,7 @@ public class EmergencyStopDetectionJob extends Job {
     var vehiclePositionStream =
         source("ingress.vehicle-position", VehiclePosition.class)
             .map(new VehiclePositionTableTupleBuilderProcessFunction());
+    // TODO check which vehicle types have emergency stops
     var vehiclePositionTable =
         tableEnv.fromDataStream(
             vehiclePositionStream,

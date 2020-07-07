@@ -42,10 +42,11 @@ public abstract class Job {
 
   private void configureEnvironment(boolean withCheckpointing, int checkpointingInterval) {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
+    env.setParallelism(2);
     if (withCheckpointing) {
       env.enableCheckpointing(checkpointingInterval, CheckpointingMode.EXACTLY_ONCE)
           .getCheckpointConfig()
-          .setMinPauseBetweenCheckpoints(5000);
+          .setMinPauseBetweenCheckpoints(checkpointingInterval / 2);
     }
   }
 

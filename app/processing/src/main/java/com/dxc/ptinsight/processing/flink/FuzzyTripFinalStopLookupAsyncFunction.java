@@ -2,7 +2,6 @@ package com.dxc.ptinsight.processing.flink;
 
 import com.dxc.ptinsight.GraphQLClient;
 import com.dxc.ptinsight.Timestamps;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.time.Duration;
 import java.time.Instant;
@@ -11,6 +10,7 @@ import java.time.LocalTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
@@ -20,6 +20,7 @@ import org.apache.flink.shaded.guava18.com.google.common.cache.Cache;
 import org.apache.flink.shaded.guava18.com.google.common.cache.CacheBuilder;
 import org.apache.flink.streaming.api.functions.async.ResultFuture;
 import org.apache.flink.streaming.api.functions.async.RichAsyncFunction;
+import org.apache.flink.streaming.runtime.operators.windowing.TimestampedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,14 +30,13 @@ import org.slf4j.LoggerFactory;
  * <p>A fuzzy trip allows retrieving trip information without the trip id but other trip information
  */
 public class FuzzyTripFinalStopLookupAsyncFunction
-    extends RichAsyncFunction<Tuple2<Instant, VehiclePosition>, Tuple2<VehicleInfo, Long>> {
+    extends RichAsyncFunction<TimestampedValue<VehiclePosition>, Tuple2<Double, Double>> {
 
   private static final Logger LOG =
       LoggerFactory.getLogger(FuzzyTripFinalStopLookupAsyncFunction.class);
 
   private transient GraphQLClient client;
-  private transient GeocellKeySelector<Tuple2<Double, Double>> cellSelector;
-  private transient Cache<String, Long> cache;
+  private transient Cache<String, Optional<Tuple2<Double, Double>>> cache;
 
   private transient long currentCacheSize = 0;
   private transient Counter cacheHits;
@@ -45,10 +45,10 @@ public class FuzzyTripFinalStopLookupAsyncFunction
   @Override
   public void open(Configuration parameters) {
     client = new GraphQLClient();
-    cellSelector = GeocellKeySelector.ofTuple2();
     cache =
         CacheBuilder.newBuilder()
-            .expireAfterAccess(1, TimeUnit.HOURS)
+            .expireAfterAccess(20, TimeUnit.MINUTES)
+            // There are usually about 1000 unique routes at any time
             .maximumSize(1500)
             .removalListener(x -> currentCacheSize = cache.size())
             .build();
@@ -64,28 +64,33 @@ public class FuzzyTripFinalStopLookupAsyncFunction
 
   @Override
   public void asyncInvoke(
-      Tuple2<Instant, VehiclePosition> input, ResultFuture<Tuple2<VehicleInfo, Long>> resultFuture)
+      TimestampedValue<VehiclePosition> input, ResultFuture<Tuple2<Double, Double>> resultFuture)
       throws Exception {
-    var timestamp = input.f0.atZone(Timestamps.TIMEZONE_HELSINKI);
-    var operatingDay = LocalDate.parse(input.f1.getRoute().getOperatingDay());
-    var departureTime = LocalTime.parse(input.f1.getRoute().getDepartureTime());
+    var timestamp = Instant.ofEpochMilli(input.getTimestamp()).atZone(Timestamps.TIMEZONE_HELSINKI);
+    var route = input.getValue().getRoute();
+    var operatingDay = LocalDate.parse(route.getOperatingDay());
+    var departureTime = LocalTime.parse(route.getDepartureTime());
 
     // The time needs to be transformed to seconds for the request
     // https://digitransit.fi/en/developers/apis/1-routing-api/routes/#a-namefuzzytripaquery-a-trip-without-its-id
     var seconds = departureTime.toSecondOfDay();
+    // The timestamp comes from the window end and can therefore be off by a couply of seconds
+    // This might lead to incorrect results around the departure time, but the likelihood is small
     if (!timestamp.toLocalDate().equals(operatingDay)
         && departureTime.isBefore(timestamp.toLocalTime())) {
       seconds += Duration.ofHours(24).toSeconds();
     }
 
-    var route = input.f1.getRoute().getId();
-    var direction = input.f1.getRoute().getDirection() ? "1" : "0";
+    var routeId = route.getId();
+    var direction = route.getDirection() ? "1" : "0";
 
     // Do not use RouteInfo directly since protobuf hashcode includes other fields as well
-    var cacheKey = route + direction + operatingDay + seconds;
-    var cached = cache.getIfPresent(cacheKey);
-    if (cached != null) {
-      resultFuture.complete(Collections.singleton(Tuple2.of(input.f1.getVehicle(), cached)));
+    var cacheKey = routeId + direction + operatingDay + seconds;
+    var cachedGeocell = cache.getIfPresent(cacheKey);
+    // Null means that this route has not yet been seen
+    // Empty optional means that no fuzzy trip was found
+    if (cachedGeocell != null) {
+      complete(resultFuture, cachedGeocell.orElse(null));
       this.cacheHits.inc();
       return;
     }
@@ -100,7 +105,7 @@ public class FuzzyTripFinalStopLookupAsyncFunction
             "fuzzytrip",
             Map.of(
                 "route",
-                route,
+                routeId,
                 "direction",
                 direction,
                 "date",
@@ -111,25 +116,37 @@ public class FuzzyTripFinalStopLookupAsyncFunction
             data -> {
               try {
                 var fuzzyTrip = (Map<String, Object>) data.get("fuzzyTrip");
+                if (fuzzyTrip == null) {
+                  complete(resultFuture, null);
+                  cache.put(cacheKey, Optional.empty());
+                  return;
+                }
+
                 var stops = (List<Map<String, Double>>) fuzzyTrip.get("stops");
                 var lastStop = stops.get(stops.size() - 1);
-                var geocell =
-                    cellSelector.getKey(Tuple2.of(lastStop.get("lat"), lastStop.get("lon")));
-                resultFuture.complete(
-                    Collections.singleton(Tuple2.of(input.f1.getVehicle(), geocell)));
-                cache.put(cacheKey, geocell);
+                var coords = Tuple2.of(lastStop.get("lat"), lastStop.get("lon"));
+                complete(resultFuture, coords);
+                cache.put(cacheKey, Optional.of(coords));
                 currentCacheSize = cache.size();
               } catch (Exception e) {
-                LOG.error("Could not extract geocell from final stop", e);
-                resultFuture.complete(Collections.emptyList());
+                LOG.error("Could not extract coordinates from final stop", e);
+                complete(resultFuture, null);
               }
             });
   }
 
   @Override
   public void timeout(
-      Tuple2<Instant, VehiclePosition> input,
-      ResultFuture<Tuple2<VehicleInfo, Long>> resultFuture) {
+      TimestampedValue<VehiclePosition> input, ResultFuture<Tuple2<Double, Double>> resultFuture) {
     resultFuture.complete(Collections.emptyList());
+  }
+
+  private void complete(
+      ResultFuture<Tuple2<Double, Double>> resultFuture, Tuple2<Double, Double> value) {
+    if (value == null) {
+      resultFuture.complete(Collections.emptyList());
+    } else {
+      resultFuture.complete(Collections.singleton(value));
+    }
   }
 }

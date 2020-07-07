@@ -44,6 +44,7 @@ public class VehicleCountJob extends Job {
         .window(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5)))
         // Since stream is already keyed, use evict without specifying key
         .evictor(MostRecentDeduplicationEvictor.ofAll())
+        // Collect most recent vehicle position from all keyed streams into single stream
         .process(new IdentityProcessFunction<>())
         // Then, key by geocell to count vehicles
         .keyBy(GeocellKeySelector.ofVehiclePosition())

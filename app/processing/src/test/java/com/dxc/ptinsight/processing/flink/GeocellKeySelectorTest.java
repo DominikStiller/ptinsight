@@ -41,13 +41,13 @@ class GeocellKeySelectorTest {
   }
 
   @Test
-  void shouldReturnCorrectGeocellFromVehiclePosition() throws Exception {
-    var selector = GeocellKeySelector.ofVehiclePosition();
+  void shouldReturnCorrectGeocellFromVehiclePositionInTuple() throws Exception {
+    var selector = GeocellKeySelector.ofVehiclePosition().inTuple(1);
 
     var vehiclePosition =
         VehiclePosition.newBuilder().setLatitude(40.689167f).setLongitude(-74.044444f).build();
 
-    var actual = selector.getKey(vehiclePosition);
+    var actual = selector.getKey(Tuple2.of(42, vehiclePosition));
     assertEquals(599718752904282111L, actual);
   }
 }

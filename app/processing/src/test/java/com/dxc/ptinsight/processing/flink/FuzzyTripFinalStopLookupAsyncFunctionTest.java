@@ -6,7 +6,6 @@ import static org.mockito.Mockito.*;
 import com.dxc.ptinsight.GraphQLClient;
 import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.time.Instant;
 import java.util.HashMap;
@@ -21,6 +20,7 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream.OutputMode;
 import org.apache.flink.streaming.api.functions.async.AsyncFunction;
 import org.apache.flink.streaming.api.operators.async.AsyncWaitOperatorFactory;
+import org.apache.flink.streaming.runtime.operators.windowing.TimestampedValue;
 import org.apache.flink.streaming.runtime.streamrecord.StreamRecord;
 import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
 import org.apache.flink.streaming.util.TestHarnessUtil;
@@ -51,27 +51,19 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
                     Thread.sleep(TIMEOUT * 10);
                   } catch (InterruptedException e) {
                   }
-                  return null;
+                  return getNullFuzzyTrip();
                 }))
         .when(mockGraphQLClient)
         .get(anyString(), anyString(), argThat(data -> data.get("route").equals("1550")));
-    doReturn(
-            CompletableFuture.completedFuture(
-                Map.of(
-                    "fuzzyTrip",
-                    Map.of(
-                        "stops",
-                        List.of(
-                            Map.of("lat", 42.0, "lon", 42.0),
-                            Map.of("lat", 40.689167, "lon", -74.044444))))))
+    doReturn(CompletableFuture.completedFuture(getRealFuzzyTrip()))
         .when(mockGraphQLClient)
         .get(anyString(), anyString(), argThat(data -> data.get("route").equals("2550")));
 
     // Build test messages
-    var timestamp1 = Instant.parse("2019-06-28T08:49:01.457Z");
+    var timestamp1 = Instant.parse("2019-06-28T08:49:01.457Z").toEpochMilli();
     var vehiclePosition1 = createVehiclePosition("1550", "2019-06-28", "10:57");
 
-    var timestamp2 = Instant.parse("2019-06-28T09:49:01.457Z");
+    var timestamp2 = Instant.parse("2019-06-28T09:49:01.457Z").toEpochMilli();
     var vehiclePosition2 = createVehiclePosition("2550", "2019-06-28", "11:57");
 
     // Set up test environment
@@ -85,15 +77,12 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
     // Run test
     var expectedOutput = new ConcurrentLinkedQueue<>();
     // Should timeout
-    harness.processElement(Tuple2.of(timestamp1, vehiclePosition1), timestamp1.toEpochMilli());
+    harness.processElement(new TimestampedValue<>(vehiclePosition1, timestamp1), timestamp1);
 
     harness.setProcessingTime(TIMEOUT / 2);
     // Should be processed normally
-    harness.processElement(Tuple2.of(timestamp2, vehiclePosition2), timestamp2.toEpochMilli());
-    expectedOutput.add(
-        new StreamRecord<>(
-            Tuple2.of(vehiclePosition2.getVehicle(), 599718752904282111L),
-            timestamp2.toEpochMilli()));
+    harness.processElement(new TimestampedValue<>(vehiclePosition2, timestamp2), timestamp2);
+    expectedOutput.add(new StreamRecord<>(Tuple2.of(42.0, 42.0), timestamp2));
 
     harness.setProcessingTime(TIMEOUT + 1);
     harness.close();
@@ -109,14 +98,12 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
   void shouldDismissRecordsWithNoFuzzyTripMatches() throws Exception {
     // Set up mock API responses
     var mockGraphQLClient = Mockito.mock(GraphQLClient.class);
-    var nullFuzzyTrip = new HashMap<String, Object>();
-    nullFuzzyTrip.put("fuzzyTrip", null);
     when(mockGraphQLClient.get(anyString(), anyString(), anyMap()))
-        .thenReturn(CompletableFuture.completedFuture(nullFuzzyTrip));
+        .thenReturn(CompletableFuture.completedFuture(getNullFuzzyTrip()));
 
     // Build test messages
-    var timestamp1 = Instant.parse("2019-06-28T08:49:01.457Z");
-    var vehiclePosition1 = createVehiclePosition("1550", "2019-06-28", "10:57");
+    var timestamp = Instant.parse("2019-06-28T08:49:01.457Z").toEpochMilli();
+    var vehiclePosition = createVehiclePosition("1550", "2019-06-28", "10:57");
 
     // Set up test environment
     var function = new FuzzyTripFinalStopLookupAsyncFunction();
@@ -128,7 +115,7 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
 
     // Run test
     // Should find no fuzzy trip
-    harness.processElement(Tuple2.of(timestamp1, vehiclePosition1), timestamp1.toEpochMilli());
+    harness.processElement(new TimestampedValue<>(vehiclePosition, timestamp), timestamp);
     harness.close();
 
     // Check output
@@ -141,10 +128,10 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
     // Set up mock API response
     var mockGraphQLClient = Mockito.mock(GraphQLClient.class);
     when(mockGraphQLClient.get(anyString(), anyString(), anyMap()))
-        .thenReturn(CompletableFuture.completedFuture(null));
+        .thenReturn(CompletableFuture.completedFuture(getNullFuzzyTrip()));
 
     // Build test message where timestamp day and operating day are different
-    var timestamp = Instant.parse("2018-08-16T00:15:00.836Z");
+    var timestamp = Instant.parse("2018-08-16T00:15:00.836Z").toEpochMilli();
     var vehiclePosition = createVehiclePosition("2550", "2018-08-15", "03:10");
 
     // Set up test environment
@@ -156,12 +143,49 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
         function, function.getClass().getDeclaredField("client"), mockGraphQLClient);
 
     // Run test
-    harness.processElement(Tuple2.of(timestamp, vehiclePosition), timestamp.toEpochMilli());
+    harness.processElement(new TimestampedValue<>(vehiclePosition, timestamp), timestamp);
     harness.close();
 
     // Check if 24 h in seconds were added to the "time" field
     verify(mockGraphQLClient)
         .get(anyString(), anyString(), argThat(data -> data.get("time").equals("97800")));
+  }
+
+  @Test
+  void shouldUseCachedValue() throws Exception {
+    // Set up mock API responses
+    var mockGraphQLClient = Mockito.mock(GraphQLClient.class);
+    when(mockGraphQLClient.get(anyString(), anyString(), anyMap()))
+        .thenReturn(CompletableFuture.completedFuture(getRealFuzzyTrip()))
+        .thenReturn(CompletableFuture.completedFuture(getNullFuzzyTrip()));
+
+    // Build test messages
+    var timestamp1 = Instant.parse("2019-06-28T09:49:01.457Z").toEpochMilli();
+    var timestamp2 = Instant.parse("2019-06-28T09:49:02.457Z").toEpochMilli();
+    var vehiclePosition = createVehiclePosition("1550", "2019-06-28", "10:57");
+
+    // Set up test environment
+    var function = new FuzzyTripFinalStopLookupAsyncFunction();
+    var harness = createHarness(function);
+    harness.open();
+
+    FieldSetter.setField(
+        function, function.getClass().getDeclaredField("client"), mockGraphQLClient);
+
+    // Run test
+    var expectedOutput = new ConcurrentLinkedQueue<>();
+    // Should find fuzzy trip
+    harness.processElement(new TimestampedValue<>(vehiclePosition, timestamp1), timestamp1);
+    // Should find no fuzzy trip but use cached result
+    harness.processElement(new TimestampedValue<>(vehiclePosition, timestamp2), timestamp2);
+    expectedOutput.add(new StreamRecord<>(Tuple2.of(42.0, 42.0), timestamp1));
+    expectedOutput.add(new StreamRecord<>(Tuple2.of(42.0, 42.0), timestamp2));
+
+    harness.close();
+
+    // Check output
+    TestHarnessUtil.assertOutputEquals(
+        "Should use cached value", expectedOutput, harness.getOutput());
   }
 
   private VehiclePosition createVehiclePosition(
@@ -176,16 +200,30 @@ class FuzzyTripFinalStopLookupAsyncFunctionTest {
         .build();
   }
 
+  private Map<String, Object> getRealFuzzyTrip() {
+    return Map.of(
+        "fuzzyTrip",
+        Map.of(
+            "stops", List.of(Map.of("lat", 41.0, "lon", 41.0), Map.of("lat", 42.0, "lon", 42.0))));
+  }
+
+  private Map<String, Object> getNullFuzzyTrip() {
+    // Map.of does not allow null values
+    var nullFuzzyTrip = new HashMap<String, Object>();
+    nullFuzzyTrip.put("fuzzyTrip", null);
+    return nullFuzzyTrip;
+  }
+
   private OneInputStreamOperatorTestHarness<
-          Tuple2<Instant, VehiclePosition>, Tuple2<VehicleInfo, Long>>
+          TimestampedValue<VehiclePosition>, Tuple2<Double, Double>>
       createHarness(
-          AsyncFunction<Tuple2<Instant, VehiclePosition>, Tuple2<VehicleInfo, Long>> function)
+          AsyncFunction<TimestampedValue<VehiclePosition>, Tuple2<Double, Double>> function)
           throws Exception {
     var asyncOperator = new AsyncWaitOperatorFactory<>(function, TIMEOUT, 2, OutputMode.ORDERED);
 
     return new OneInputStreamOperatorTestHarness<>(
         asyncOperator,
-        TypeInformation.of(new TypeHint<Tuple2<Instant, VehiclePosition>>() {})
+        TypeInformation.of(new TypeHint<TimestampedValue<VehiclePosition>>() {})
             .createSerializer(new ExecutionConfig()));
   }
 }
