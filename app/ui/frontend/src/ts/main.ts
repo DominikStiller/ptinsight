@@ -14,12 +14,11 @@ const legend = new LegendUi();
 const vehicleCountsLayer = new GeocellLayer<{
   count: number;
 }>(
-  "Vehicle Count",
   (data) => `Vehicles in the last 30 s: ${data.count}`,
   (data) => data.count
 ).addToLegend(legend);
 socket.on("egress.vehicle-count", (msg: any) => {
-  vehicleCountsLayer.updateData(msg.data.geocell, msg.timestamp, msg.data);
+  vehicleCountsLayer.updateData(msg.data.geocell, msg);
 });
 
 // Delay statistics layer
@@ -28,7 +27,6 @@ const delayStatisticsLayer = new GeocellLayer<{
   p90: number;
   p99: number;
 }>(
-  "Arrival Delay",
   (data) =>
     `Arrival delay in the last 5 min (50th percentile): ${data.p50} min<br>
       Arrival delay in the last 5 min (90th percentile): ${data.p90} min<br>
@@ -36,29 +34,26 @@ const delayStatisticsLayer = new GeocellLayer<{
   (data) => data.p90
 ).addToLegend(legend);
 socket.on("egress.delay-statistics", (msg: any) => {
-  delayStatisticsLayer.updateData(msg.data.geocell, msg.timestamp, msg.data);
+  delayStatisticsLayer.updateData(msg.data.geocell, msg);
 });
 
 // Flow direction layer
-const flowDirectionLayer = new GeoedgeLayer(
-  "Flow direction",
-  (data) => `Vehicles in the last 5 min: ${data}`
-);
+const flowDirectionLayer = new GeoedgeLayer<{
+  count: number;
+}>((data) => `Vehicles in the last 5 min: ${data.count}`);
 socket.on("egress.flow-direction", (msg: any) => {
-  flowDirectionLayer.updateData(msg.data.edge, msg.data.count);
+  flowDirectionLayer.updateData(msg.data.edge, msg);
 });
 
 // Final stop counts layer
 const finalStopCountsLayer = new GeocellLayer<{
   count: number;
 }>(
-  "Final Stop Count",
   (data) => `Vehicles bound for here in the last 5 min: ${data.count}`,
-  (data) => data.count,
-  15000
+  (data) => data.count
 ).addToLegend(legend);
 socket.on("egress.final-stop-count", (msg: any) => {
-  finalStopCountsLayer.updateData(msg.data.geocell, msg.timestamp, msg.data);
+  finalStopCountsLayer.updateData(msg.data.geocell, msg);
 });
 
 // Emergency stop layer
@@ -68,17 +63,15 @@ const emergencyStopLayer = new GeopointLayer<{
   max_deceleration: number;
   speed_diff: number;
 }>(
-  "Emergency Stop Count",
   (data) =>
     `Speed difference between cruising and stop: ${data.speed_diff.toFixed(
       1
     )} m/s<br>
       Maximum deceleration: ${data.max_deceleration.toFixed(1)} m/s^2`,
-  (data) => -data.max_deceleration,
-  30000
+  (data) => -data.max_deceleration
 ).addToLegend(legend);
 socket.on("egress.emergency-stop", (msg: any) => {
-  emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg.data);
+  emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);
 });
 
 // General maps

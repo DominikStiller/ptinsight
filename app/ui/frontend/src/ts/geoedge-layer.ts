@@ -7,7 +7,7 @@ import "leaflet-arrowheads";
  * Map layer for drawing edges between H3 geocells
  */
 export default class GeoedgeLayer<T> extends Layer {
-  private data = new ExpiringMap<string, T>();
+  private data = new ExpiringMap<string, { data: T; timestamp: number }>();
   private edges = new Map<string, Polyline>();
 
   private active = false;
@@ -15,7 +15,6 @@ export default class GeoedgeLayer<T> extends Layer {
   private map: LMap;
 
   constructor(
-    private name: string,
     private popupTextSelector: (data: T) => string = undefined,
     private displayDataSelector: (data: T) => number = (data) => Number(data),
     private timeout: number = 10000
@@ -39,12 +38,19 @@ export default class GeoedgeLayer<T> extends Layer {
     return this;
   }
 
-  public updateData(edge: H3Index, data: T): void {
+  public updateData(edge: H3Index, data: { timestamp: number; data: T }): void {
     if (!this.active) {
       return;
     }
 
     let [fromCell, toCell] = getH3IndexesFromUnidirectionalEdge(edge);
+
+    if (
+      this.data.has(fromCell) &&
+      data.timestamp < this.data.get(fromCell).timestamp
+    ) {
+      return;
+    }
 
     this.data.set(fromCell, data, this.timeout, (key, value) => {
       // Clean up map cell when data expires
@@ -66,7 +72,7 @@ export default class GeoedgeLayer<T> extends Layer {
     }
     if (this.popupTextSelector) {
       line.bindPopup(() => {
-        return this.popupTextSelector(data);
+        return this.popupTextSelector(data.data);
       });
     }
   }

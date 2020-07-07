@@ -1,14 +1,19 @@
 import { Map as LMap, Layer, Circle, circle } from "leaflet";
+import { v4 as uuidv4 } from "uuid";
 import { debounce } from "underscore";
 import { ExpiringMap } from "./expiring-map";
 import { LegendUi, ColorBar } from "./legend-ui";
 import { schemeOrRd } from "d3-scale-chromatic";
+import { H3Index } from "h3-js";
 
 /**
  * Map layer for drawing points at coordinates with data-based coloring
  */
 export default class GeopointLayer<T> extends Layer {
-  private data = new ExpiringMap<[number, number], T>();
+  private data = new ExpiringMap<
+    [number, number],
+    { data: T; timestamp: number }
+  >();
   private points = new Map<[number, number], Circle>();
 
   private active = false;
@@ -22,17 +27,13 @@ export default class GeopointLayer<T> extends Layer {
   private updateLimitsDebounced: () => void;
 
   constructor(
-    private name: string,
     private popupTextSelector: (data: T) => string = undefined,
     private displayDataSelector: (data: T) => number = (data) => Number(data),
-    private timeout: number = 10000
+    private timeout: number = 30000
   ) {
     super();
-    this.colorbar = new ColorBar(
-      name.split(" ").join("-").toLowerCase(),
-      // @ts-ignore
-      schemeOrRd[8]
-    );
+    // @ts-ignore
+    this.colorbar = new ColorBar(uuidv4(), schemeOrRd[8]);
     this.updateLimitsDebounced = debounce(this.updateLimits, 2000);
   }
 
@@ -60,8 +61,18 @@ export default class GeopointLayer<T> extends Layer {
     return this;
   }
 
-  public updateData(coords: [number, number], data: T): void {
+  public updateData(
+    coords: [number, number],
+    data: { timestamp: number; data: T }
+  ): void {
     if (!this.active) {
+      return;
+    }
+
+    if (
+      this.data.has(coords) &&
+      data.timestamp < this.data.get(coords).timestamp
+    ) {
       return;
     }
 
@@ -81,12 +92,12 @@ export default class GeopointLayer<T> extends Layer {
     this.points.set(coords, point);
     point.setStyle({
       stroke: false,
-      fillColor: this.colorbar.getColor(this.displayDataSelector(data)),
+      fillColor: this.colorbar.getColor(this.displayDataSelector(data.data)),
       fillOpacity: 0.7,
     });
     if (this.popupTextSelector) {
       point.bindPopup(() => {
-        return this.popupTextSelector(data);
+        return this.popupTextSelector(data.data);
       });
     }
   }
@@ -94,7 +105,9 @@ export default class GeopointLayer<T> extends Layer {
   private updateLimits(): void {
     // Limits are calculated regularly from all data instead of for every data update
     // because the limits cannot shrink otherwise
-    let values = Array.from(this.data.values()).map(this.displayDataSelector);
+    let values = Array.from(this.data.values())
+      .map((value) => value.data)
+      .map(this.displayDataSelector);
     this.minData = Math.min(...values);
     this.maxData = Math.max(...values);
     this.colorbar.updateDomain([this.minData, this.maxData]);

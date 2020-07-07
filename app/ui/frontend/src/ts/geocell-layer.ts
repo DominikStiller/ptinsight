@@ -1,5 +1,6 @@
 import { Map as LMap, Layer, Polygon, polygon } from "leaflet";
 import { debounce } from "underscore";
+import { v4 as uuidv4 } from "uuid";
 import { h3ToGeoBoundary, H3Index } from "h3-js";
 import { ExpiringMap } from "./expiring-map";
 import { LegendUi, ColorBar } from "./legend-ui";
@@ -25,18 +26,21 @@ export default class GeocellLayer<T> extends Layer {
 
   private updateLimitsDebounced: () => void;
 
+  /**
+   * Creates a new geocell layer
+   * @param popupTextSelector A function that returns the popup text
+   * @param displayDataSelector A function that returns the value used for coloring
+   * @param timeout The timeout after which data for a cell is removed if they were not updated.
+   *                Should be set about 5 s higher than the data generation interval.
+   */
   constructor(
-    private name: string,
     private popupTextSelector: (data: T) => string,
     private displayDataSelector: (data: T) => number,
     private timeout: number = 10000
   ) {
     super();
-    this.colorbar = new ColorBar(
-      name.split(" ").join("-").toLowerCase(),
-      // @ts-ignore
-      schemeOrRd[8]
-    );
+    // @ts-ignore
+    this.colorbar = new ColorBar(uuidv4(), schemeOrRd[8]);
     this.updateLimitsDebounced = debounce(this.updateLimits, 2000);
   }
 
@@ -64,7 +68,10 @@ export default class GeocellLayer<T> extends Layer {
     return this;
   }
 
-  public updateData(geocell: H3Index, timestamp: number, data: T): void {
+  public updateData(
+    geocell: H3Index,
+    data: { timestamp: number; data: T }
+  ): void {
     // Do not accept data for inactive layer
     if (!this.active) {
       return;
@@ -74,21 +81,15 @@ export default class GeocellLayer<T> extends Layer {
     // Data with the same timestamp are okay, since they are refinements using late data
     if (
       this.data.has(geocell) &&
-      timestamp < this.data.get(geocell).timestamp
+      data.timestamp < this.data.get(geocell).timestamp
     ) {
-      console.log("old");
       return;
     }
-    if (
-      this.data.has(geocell) &&
-      timestamp == this.data.get(geocell).timestamp
-    ) {
-      console.log("refinement");
-    }
-    this.data.set(geocell, { data, timestamp }, this.timeout, (key) => {
+
+    this.data.set(geocell, data, this.timeout, (geocell) => {
       // Clean up map cell when data expires
-      this.cells.get(key).removeFrom(this.map);
-      this.cells.delete(key);
+      this.cells.get(geocell).removeFrom(this.map);
+      this.cells.delete(geocell);
     });
 
     if (this.cells.size <= 5) {
@@ -97,6 +98,7 @@ export default class GeocellLayer<T> extends Layer {
       this.updateLimitsDebounced();
     }
 
+    // Reuse and only re-color old hexagons if possible to improve performance
     let hexagon = this.cells.get(geocell);
     if (hexagon == undefined) {
       // @ts-ignore
@@ -105,11 +107,11 @@ export default class GeocellLayer<T> extends Layer {
     }
     hexagon.setStyle({
       stroke: false,
-      fillColor: this.colorbar.getColor(this.displayDataSelector(data)),
+      fillColor: this.colorbar.getColor(this.displayDataSelector(data.data)),
       fillOpacity: 0.7,
     });
     hexagon.bindPopup(() => {
-      return this.popupTextSelector(data);
+      return this.popupTextSelector(data.data);
     });
   }
 
