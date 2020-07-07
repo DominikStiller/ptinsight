@@ -30,7 +30,7 @@ public class MultiWindowing {
     env.addSource(new DataGenerator())
         .keyBy(value -> value.f0)
         .window(TumblingEventTimeWindows.of(Time.seconds(5)))
-        .evictor(new MostRecentDeduplicationEvictor<>(value -> value))
+        .evictor(MostRecentDeduplicationEvictor.of(value -> value))
         .process(
             new ProcessWindowFunction<
                 Tuple2<String, String>, Tuple2<String, String>, String, TimeWindow>() {

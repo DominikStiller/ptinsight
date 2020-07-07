@@ -9,14 +9,14 @@ import org.apache.flink.streaming.runtime.operators.windowing.TimestampedValue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-/** Evict all but the most recent element by key */
+/** Evict all but the most recent record by key */
 public class MostRecentDeduplicationEvictor<T, KEY, W extends Window> implements Evictor<T, W> {
 
   private static final Logger LOG = LoggerFactory.getLogger(MostRecentDeduplicationEvictor.class);
 
   private final KeySelector<T, KEY> keySelector;
 
-  public MostRecentDeduplicationEvictor(KeySelector<T, KEY> keySelector) {
+  private MostRecentDeduplicationEvictor(KeySelector<T, KEY> keySelector) {
     this.keySelector = keySelector;
   }
 
@@ -61,5 +61,16 @@ public class MostRecentDeduplicationEvictor<T, KEY, W extends Window> implements
       return it.next().hasTimestamp();
     }
     return false;
+  }
+
+  /** An evictor which keeps only the most recent record for each key */
+  public static <T, KEY, W extends Window> MostRecentDeduplicationEvictor<T, KEY, W> of(
+      KeySelector<T, KEY> keySelector) {
+    return new MostRecentDeduplicationEvictor<>(keySelector);
+  }
+
+  /** An evictor which keeps only the most recent record */
+  public static <T, W extends Window> MostRecentDeduplicationEvictor<T, Integer, W> ofAll() {
+    return new MostRecentDeduplicationEvictor<>((value -> 0));
   }
 }

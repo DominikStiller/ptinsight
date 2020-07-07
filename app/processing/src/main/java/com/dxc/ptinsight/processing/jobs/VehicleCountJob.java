@@ -36,20 +36,18 @@ public class VehicleCountJob extends Job {
   protected void setup() {
     // See documentation for consecutive window operations:
     // https://ci.apache.org/projects/flink/flink-docs-release-1.10/dev/stream/operators/windows.html#consecutive-windowed-operations
+    // Do not allow lateness, because evicted elements in the first window remain in the second
+    // window when it is triggered again
     source("ingress.vehicle-position", VehiclePosition.class)
         // First, key by vehicle to select only most recent position of each vehicle
         .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
         .window(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5)))
-        .allowedLateness(Time.seconds(5))
         // Since stream is already keyed, use evict without specifying key
-        .evictor(new MostRecentDeduplicationEvictor<>(value -> 0))
+        .evictor(MostRecentDeduplicationEvictor.ofAll())
         .process(new IdentityProcessFunction<>())
         // Then, key by geocell to count vehicles
-        // TODO fix vehicle is not unique if late element arrives with
-        // Multiwindowing/Latedatahandling
         .keyBy(GeocellKeySelector.ofVehiclePosition())
         .window(TumblingEventTimeWindows.of(Time.seconds(5)))
-        .allowedLateness(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
         .addSink(sink("egress.vehicle-count"));
   }
@@ -64,7 +62,6 @@ public class VehicleCountJob extends Job {
       var count = elements.iterator().next();
       var details = VehicleCount.newBuilder().setGeocell(geocell).setCount(count).build();
       out.collect(output(details, context.window()));
-      System.out.println(details);
     }
   }
 }

@@ -24,7 +24,7 @@ class MostRecentDeduplicationEvictorTest {
 
     var expected = Arrays.asList(elements.get(2), elements.get(3), elements.get(4));
 
-    var evictor = new MostRecentDeduplicationEvictor<String, String, TimeWindow>(v -> v);
+    var evictor = MostRecentDeduplicationEvictor.<String, String, TimeWindow>of(v -> v);
     evictor.evictBefore(
         elements, elements.size(), new TimeWindow(0, 3000), Mockito.mock(EvictorContext.class));
 
@@ -43,7 +43,7 @@ class MostRecentDeduplicationEvictorTest {
     var expected = List.copyOf(elements);
 
     var evictor =
-        new MostRecentDeduplicationEvictor<String, String, TimeWindow>(
+        MostRecentDeduplicationEvictor.<String, String, TimeWindow>of(
             v -> {
               throw new Exception();
             });
@@ -66,7 +66,7 @@ class MostRecentDeduplicationEvictorTest {
     // Use a copy of the TimestampedValue instances to ensure equality
     var expected = List.copyOf(elements);
 
-    var evictor = new MostRecentDeduplicationEvictor<String, String, TimeWindow>(v -> v);
+    var evictor = MostRecentDeduplicationEvictor.<String, String, TimeWindow>of(v -> v);
     evictor.evictAfter(
         elements, elements.size(), new TimeWindow(0, 3000), Mockito.mock(EvictorContext.class));
 

@@ -50,7 +50,7 @@ public class FinalStopCountJob extends Job {
         .windowAll(SlidingProcessingTimeWindows.of(Time.minutes(5), Time.seconds(10)))
         .allowedLateness(Time.seconds(5))
         .evictor(
-            new MostRecentDeduplicationEvictor<>(
+            MostRecentDeduplicationEvictor.of(
                 UniqueVehicleIdKeySelector.ofVehicleInfo().inTuple(0)))
         .process(new FinalStopCounterProcessFunction())
         .addSink(sink("egress.final-stop-count"));
