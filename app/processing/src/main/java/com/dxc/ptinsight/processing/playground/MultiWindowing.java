@@ -10,7 +10,6 @@ import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
 import org.apache.flink.streaming.api.functions.source.SourceFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.watermark.Watermark;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -29,7 +28,7 @@ public class MultiWindowing {
 
     env.addSource(new DataGenerator())
         .keyBy(value -> value.f0)
-        .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+        .timeWindow(Time.seconds(5))
         .evictor(MostRecentDeduplicationEvictor.of(value -> value))
         .process(
             new ProcessWindowFunction<
@@ -47,7 +46,7 @@ public class MultiWindowing {
               }
             })
         .keyBy(value -> value.f1)
-        .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+        .timeWindow(Time.seconds(5))
         .process(
             new ProcessWindowFunction<
                 Tuple2<String, String>, Tuple2<String, String>, String, TimeWindow>() {

@@ -42,7 +42,10 @@ const flowDirectionLayer = new GeoedgeLayer<{
   count: number;
 }>((data) => `Vehicles in the last 5 min: ${data.count}`);
 socket.on("egress.flow-direction", (msg: any) => {
-  flowDirectionLayer.updateData(msg.data.edge, msg);
+  // Keep map clean by only showing edges with more than 3 vehicles
+  if (msg.data.count > 3) {
+    flowDirectionLayer.updateData(msg.data.edge, msg);
+  }
 });
 
 // Final stop counts layer
@@ -58,17 +61,19 @@ socket.on("egress.final-stop-count", (msg: any) => {
 
 // Emergency stop layer
 const emergencyStopLayer = new GeopointLayer<{
+  veh_type: string;
   lat: number;
   lon: number;
-  max_deceleration: number;
+  max_dec: number;
   speed_diff: number;
 }>(
   (data) =>
-    `Speed difference between cruising and stop: ${data.speed_diff.toFixed(
-      1
-    )} m/s<br>
-      Maximum deceleration: ${data.max_deceleration.toFixed(1)} m/s^2`,
-  (data) => -data.max_deceleration
+    `Vehicle type: ${data.veh_type}<br>
+     Speed difference between cruising and stop: ${data.speed_diff.toFixed(
+       1
+     )} m/s<br>
+      Maximum deceleration: ${data.max_dec.toFixed(1)} m/s^2`,
+  (data) => -data.max_dec
 ).addToLegend(legend);
 socket.on("egress.emergency-stop", (msg: any) => {
   emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);

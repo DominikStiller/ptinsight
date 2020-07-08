@@ -16,7 +16,6 @@ import org.apache.flink.api.java.tuple.Tuple2;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.KeyedProcessFunction;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -41,7 +40,7 @@ public class FlowDirectionJob extends Job {
         .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
         .process(new CellChangeDetectionProcessFunction())
         .keyBy(value -> value.f0)
-        .window(SlidingEventTimeWindows.of(Time.minutes(5), Time.seconds(5)))
+        .timeWindow(Time.minutes(5), Time.seconds(5))
         .allowedLateness(Time.seconds(5))
         .process(new FindMostTraversedEdgeProcessFunction())
         .addSink(sink("egress.flow-direction"));

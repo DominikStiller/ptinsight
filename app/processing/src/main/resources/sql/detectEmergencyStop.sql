@@ -1,4 +1,4 @@
-SELECT stop_time, lat, lon, speed_diff, max_deceleration
+SELECT stop_time, lat, lon, speed_diff, max_deceleration, vehicle_type
 FROM vehicle_position
 MATCH_RECOGNIZE (
     PARTITION by vehicle_id
@@ -8,7 +8,8 @@ MATCH_RECOGNIZE (
         stopped.lat as lat,
         stopped.lon as lon,
         cruising.speed - stopped.speed AS speed_diff,
-        MIN(braking.acceleration) as max_deceleration
+        MIN(braking.acceleration) as max_deceleration,
+        stopped.vehicle_type as vehicle_type
     ONE ROW PER MATCH
     AFTER MATCH SKIP PAST LAST ROW
     PATTERN (cruising braking+ stopped) WITHIN INTERVAL '10' SECOND

@@ -1,5 +1,7 @@
 package com.dxc.ptinsight.processing.jobs;
 
+import static org.apache.flink.table.api.Expressions.$;
+
 import com.dxc.ptinsight.Resources;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
@@ -39,12 +41,17 @@ public class EmergencyStopDetectionJob extends Job {
     var vehiclePositionStream =
         source("ingress.vehicle-position", VehiclePosition.class)
             .map(new VehiclePositionTableTupleBuilderProcessFunction());
-    // TODO check which vehicle types have emergency stops
-    var vehiclePositionTable =
+    tableEnv.createTemporaryView(
+        "vehicle_position",
         tableEnv.fromDataStream(
             vehiclePositionStream,
-            "vehicle_id, vehicle_type, lat, lon, speed, acceleration, event_time.rowtime");
-    tableEnv.createTemporaryView("vehicle_position", vehiclePositionTable);
+            $("vehicle_id"),
+            $("vehicle_type"),
+            $("lat"),
+            $("lon"),
+            $("speed"),
+            $("acceleration"),
+            $("event_time").rowtime()));
 
     // Detect emergency stops into table
     var emergencyStopTable =
@@ -53,7 +60,7 @@ public class EmergencyStopDetectionJob extends Job {
     // Convert result table back to stream
     tableEnv
         .toAppendStream(emergencyStopTable, Row.class)
-        .process(new EmergencyStopTableRowToEventProcessFunction())
+        .process(new OutputProcessFunction())
         .addSink(sink("egress.emergency-stop"));
   }
 
@@ -81,19 +88,20 @@ public class EmergencyStopDetectionJob extends Job {
     }
   }
 
-  private static class EmergencyStopTableRowToEventProcessFunction
-      extends ProcessFunction<Row, Event> {
+  private static class OutputProcessFunction extends ProcessFunction<Row, Event> {
 
     @Override
     public void processElement(Row value, Context ctx, Collector<Event> out) {
+      var timestamp = ((LocalDateTime) value.getField(0)).toInstant(ZoneOffset.UTC);
       var details =
           EmergencyStop.newBuilder()
               .setLatitude((float) value.getField(1))
               .setLongitude((float) value.getField(2))
               .setSpeedDiff((float) value.getField(3))
               .setMaxDeceleration((float) value.getField(4))
+              .setVehicleType((VehicleType) value.getField(5))
               .build();
-      out.collect(output(details, ((LocalDateTime) value.getField(0)).toInstant(ZoneOffset.UTC)));
+      out.collect(output(details, timestamp));
     }
   }
 }

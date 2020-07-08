@@ -13,8 +13,6 @@ import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import java.util.concurrent.TimeUnit;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingProcessingTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingProcessingTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -35,7 +33,7 @@ public class FinalStopCountJob extends Job {
     var vehiclePositionStream =
         source("ingress.vehicle-position", VehiclePosition.class)
             .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
-            .window(SlidingProcessingTimeWindows.of(Time.minutes(5), Time.seconds(5)))
+            .timeWindow(Time.minutes(5), Time.seconds(5))
             .evictor(MostRecentDeduplicationEvictor.ofAll())
             .process(new TimestampValueProcessFunction<>());
 
@@ -44,9 +42,7 @@ public class FinalStopCountJob extends Job {
     AsyncDataStream.unorderedWait(
             vehiclePositionStream, new FuzzyTripFinalStopLookupAsyncFunction(), 5, TimeUnit.SECONDS)
         .keyBy(GeocellKeySelector.ofTuple2())
-        // For some reason, event time windows are not triggered after an async function
-        // Sliding windows with intervals < 10 s create a lot of backpressure with parallelism = 1
-        .window(TumblingProcessingTimeWindows.of(Time.seconds(5)))
+        .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
         .addSink(sink("egress.final-stop-count"));
   }

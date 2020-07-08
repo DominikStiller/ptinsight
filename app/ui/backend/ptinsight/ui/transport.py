@@ -11,6 +11,7 @@ from ptinsight.common import (
     DelayStatistics,
     VehicleCount,
     EmergencyStop,
+    VehicleType,
 )
 from ptinsight.common.serialize import deserialize
 
@@ -71,9 +72,6 @@ class KafkaToSocketioBridge:
             flow_direction = FlowDirection()
             event.details.Unpack(flow_direction)
 
-            # if flow_direction.count < 3:
-            #     return
-
             data = {
                 "edge": h3.h3_to_string(flow_direction.geocells_edge),
                 "count": flow_direction.count,
@@ -91,9 +89,10 @@ class KafkaToSocketioBridge:
             event.details.Unpack(emergency_stop)
 
             data = {
+                "veh_type": VehicleType.Name(emergency_stop.vehicle_type).lower(),
                 "lat": emergency_stop.latitude,
                 "lon": emergency_stop.longitude,
-                "max_deceleration": emergency_stop.max_deceleration,
+                "max_dec": emergency_stop.max_deceleration,
                 "speed_diff": emergency_stop.speed_diff,
             }
         else:

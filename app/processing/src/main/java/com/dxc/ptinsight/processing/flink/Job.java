@@ -5,28 +5,28 @@ import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.proto.Base.Event;
 import com.google.protobuf.Any;
 import com.google.protobuf.Message;
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Properties;
+import org.apache.flink.api.common.eventtime.WatermarkStrategy;
 import org.apache.flink.streaming.api.CheckpointingMode;
 import org.apache.flink.streaming.api.TimeCharacteristic;
 import org.apache.flink.streaming.api.datastream.SingleOutputStreamOperator;
 import org.apache.flink.streaming.api.environment.StreamExecutionEnvironment;
 import org.apache.flink.streaming.api.functions.sink.SinkFunction;
-import org.apache.flink.streaming.api.functions.timestamps.BoundedOutOfOrdernessTimestampExtractor;
-import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaConsumer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer;
 import org.apache.flink.streaming.connectors.kafka.FlinkKafkaProducer.Semantic;
 import org.apache.flink.table.api.EnvironmentSettings;
-import org.apache.flink.table.api.java.StreamTableEnvironment;
+import org.apache.flink.table.api.bridge.java.StreamTableEnvironment;
 
 public abstract class Job {
 
   private final String name;
   private final StreamExecutionEnvironment env;
   private StreamTableEnvironment tableEnv;
-  private static final Properties props = new Properties();
+  private static final Properties kafkaProps = new Properties();
 
   public Job(String name) {
     this(name, true, 10000);
@@ -43,19 +43,19 @@ public abstract class Job {
   private void configureEnvironment(boolean withCheckpointing, int checkpointingInterval) {
     env.setStreamTimeCharacteristic(TimeCharacteristic.EventTime);
     env.setParallelism(2);
+
     if (withCheckpointing) {
-      env.enableCheckpointing(checkpointingInterval, CheckpointingMode.EXACTLY_ONCE)
-          .getCheckpointConfig()
-          .setMinPauseBetweenCheckpoints(checkpointingInterval / 2);
+      env.enableCheckpointing(checkpointingInterval, CheckpointingMode.EXACTLY_ONCE);
+      env.getCheckpointConfig().setMinPauseBetweenCheckpoints(checkpointingInterval / 2);
     }
   }
 
   private void configureKafka() {
-    props.clear();
+    kafkaProps.clear();
 
     var kafkaConfig = EntryPoint.getConfiguration().kafka;
-    props.setProperty("bootstrap.servers", String.join(",", kafkaConfig.bootstrapServers));
-    props.setProperty("group.id", "ptinsight_" + this.name.replace(' ', '_'));
+    kafkaProps.setProperty("bootstrap.servers", String.join(",", kafkaConfig.bootstrapServers));
+    kafkaProps.setProperty("group.id", "ptinsight_" + this.name.replace(' ', '_'));
   }
 
   protected StreamTableEnvironment getTableEnvironment() {
@@ -68,20 +68,22 @@ public abstract class Job {
 
   protected final <T extends Message> SingleOutputStreamOperator<T> source(
       String topic, Class<T> clazz) {
-    var consumer = new FlinkKafkaConsumer<>(topic, new EventDeserializationSchema(), Job.props);
+    var consumer =
+        new FlinkKafkaConsumer<>(topic, new EventDeserializationSchema(), Job.kafkaProps);
+    consumer.setStartFromLatest();
     consumer.assignTimestampsAndWatermarks(
-        new BoundedOutOfOrdernessTimestampExtractor<Event>(Time.seconds(1)) {
-          @Override
-          public long extractTimestamp(Event element) {
-            return Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli();
-          }
-        });
-    return env.addSource(consumer).map(new ExtractDetailMapFunction<T>(clazz)).returns(clazz);
+        WatermarkStrategy.<Event>forBoundedOutOfOrderness(Duration.ofSeconds(1))
+            .withTimestampAssigner(
+                (element, recordTimestamp) ->
+                    Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli()));
+    return env.addSource(consumer).map(new ExtractDetailMapFunction<>(clazz)).returns(clazz);
   }
 
   protected final SinkFunction<Event> sink(String topic) {
+    // Cannot use exactly-once, because kafka-python consumer does not support
+    // transactions
     return new FlinkKafkaProducer<>(
-        topic, new EventSerializationSchema(topic), props, Semantic.AT_LEAST_ONCE);
+        topic, new EventSerializationSchema(topic), kafkaProps, Semantic.AT_LEAST_ONCE);
   }
 
   protected static Event output(Message details) {

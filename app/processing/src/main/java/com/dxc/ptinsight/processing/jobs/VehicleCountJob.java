@@ -11,8 +11,6 @@ import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
 import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
-import org.apache.flink.streaming.api.windowing.assigners.SlidingEventTimeWindows;
-import org.apache.flink.streaming.api.windowing.assigners.TumblingEventTimeWindows;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
 import org.apache.flink.util.Collector;
@@ -41,14 +39,14 @@ public class VehicleCountJob extends Job {
     source("ingress.vehicle-position", VehiclePosition.class)
         // First, key by vehicle to select only most recent position of each vehicle
         .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
-        .window(SlidingEventTimeWindows.of(Time.seconds(30), Time.seconds(5)))
+        .timeWindow(Time.seconds(30), Time.seconds(5))
         // Since stream is already keyed, use evict without specifying key
         .evictor(MostRecentDeduplicationEvictor.ofAll())
         // Collect most recent vehicle position from all keyed streams into single stream
         .process(new IdentityProcessFunction<>())
         // Then, key by geocell to count vehicles
         .keyBy(GeocellKeySelector.ofVehiclePosition())
-        .window(TumblingEventTimeWindows.of(Time.seconds(5)))
+        .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
         .addSink(sink("egress.vehicle-count"));
   }
