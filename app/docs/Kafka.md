@@ -4,6 +4,9 @@ Apache Kafka is used as event transport and storage backbone. Every topic only c
 
 
 ## Topics
+Every topic only contains protobuf messages of a single type. Topics are prefixed with `ingress` if they are produced in `ingest`, and `egress` if they are produced in `processing`.
+
+All topics are replicated on all 3 hosts and have two partitions. Records are randomly assigned to a partition, i.e. no keys are used and the order of records is only preserved within a partition.
 
 | Topic                   | Description                            | Source                | Protobuf Type                                   |
 | ----------------------- | -------------------------------------- | --------------------- | ----------------------------------------------- |
@@ -20,3 +23,25 @@ Apache Kafka is used as event transport and storage backbone. Every topic only c
 
 ## Addresses
 Kafka brokers listen to connections from inside the VPC on port 9092, but to external connections on port 9093.
+
+
+## Debugging
+Print a topic to console live:
+```
+# On Kafka host
+./ssh.sh kafka [0|1|2]
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server [private-ip]:9092 --topic [topic]
+
+# From local computer (assuming Kafka is installed)
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server [public-ip]:9093 --topic [topic]
+```
+
+List topics:
+```
+# On Kafka host
+./ssh.sh kafka [0|1|2]
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server [private-ip]:9092 --describe
+
+# From local computer (assuming Kafka is installed)
+/opt/kafka/bin/kafka-topics.sh --bootstrap-server [public-ip]:9093 --describe
+```
