@@ -37,8 +37,19 @@ export class ExpiringMap<K, V> extends Map<K, Record<V>> {
 
   // @ts-ignore
   *values(): IterableIterator<V> {
-    for (let record of super.values()) {
-      yield record.data;
+    for (const record of super.values()) {
+      if (!record.expired) {
+        yield record.data;
+      }
+    }
+  }
+
+  // @ts-ignore
+  *[Symbol.iterator](): IterableIterator<[K, V]> {
+    for (const [key, record] of super[Symbol.iterator]()) {
+      if (!record.expired) {
+        yield [key, record.data];
+      }
     }
   }
 }

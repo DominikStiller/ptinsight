@@ -1,9 +1,13 @@
 import { select, create, Selection, BaseType } from "d3-selection";
 import { ScaleSequential, scaleSequential } from "d3-scale";
 import { interpolateRgbBasis } from "d3-interpolate";
+import { Path } from "leaflet";
 
 type D3Selection = Selection<BaseType, unknown, HTMLElement, any>;
 
+/**
+ * A container for D3-based UI components
+ */
 export class LegendUi {
   private defs: D3Selection;
   private content: D3Selection;
@@ -32,6 +36,9 @@ export class LegendUi {
   }
 }
 
+/**
+ * A colorbar with a color gradient that is mapped to a number range
+ */
 export class ColorBar {
   private readonly scale: ScaleSequential<string>;
 
@@ -83,15 +90,17 @@ export class ColorBar {
 
   public updateDomain(domain: [number, number]): void {
     this.scale.domain(domain);
-    this.minText.text(
-      domain[0] == Number.NEGATIVE_INFINITY ? 0 : this.formatLimit(domain[0])
-    );
-    this.maxText.text(
-      domain[1] == Number.POSITIVE_INFINITY ? 0 : this.formatLimit(domain[1])
-    );
+    this.minText.text(this.formatLimit(domain[0]));
+    this.maxText.text(this.formatLimit(domain[1]));
   }
 
   private formatLimit(limit: number): string {
+    if (limit == Number.POSITIVE_INFINITY) {
+      return "0";
+    }
+    if (limit == Number.NEGATIVE_INFINITY) {
+      return "1";
+    }
     if (Number.isInteger(limit)) {
       return limit.toString();
     } else {
@@ -115,5 +124,65 @@ export class ColorBar {
     legend.removeContent(this.bar);
     legend.removeContent(this.minText);
     legend.removeContent(this.maxText);
+  }
+}
+
+/**
+ * A class that periodically updates colorbar limits based on data and updates shape color correspondingly.
+ *
+ * While the periodic approach might be inefficient, updating the limits on each data update is impossibly because then the limits will never shrink.
+ */
+export class ColorbarLimitUpdater<K, T> {
+  private timeoutHandle: number;
+  private legend: LegendUi;
+
+  constructor(
+    private dataIterator: () => IterableIterator<[K, T, Path]>,
+    private dataSizeAccessor: () => number,
+    private displayDataSelector: (data: T) => number,
+    private colorbar: ColorBar
+  ) {}
+
+  public addToLegend(legend: LegendUi): void {
+    this.legend = legend;
+  }
+
+  public activate(): void {
+    this.colorbar.attachTo(this.legend);
+
+    // @ts-ignore
+    this.updateLimitsHandle = setTimeout(() => this.updateLimits(), 1000);
+  }
+
+  public deactivate(): void {
+    this.colorbar.removeFrom(this.legend);
+    clearTimeout(this.timeoutHandle);
+  }
+
+  private updateLimits(): void {
+    // Retrieve number values
+    let values = Array.from(this.dataIterator())
+      .map((value) => value[1])
+      .map(this.displayDataSelector);
+
+    const minData = Math.min(...values);
+    const maxData = Math.max(...values);
+    this.colorbar.updateDomain([minData, maxData]);
+
+    // Update shape colors
+    for (const [geokey, data, shape] of this.dataIterator()) {
+      shape.setStyle({
+        fillColor: this.colorbar.getColor(this.displayDataSelector(data)),
+        fillOpacity: 0.7,
+      });
+    }
+
+    let timeout = 50;
+    if (this.dataSizeAccessor() > 10) {
+      // Use larger timeout when there are many shapes to improve performance
+      timeout = 1000;
+    }
+    // @ts-ignore
+    this.updateLimitsHandle = setTimeout(() => this.updateLimits(), timeout);
   }
 }

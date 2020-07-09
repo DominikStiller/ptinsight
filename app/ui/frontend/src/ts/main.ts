@@ -1,11 +1,11 @@
 import "leaflet-providers";
 import { control, map as lmap, tileLayer } from "leaflet";
 import * as socketio from "socket.io-client";
-import GeocellLayer from "./geocell-layer";
-import GeoedgeLayer from "./geoedge-layer";
-import { LegendUi } from "./legend-ui";
+import GeocellLayer from "./layers/geocell-layer";
+import GeoedgeLayer from "./layers/geoedge-layer";
+import { LegendUi } from "./util/legend-ui";
 import "./styles";
-import GeopointLayer from "./geopoint-layer";
+import GeopointLayer from "./layers/geopoint-layer";
 
 const socket = socketio();
 const legend = new LegendUi();
@@ -72,10 +72,11 @@ const emergencyStopLayer = new GeopointLayer<{
      Speed difference between cruising and stop: ${data.speed_diff.toFixed(
        1
      )} m/s<br>
-      Maximum deceleration: ${data.max_dec.toFixed(1)} m/s^2`,
+      Maximum deceleration: ${data.max_dec.toFixed(1)} m/s<sup>2</sup>`,
   (data) => -data.max_dec
 ).addToLegend(legend);
 socket.on("egress.emergency-stop", (msg: any) => {
+  console.log(msg);
   emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);
 });
 

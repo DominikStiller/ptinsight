@@ -39,8 +39,13 @@ public class FinalStopCountJob extends Job {
 
     // Requests usually take between 2 and 3 s, but can be up to 15 s
     // There are about 100 requests per second after deduplication
+    // Capacity is 200 to handle spikes
     AsyncDataStream.unorderedWait(
-            vehiclePositionStream, new FuzzyTripFinalStopLookupAsyncFunction(), 5, TimeUnit.SECONDS)
+            vehiclePositionStream,
+            new FuzzyTripFinalStopLookupAsyncFunction(),
+            5,
+            TimeUnit.SECONDS,
+            200)
         .keyBy(GeocellKeySelector.ofTuple2())
         .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
