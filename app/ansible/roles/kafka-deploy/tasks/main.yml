@@ -8,7 +8,6 @@
     - ingress.arrival
     - ingress.departure
     - ingress.vehicle-position
-    - egress.arrival-count
     - egress.vehicle-count
     - egress.delay-statistics
     - egress.flow-direction

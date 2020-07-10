@@ -76,7 +76,6 @@ const emergencyStopLayer = new GeopointLayer<{
   (data) => -data.max_dec
 ).addToLegend(legend);
 socket.on("egress.emergency-stop", (msg: any) => {
-  console.log(msg);
   emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);
 });
 
@@ -85,6 +84,7 @@ var streetsLayerLite = tileLayer.provider("Stamen.TonerLite");
 var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 
 const map = lmap("map-container", {
+  // Zoom on Helsinki initially
   center: [60.2199, 24.9284],
   zoom: 11.7,
   layers: [streetsLayerLite, vehicleCountsLayer],

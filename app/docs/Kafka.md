@@ -13,7 +13,6 @@ All topics are replicated on all 3 hosts and have two partitions. Records are ra
 | ingress.arrival         | Arrival of vehicle at stop             | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Arrival         |
 | ingress.departure       | Departure of vehicle from stop         | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Departure       |
 | ingess.vehicle-position | Position and speed of vehicle          | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.VehiclePosition |
-| egress.arrival-count    | Number of arrivals by vehicle type     | PT Insight Processing | com.dxc.ptinsight.proto.egress.ArrivalCount     |
 | egress.vehicle-count    | Number of vehicles per geocell         | PT Insight Processing | com.dxc.ptinsight.proto.egress.VehicleCount     |
 | egress.delay-statistics | Arrival delay statistics per cell      | PT Insight Processing | com.dxc.ptinsight.proto.egress.DelayStatistics  |
 | egress.flow-direction   | Flow direction between cells           | PT Insight Processing | com.dxc.ptinsight.proto.egress.FlowDirection    |

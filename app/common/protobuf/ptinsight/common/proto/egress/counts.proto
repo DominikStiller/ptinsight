@@ -8,13 +8,6 @@ import "google/protobuf/timestamp.proto";
 option java_package = "com.dxc.ptinsight.proto.egress";
 
 
-message ArrivalCount {
-  com.dxc.ptinsight.VehicleType vehicle_type = 1;
-  google.protobuf.Timestamp window_start = 2;
-  google.protobuf.Timestamp window_end = 3;
-  int32 count = 4;
-}
-
 message VehicleCount {
   int64 geocell = 1;
   int32 count = 2;
