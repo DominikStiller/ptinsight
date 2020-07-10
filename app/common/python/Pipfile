@@ -7,7 +7,7 @@ verify_ssl = true
 black = "*"
 
 [packages]
-ptinsight-common = {editable = true,path = "."}
+ptinsight-common = {editable = true, path = "."}
 
 [requires]
 python_version = "3.8"

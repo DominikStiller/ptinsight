@@ -10,18 +10,20 @@ producer:
 
 sources:
   - type: mqtt
-    broker:
+    config:
       host: mqtt.hsl.fi
       port: 8883
-    processor: hsl-realtime
+    processor:
+      type: hsl-realtime
+      config:
+        vehicle_types: bus,tram,train
+        event_types: ars,dep,vp
+  - type: mqtt-recording
     config:
-      vehicle_types: bus,tram,train
-      event_types: ars,dep,vp
-  # - type: mqtt-recording
-  #   file:
-  #     bucket: mqtt-recordings
-  #     key: mqtt.hsl.fi/2020-06-02T10-31-46.rec
-  #   processor: hsl-realtime
-  #   config:
-  #     vehicle_types: bus,tram,train
-  #     event_types: ars,dep,vp
+      bucket: mqtt-recordings
+      key: mqtt.hsl.fi/2020-06-02T10-31-46.rec
+    processor:
+      type: hsl-realtime
+      config:
+        vehicle_types: bus,tram,train
+        event_types: ars,dep,vp

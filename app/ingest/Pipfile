@@ -11,7 +11,7 @@ paho-mqtt = "*"
 python-dateutil = "*"
 kafka-python = "*"
 pyyaml = "*"
-ptinsight-common = {editable = true,path = "./../common/python"}
+ptinsight-common = {editable = true, path = "./../common/python"}
 boto3 = "*"
 
 [requires]

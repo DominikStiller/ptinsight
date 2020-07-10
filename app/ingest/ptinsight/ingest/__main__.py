@@ -48,16 +48,19 @@ for type in [MQTTProcessor]:
 # Load sources from config and create respective ingestors
 ingestors = []
 for source in config["sources"]:
+    ingestor_config = source["config"]
     if source["type"] == "mqtt":
-        broker = source["broker"]
-        processor = processors[source["processor"]](source["config"])
-        ingestor = MQTTIngestor(broker["host"], int(broker["port"]), processor)
-        ingestors.append(ingestor)
+        ingestor_class = MQTTIngestor
     elif source["type"] == "mqtt-recording":
-        file = source["file"]
-        processor = processors[source["processor"]](source["config"])
-        ingestor = MQTTRecordingIngestor(file["bucket"], file["key"], processor)
-        ingestors.append(ingestor)
+        ingestor_class = MQTTRecordingIngestor
+    else:
+        continue
+
+    processor_type = source["processor"]["type"]
+    processor_config = source["processor"]["config"]
+    processor = processors[processor_type](processor_config)
+
+    ingestors.append(ingestor_class(ingestor_config, processor))
 
 # Start all ingestors
 with ThreadPoolExecutor() as executor:

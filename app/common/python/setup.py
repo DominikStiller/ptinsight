@@ -8,6 +8,6 @@ setup(
     license="",
     author="Dominik Stiller",
     author_email="dominik.stiller@hpe.com",
-    description="",
-    install_requires=["protobuf>=3"],
+    description="Common functionality for PT Insight Python components",
+    install_requires=["protobuf >= 3", "h3 >= 3.6"],
 )

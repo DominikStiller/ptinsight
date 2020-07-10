@@ -1,6 +1,5 @@
 import abc
 import base64
-import datetime
 import functools
 import json
 import logging
@@ -8,15 +7,17 @@ import re
 import sched
 import threading
 import time
+from datetime import datetime, timezone
 from typing import final, Literal
 
 import boto3
 import paho.mqtt.client as mqtt
+from google.protobuf.message import Message
 from kafka import KafkaProducer
 from ptinsight.common import Event
 from ptinsight.common.serialize import serialize
 
-from ptinsight.ingest.processors import MQTTProcessor
+from ptinsight.ingest.processors import MQTTProcessor, Processor
 
 logger = logging.getLogger(__name__)
 
@@ -27,7 +28,8 @@ class Ingestor(abc.ABC):
     _protobuf_format = "binary"
     _producer = None
 
-    def __init__(self):
+    @abc.abstractmethod
+    def __init__(self, config: dict, processor: Processor):
         pass
 
     @abc.abstractmethod
@@ -65,17 +67,17 @@ class Ingestor(abc.ABC):
 class MQTTIngestor(Ingestor):
     """Receives messages from an MQTT broker"""
 
-    def __init__(self, host: str, port: int, processor: MQTTProcessor):
-        super().__init__()
-        self.host = host
-        self.port = port
+    def __init__(self, config: dict, processor: MQTTProcessor):
+        super().__init__(config, processor)
+        self.host = config["host"]
+        self.port = int(config["port"])
         self.processor = processor
 
         self.client = mqtt.Client()
         self.client.enable_logger(logger)
         self.client.on_connect = self._mqtt_on_connect
         self.client.on_message = self._mqtt_on_message
-        if port == 8883:
+        if self.port == 8883:
             self.client.tls_set()
 
     def start(self):
@@ -105,13 +107,14 @@ class MQTTIngestor(Ingestor):
 class MQTTRecordingIngestor(Ingestor):
     """Receives messages from an MQTT recording located in S3"""
 
-    def __init__(self, bucket: str, key: str, processor: MQTTProcessor):
-        super().__init__()
-        self.bucket = bucket
-        self.key = key
+    def __init__(self, config: dict, processor: MQTTProcessor):
+        super().__init__(config, processor)
+        self.config = config
+        self.bucket = config["bucket"]
+        self.key = config["key"]
         self.processor = processor
 
-        self.file = boto3.resource("s3").Object(bucket, key)
+        self.file = boto3.resource("s3").Object(self.bucket, self.key)
 
     def start(self):
         logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
@@ -120,7 +123,7 @@ class MQTTRecordingIngestor(Ingestor):
 
         original_broker = next(lines)[8:]
         original_topics = next(lines)[8:]
-        original_t_start = datetime.datetime.fromisoformat(next(lines)[12:]).replace(
+        original_t_start = datetime.fromisoformat(next(lines)[12:]).replace(
             microsecond=0
         )
         next(lines)
@@ -128,6 +131,7 @@ class MQTTRecordingIngestor(Ingestor):
         logger.info(f"Recorded from {original_broker} at {str(original_t_start)}")
         logger.info(f"Topics: {original_topics}\n")
 
+        self._start_latency_marker_generator()
         self._start_scheduler(lines)
 
     def _start_scheduler(self, lines):
@@ -164,15 +168,45 @@ class MQTTRecordingIngestor(Ingestor):
         done = True
         thread.join()
 
+    def _start_latency_marker_generator(self):
+        if "latency_marker_interval" in self.config:
+            interval = int(self.config["latency_marker_interval"]) / 1000
+
+            def _run():
+                threading.Thread(target=self._emit_latency_markers).start()
+                threading.Timer(interval, _run).start()
+
+            t = threading.Timer(interval + 1, _run)
+            t.setDaemon(False)
+            t.start()
+
+    def _emit_latency_markers(self):
+        ingestion_timestamp = datetime.now(timezone.utc)
+
+        markers = self.processor.generate_latency_markers()
+        for target_topic, event_timestamp, details in markers:
+            self._ingest(
+                target_topic,
+                self._create_event(ingestion_timestamp, event_timestamp, details),
+            )
+
     def _process_and_ingest(self, topic: str, payload: str):
-        ingestion_timestamp = datetime.datetime.now(datetime.timezone.utc)
+        ingestion_timestamp = datetime.now(timezone.utc)
 
         if processed := self.processor.process(topic, json.loads(payload)):
             target_topic, event_timestamp, details = processed
+            self._ingest(
+                target_topic,
+                self._create_event(ingestion_timestamp, event_timestamp, details),
+            )
 
-            event = Event()
-            event.event_timestamp.FromDatetime(event_timestamp or ingestion_timestamp)
-            event.ingestion_timestamp.FromDatetime(ingestion_timestamp)
-            event.details.Pack(details)
+    def _create_event(
+        self, ingestion_timestamp: datetime, event_timestamp: datetime, details: Message
+    ):
+        event = Event()
 
-            self._ingest(target_topic, event)
+        event.event_timestamp.FromDatetime(event_timestamp or ingestion_timestamp)
+        event.ingestion_timestamp.FromDatetime(ingestion_timestamp)
+        event.details.Pack(details)
+
+        return event

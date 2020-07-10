@@ -3,13 +3,15 @@ from __future__ import annotations
 import abc
 import functools
 import itertools
-from datetime import datetime
-from typing import Tuple, Optional
+from datetime import datetime, timedelta, timezone
+from random import randint
+from typing import Tuple, Optional, List
 
 import paho.mqtt.client as mqtt
 from dateutil.parser import isoparse
 from google.protobuf.message import Message
 from ptinsight.common import Arrival, Departure, VehiclePosition, VehicleType
+from ptinsight.common.geocells import SpiralingGeocellGenerator
 
 
 class Processor(abc.ABC):
@@ -48,12 +50,25 @@ class MQTTProcessor(Processor, abc.ABC):
         """Defines the topics an MQTT ingestor should subscribe to"""
         pass
 
+    def generate_latency_markers(self) -> List[Tuple[str, datetime, Message]]:
+        """
+        Generates all latency markers messages
+
+        Returns:
+            A list of tuples of the Kafka topic, the event time and the protobuf message
+        """
+        pass
+
 
 class HSLRealtimeProcessor(MQTTProcessor):
     def __init__(self, config):
         super().__init__(config)
+        self.config = config
         self.event_types = config["event_types"].split(",")
         self.vehicle_types = config["vehicle_types"].split(",")
+        self._latest_timestamp = None
+
+        self.coordinate_generator = None
 
     @staticmethod
     def name():
@@ -87,6 +102,8 @@ class HSLRealtimeProcessor(MQTTProcessor):
         event_type = list(payload.keys())[0].lower()
         payload = list(payload.values())[0]
         event_timestamp = isoparse(payload["tst"])
+        if not self._latest_timestamp or event_timestamp > self._latest_timestamp:
+            self._latest_timestamp = event_timestamp
 
         if not payload["lat"] or not payload["long"]:
             return
@@ -110,6 +127,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
             event = VehiclePosition()
 
             event.route.id = payload["route"]
+            # Directions in realtime API are encoded by 1 or 2, but we want to use 0 or 1
             event.route.direction = bool(int(payload["dir"]) - 1)
             event.route.operating_day = payload["oday"]
             event.route.departure_time = payload["start"]
@@ -129,3 +147,82 @@ class HSLRealtimeProcessor(MQTTProcessor):
         event.vehicle.number = int(payload["veh"])
 
         return target_topic, event_timestamp, event
+
+    def generate_latency_markers(self) -> List[Tuple[str, datetime, Message]]:
+        if not self._latest_timestamp:
+            # No real records have been processed yet
+            return []
+        if not self.coordinate_generator:
+            h3_resolution = int(self.config["h3_resolution"])
+            # Use "Point Nemo" as origin since we can assume no events come from there
+            self.coordinate_generator = SpiralingGeocellGenerator(
+                (-48.875, -123.393), h3_resolution
+            ).coordinates()
+
+        def _add_common_information(event):
+            coordinates = next(self.coordinate_generator)
+            event.latitude = coordinates[0]
+            event.longitude = coordinates[1]
+
+            event.vehicle.type = VehicleType.BUS
+            event.vehicle.operator = 42000
+            event.vehicle.number = randint(100000, 2 ** 31 - 1)
+
+            return event
+
+        return [
+            (
+                "ingress.vehicle-position",
+                self._latest_timestamp,
+                _add_common_information(
+                    self._generate_vehicle_position_latency_marker()
+                ),
+            ),
+            (
+                "ingress.arrival",
+                self._latest_timestamp,
+                _add_common_information(self._generate_arrival_latency_marker()),
+            ),
+            (
+                "ingress.departure",
+                self._latest_timestamp,
+                _add_common_information(self._generate_departure_latency_marker()),
+            ),
+        ]
+
+    def _generate_vehicle_position_latency_marker(self) -> VehiclePosition:
+        event = VehiclePosition()
+
+        event.route.id = str(randint(100000, 2 ** 31 - 1))
+        event.route.direction = 1
+        event.route.operating_day = self._latest_timestamp.strftime("%Y-%m-%d")
+        event.route.departure_time = (
+            self._latest_timestamp - timedelta(minutes=20)
+        ).strftime("%H:%M")
+        event.heading = 0
+        event.speed = 10
+        event.acceleration = 3
+
+        return event
+
+    def _generate_arrival_latency_marker(self) -> Arrival:
+        event = Arrival()
+
+        event.stop = randint(100000, 2 ** 31 - 1)
+        event.scheduled_arrival.FromDatetime(self._latest_timestamp)
+        event.scheduled_departure.FromDatetime(
+            self._latest_timestamp + timedelta(minutes=1)
+        )
+
+        return event
+
+    def _generate_departure_latency_marker(self) -> Departure:
+        event = Departure()
+
+        event.stop = randint(100000, 2 ** 31 - 1)
+        event.scheduled_arrival.FromDatetime(self._latest_timestamp)
+        event.scheduled_departure.FromDatetime(
+            self._latest_timestamp + timedelta(minutes=1)
+        )
+
+        return event
