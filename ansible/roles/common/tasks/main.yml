@@ -8,14 +8,8 @@
 - name: install common packages
   become: true
   package:
-    name: htop, wget, zip, unzip, tmux, at, chrony, tree, nc
+    name: htop, wget, zip, unzip, tmux, chrony, tree, nc
     state: present
-
-- name: start at
-  become: true
-  systemd:
-    state: started
-    name: atd
 
 - name: add Amazon Time Sync server
   become: true
