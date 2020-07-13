@@ -171,6 +171,8 @@ class MQTTRecordingIngestor(Ingestor):
     def _start_latency_marker_generator(self):
         if "latency_marker_interval" in self.config:
             interval = int(self.config["latency_marker_interval"]) / 1000
+            if interval <= 0:
+                return
 
             def _run():
                 threading.Thread(target=self._emit_latency_markers).start()
