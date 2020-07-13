@@ -77,7 +77,7 @@ public abstract class Job {
             .withTimestampAssigner(
                 (element, recordTimestamp) ->
                     Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli()));
-    return env.addSource(consumer).map(new ExtractDetailMapFunction<>(clazz)).returns(clazz);
+    return env.addSource(consumer).map(new ExtractDetailMapFunction<>(clazz));
   }
 
   protected final SinkFunction<Event> sink(String topic) {
