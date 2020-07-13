@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory={{ deploy_path }}/ui/backend
-ExecStart=/usr/local/bin/pipenv run python -m ptinsight.ui
+ExecStart={{ deploy_path }}/ui/backend/start.sh
 User={{ deploy_user }}
 Group={{ deploy_user }}
 Environment=FLASK_ENV=production

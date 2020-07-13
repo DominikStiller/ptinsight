@@ -18,12 +18,12 @@ sources:
       config:
         vehicle_types: bus,tram,train
         event_types: ars,dep,vp
-  - type: mqtt-recording
-    config:
-      bucket: mqtt-recordings
-      key: mqtt.hsl.fi/2020-06-02T10-31-46.rec
-    processor:
-      type: hsl-realtime
-      config:
-        vehicle_types: bus,tram,train
-        event_types: ars,dep,vp
+  # - type: mqtt-recording
+  #   config:
+  #     bucket: mqtt-recordings
+  #     key: mqtt.hsl.fi/2020-06-02T10-31-46.rec
+  #   processor:
+  #     type: hsl-realtime
+  #     config:
+  #       vehicle_types: bus,tram,train
+  #       event_types: ars,dep,vp

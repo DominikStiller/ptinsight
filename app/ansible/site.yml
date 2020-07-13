@@ -88,8 +88,6 @@
     - source_path: "{{ playbook_dir }}/../ui"
     - deploy_path: /opt/ptinsight
     - deploy_user: ptinsight
-  environment:
-    PATH: "{{ ansible_env.PATH }}:/usr/local/bin"
   roles:
     - role: ../ansible/roles/python
       tags: [setup, setup-ui]

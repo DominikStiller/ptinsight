@@ -39,7 +39,3 @@
         state: absent
   when: >
     python_version.rc != 0 or not python_version.stdout == 'Python 3.8.3'
-
-- name: install Pipenv
-  become: true
-  command: /usr/local/bin/pip3 install pipenv

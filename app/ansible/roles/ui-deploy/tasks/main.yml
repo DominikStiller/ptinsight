@@ -26,6 +26,13 @@
   notify:
     - restart UI service
 
+- name: build ptinsight-ui
+  run_once: true
+  command:
+    cmd: poetry build --format=wheel
+    chdir: "{{ source_path }}/backend"
+  delegate_to: localhost
+
 - name: create backend deploy directory
   become: true
   file:
@@ -34,18 +41,33 @@
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
 
-- name: upload backend
+- name: upload ptinsight-ui
   become: true
   become_user: "{{ deploy_user }}"
   copy:
-    src: "{{ source_path }}/backend/{{ item }}"
+    src: "{{ item }}"
     dest: "{{ deploy_path }}/ui/backend"
-  loop:
-    - Pipfile
-    - Pipfile.lock
-    - ptinsight
+  with_fileglob:
+    - "{{ source_path }}/backend/dist/ptinsight_ui-*.whl"
+  register: python_ui
   notify:
     - restart UI service
+
+- name: remove virtual environment
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/ui/backend/venv"
+    state: absent
+
+- name: install packages
+  become: true
+  become_user: "{{ deploy_user }}"
+  pip: 
+    name: "file://{{ item.dest }}"
+    virtualenv: "{{ deploy_path }}/ui/backend/venv"
+    virtualenv_command: /usr/local/bin/python3 -m venv
+  with_list: "{{ python_common.results + python_ui.results }}"
 
 - name: create config directory
   become: true
@@ -63,6 +85,14 @@
   notify:
     - restart UI service
 
+- name: upload start script
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: start.sh.j2
+    dest: "{{ deploy_path }}/ui/backend/start.sh"
+    mode: a+x
+
 - name: Copy UI service file
   become: true
   template:
@@ -73,13 +103,6 @@
   become: true
   systemd:
     daemon_reload: yes
-
-- name: install dependencies
-  become: true
-  become_user: "{{ deploy_user }}"
-  command: 
-    cmd: pipenv sync
-    chdir: "{{ deploy_path }}/ui/backend"
 
 - meta: flush_handlers
 

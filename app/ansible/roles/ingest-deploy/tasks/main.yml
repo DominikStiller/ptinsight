@@ -7,18 +7,40 @@
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
 
-- name: upload application
+- name: build ptinsight-ingest
+  run_once: true
+  command:
+    cmd: poetry build --format=wheel
+    chdir: "{{ source_path }}"
+  delegate_to: localhost
+
+- name: upload ptinsight-ingest
   become: true
   become_user: "{{ deploy_user }}"
   copy:
-    src: "{{ source_path }}/{{ item }}"
+    src: "{{ item }}"
     dest: "{{ deploy_path }}/ingest"
-  loop:
-    - Pipfile
-    - Pipfile.lock
-    - ptinsight
+  with_fileglob:
+    - "{{ source_path }}/dist/ptinsight_ingest-*.whl"
+  register: python_ingest
   notify:
     - restart ingest service
+
+- name: remove virtual environment
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/ingest/venv"
+    state: absent
+
+- name: install packages
+  become: true
+  become_user: "{{ deploy_user }}"
+  pip: 
+    name: "file://{{ item.dest }}"
+    virtualenv: "{{ deploy_path }}/ingest/venv"
+    virtualenv_command: /usr/local/bin/python3 -m venv
+  with_list: "{{ python_common.results + python_ingest.results }}"
 
 - name: create config directory
   become: true
@@ -36,7 +58,15 @@
   notify:
     - restart ingest service
 
-- name: Copy ingest service file
+- name: upload start script
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: start.sh.j2
+    dest: "{{ deploy_path }}/ingest/start.sh"
+    mode: a+x
+
+- name: upload ingest service file
   become: true
   template:
     src: ptinsight-ingest.service.j2
@@ -46,13 +76,6 @@
   become: true
   systemd:
     daemon_reload: yes
-
-- name: install dependencies
-  become: true
-  become_user: "{{ deploy_user }}"
-  command: 
-    cmd: /usr/local/bin/pipenv sync --python /usr/local/bin/python3
-    chdir: "{{ deploy_path }}/ingest"
 
 - meta: flush_handlers
 

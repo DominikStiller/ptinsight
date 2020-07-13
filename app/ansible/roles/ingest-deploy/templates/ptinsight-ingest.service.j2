@@ -6,7 +6,7 @@ After=network.target
 [Service]
 Type=simple
 WorkingDirectory={{ deploy_path }}/ingest
-ExecStart=/usr/local/bin/pipenv run python -m ptinsight.ingest
+ExecStart={{ deploy_path }}/ingest/start.sh
 User={{ deploy_user }}
 Group={{ deploy_user }}
 

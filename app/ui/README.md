@@ -9,12 +9,12 @@ The backend receives messages from Kafka and sends them to the frontend via [Soc
 
 ### Prerequisites
 * Python 3.8
-* pipenv (`pip install pipenv`)
+* poetry
 
 
 ### Usage
 
-Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shell`) before starting. Then execute with `python -m ptinsight.ui`.
+Install dependencies (`poetry install`) and enter the venv (`poetry shell`) before starting. Then execute with `python -m ptinsight.ui`.
 
 
 ### Configuration

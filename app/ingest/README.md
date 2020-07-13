@@ -11,12 +11,12 @@ Invalid and unwanted events are filtered out so all Kafka topics contain valid m
 
 ## Prerequisites
 * Python 3.8
-* pipenv (`pip install pipenv`)
+* poetry
 
 
 ## Usage
 
-Install dependencies (`pipenv install --dev`) and enter the pipenv (`pipenv shell`) before starting. Then execute with `python -m ptinsight.ingest`.
+Install dependencies (`poetry install`) and enter the venv (`poetry shell`) before starting. Then execute with `python -m ptinsight.ingest`.
 
 
 ## Configuration

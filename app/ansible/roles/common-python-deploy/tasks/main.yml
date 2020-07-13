@@ -7,17 +7,24 @@
 - name: create deploy directory
   become: true
   file:
-    path: "{{ deploy_path }}/common/python"
+    path: "{{ deploy_path }}/common"
     state: directory
     owner: "{{ deploy_user }}"
     group: "{{ deploy_user }}"
 
-- name: upload Python common library
+- name: build ptinsight-common
+  run_once: true
+  command:
+    cmd: poetry build --format=wheel
+    chdir: "{{ playbook_dir }}/../common/python"
+  delegate_to: localhost
+
+- name: upload ptinsight-common
   become: true
   become_user: "{{ deploy_user }}"
   copy:
-    src: "{{ playbook_dir }}/../common/python/{{ item }}"
-    dest: "{{ deploy_path }}/common/python"
-  loop:
-    - setup.py
-    - ptinsight
+    src: "{{ item }}"
+    dest: "{{ deploy_path }}/common"
+  with_fileglob:
+    - "{{ playbook_dir }}/../common/python/dist/ptinsight_common-*.whl"
+  register: python_common

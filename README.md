@@ -36,10 +36,11 @@ sudo apt install -y make software-properties-common
 sudo apt install -y openjdk-11-jdk
 ```
 
-3. Install Python 3.8
+3. Install Python 3.8 and Poetry
 ```
 sudo add-apt-repository -y ppa:deadsnakes/ppa
 sudo apt install -y python3.8
+wget -O - https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 ```
 
 4. Install Ansible
@@ -88,6 +89,8 @@ The user needs following policies attached:
 ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deploy
 ```
 
+10. Logout and login again to reload the environment
+
 ### Common Tools
 We use common tools for consistency. Execute the commands below in the project's folder.
 
@@ -96,8 +99,8 @@ We use common tools for consistency. Execute the commands below in the project's
 * Code style: [Google Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` to format all .java files.
 
 #### Python
-* Build & dependency management: [pipenv](https://pipenv-fork.readthedocs.io/en/latest/). Run `pipenv install --dev` to set up the environment.
-* Code style: [black](https://black.readthedocs.io/en/stable/). Run `pipenv run black .` to format all .py files.
+* Build & dependency management: [poetry](https://python-poetry.org/). Run `poetry install` to set up the environment. Use the venv from `poetry env info` as interpreter in PyCharm.
+* Code style: [black](https://black.readthedocs.io/en/stable/). Run `poetry run black .` to format all .py files.
 
 #### TypeScript
 * Build & dependency management: [npm](https://www.npmjs.com/). Run `npm install` to set up the environment.

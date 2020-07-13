@@ -140,4 +140,4 @@ cython_debug/
 /static/css/
 /config/ui.yaml
 
-Pipfile.lock
+poetry.lock
