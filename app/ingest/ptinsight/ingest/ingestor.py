@@ -91,17 +91,9 @@ class MQTTIngestor(Ingestor):
             client.subscribe(topic)
 
     def _mqtt_on_message(self, client, userdata, msg: mqtt.MQTTMessage):
-        ingestion_timestamp = datetime.now(timezone.utc)
-
         if processed := self.processor.process(msg.topic, json.loads(msg.payload)):
             target_topic, event_timestamp, details = processed
-
-            event = Event()
-            event.event_timestamp.FromDatetime(event_timestamp or ingestion_timestamp)
-            event.ingestion_timestamp.FromDatetime(ingestion_timestamp)
-            event.details.Pack(details)
-
-            self._ingest(target_topic, event)
+            self._ingest(target_topic, _create_event(event_timestamp, details))
 
 
 class MQTTRecordingIngestor(Ingestor):
@@ -183,32 +175,26 @@ class MQTTRecordingIngestor(Ingestor):
             t.start()
 
     def _emit_latency_markers(self):
-        ingestion_timestamp = datetime.now(timezone.utc)
-
         markers = self.processor.generate_latency_markers()
         for target_topic, event_timestamp, details in markers:
             self._ingest(
-                target_topic,
-                self._create_event(ingestion_timestamp, event_timestamp, details),
+                target_topic, _create_event(event_timestamp, details),
             )
 
     def _process_and_ingest(self, topic: str, payload: str):
-        ingestion_timestamp = datetime.now(timezone.utc)
-
         if processed := self.processor.process(topic, json.loads(payload)):
             target_topic, event_timestamp, details = processed
             self._ingest(
-                target_topic,
-                self._create_event(ingestion_timestamp, event_timestamp, details),
+                target_topic, _create_event(event_timestamp, details),
             )
 
-    def _create_event(
-        self, ingestion_timestamp: datetime, event_timestamp: datetime, details: Message
-    ):
-        event = Event()
 
-        event.event_timestamp.FromDatetime(event_timestamp or ingestion_timestamp)
-        event.ingestion_timestamp.FromDatetime(ingestion_timestamp)
-        event.details.Pack(details)
+def _create_event(event_timestamp: datetime, details: Message):
+    event = Event()
 
-        return event
+    if event_timestamp:
+        event.event_timestamp.FromDatetime(event_timestamp)
+    event.ingestion_timestamp.GetCurrentTime()
+    event.details.Pack(details)
+
+    return event

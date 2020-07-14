@@ -60,7 +60,6 @@ class MQTTProcessor(Processor, abc.ABC):
 class HSLRealtimeProcessor(MQTTProcessor):
     def __init__(self, config):
         super().__init__(config)
-        self.config = config
         self.event_types = config["event_types"].split(",")
         self.vehicle_types = config["vehicle_types"].split(",")
         self._latest_timestamp = None
@@ -68,8 +67,8 @@ class HSLRealtimeProcessor(MQTTProcessor):
 
         # Use "Point Nemo" as latency marker origin since we can assume no real events come from there
         origin = (-48.875, -123.393)
-        h3_resolution = int(self.config["h3_resolution"])
-        h3_max_k = int(self.config["h3_max_k"])
+        h3_resolution = int(config["h3_resolution"])
+        h3_max_k = int(config["h3_max_k"])
         self._latency_markers = HSLRealtimeLatencyMarkers(
             origin, h3_resolution, h3_max_k
         )
