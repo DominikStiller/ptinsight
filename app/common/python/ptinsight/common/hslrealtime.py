@@ -86,7 +86,6 @@ class HSLRealtimeLatencyMarkers:
         Checks if a message is a latency marker
 
         Args:
-            topic: The Kafka topic
             event: The event details protobuf message
 
         Returns:
@@ -114,7 +113,7 @@ class HSLRealtimeLatencyMarkers:
                 pass
 
     def generate(self, timestamp: datetime) -> List[Tuple[str, datetime, Message]]:
-        def _add_common_information(event):
+        def _add_common_information(event: Message) -> Message:
             coordinates = next(self.coordinate_generator)
             event.latitude = coordinates[0]
             event.longitude = coordinates[1]
@@ -125,28 +124,18 @@ class HSLRealtimeLatencyMarkers:
 
             return event
 
-        return [
+        markers = [
             (
                 "ingress.vehicle-position",
-                timestamp,
-                _add_common_information(
-                    self._generate_vehicle_position_latency_marker(timestamp)
-                ),
+                self._generate_vehicle_position_latency_marker(timestamp),
             ),
-            (
-                "ingress.arrival",
-                timestamp,
-                _add_common_information(
-                    self._generate_arrival_latency_marker(timestamp)
-                ),
-            ),
-            (
-                "ingress.departure",
-                timestamp,
-                _add_common_information(
-                    self._generate_departure_latency_marker(timestamp)
-                ),
-            ),
+            ("ingress.arrival", self._generate_arrival_latency_marker(timestamp)),
+            ("ingress.departure", self._generate_departure_latency_marker(timestamp)),
+        ]
+
+        return [
+            (topic, timestamp, _add_common_information(event))
+            for topic, event in markers
         ]
 
     def _generate_vehicle_position_latency_marker(
