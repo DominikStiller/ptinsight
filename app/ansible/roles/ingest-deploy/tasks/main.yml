@@ -33,7 +33,7 @@
     path: "{{ deploy_path }}/ingest/venv"
     state: absent
 
-- name: install packages
+- name: install packages into new virtual environment
   become: true
   become_user: "{{ deploy_user }}"
   pip: 

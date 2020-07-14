@@ -1,3 +1,4 @@
+import os
 import threading
 
 from flask import Flask
@@ -10,8 +11,9 @@ class Server:
     """A wrapper around the web server and socket.io server"""
 
     def __init__(self, config: dict):
+        static_folder = os.getcwd() + "/../frontend/dist"
         self.app = Flask(
-            __name__, static_folder="../../../frontend/dist", static_url_path="/"
+            __name__, static_folder=static_folder, static_url_path="/"
         )
         self.socketio = SocketIO(self.app)
         self.bridge = KafkaToSocketioBridge(self.socketio, config["kafka"])
