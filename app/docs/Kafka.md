@@ -20,6 +20,14 @@ All topics are replicated on all 3 hosts and have two partitions. Records are ra
 | egress.emergency-stop   | High deceleration of vehicle           | PT Insight Processing | com.dxc.ptinsight.proto.egress.EmergencyStop    |
 
 
+### Adding a new topic
+Execute these steps to add a new topic:
+1. Add the topic to the table above
+2. Add the topic to the Kafka deployment role in `ansible/role/kafka-deploy/tasks/main.yml`
+3. Add the topic to the Python mapping in `common/python/ptinsight/common/events.py`
+4. Run `make deploy-kafka`
+
+
 ## Addresses
 Kafka brokers listen to connections from inside the VPC on port 9092, but to external connections on port 9093.
 

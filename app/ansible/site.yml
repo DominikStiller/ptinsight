@@ -93,3 +93,15 @@
       tags: [setup, setup-ui]
     - role: ui-deploy
       tags: [deploy, deploy-ui]
+
+- name: set up latency tracker cluster
+  hosts: latencytracker
+  vars:
+    - source_path: "{{ playbook_dir }}/../latencytracker"
+    - deploy_path: /opt/ptinsight
+    - deploy_user: ptinsight
+  roles:
+    - role: ../ansible/roles/python
+      tags: [setup, setup-latencytracker]
+    - role: latencytracker-deploy
+      tags: [deploy, deploy-latencytracker]

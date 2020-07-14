@@ -1,0 +1,87 @@
+---
+- name: create deploy directory
+  become: true
+  file:
+    path: "{{ deploy_path }}/latencytracker"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+
+- name: build ptinsight-latencytracker
+  run_once: true
+  command:
+    cmd: poetry build --format=wheel
+    chdir: "{{ source_path }}"
+  delegate_to: localhost
+
+- name: upload ptinsight-latencytracker
+  become: true
+  become_user: "{{ deploy_user }}"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ deploy_path }}/latencytracker"
+  with_fileglob:
+    - "{{ source_path }}/dist/ptinsight_latencytracker-*.whl"
+  register: python_latencytracker
+  notify:
+    - restart latencytracker service
+
+- name: remove virtual environment
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/latencytracker/venv"
+    state: absent
+
+- name: install packages into new virtual environment
+  become: true
+  become_user: "{{ deploy_user }}"
+  pip: 
+    name: "file://{{ item.dest }}"
+    virtualenv: "{{ deploy_path }}/latencytracker/venv"
+    virtualenv_command: /usr/local/bin/python3 -m venv
+  with_list: "{{ python_common.results + python_latencytracker.results }}"
+
+- name: create config directory
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/latencytracker/config"
+    state: directory
+
+- name: upload config
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: latencytracker.yaml.j2
+    dest: "{{ deploy_path }}/latencytracker/config/latencytracker.yaml"
+  notify:
+    - restart latencytracker service
+
+- name: upload start script
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: start.sh.j2
+    dest: "{{ deploy_path }}/latencytracker/start.sh"
+    mode: a+x
+
+- name: upload latencytracker service file
+  become: true
+  template:
+    src: ptinsight-latencytracker.service.j2
+    dest: /usr/lib/systemd/system/ptinsight-latencytracker.service
+
+- name: reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- meta: flush_handlers
+
+- name: start the latencytracker service
+  become: true
+  service:
+    name: ptinsight-latencytracker
+    state: started
+    enabled: yes

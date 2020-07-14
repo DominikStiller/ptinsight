@@ -1,0 +1,22 @@
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "ptinsight-latencytracker"
+version = "1.0"
+description = "PT Insight Latency Tracker"
+authors = ["Dominik Stiller <dominik.stiller@hpe.com>"]
+packages = [
+    { include = "ptinsight" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+kafka-python = "^2.0.1"
+pyyaml = "^5.3.1"
+ptinsight-common = {path = "../common/python", develop=false}
+expiringdict = "^1.2.1"
+
+[tool.poetry.dev-dependencies]
+black = ">=19.10b0"

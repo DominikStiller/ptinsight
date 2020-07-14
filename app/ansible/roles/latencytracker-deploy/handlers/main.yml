@@ -1,0 +1,6 @@
+---
+- name: restart latencytracker service
+  become: true
+  service:
+    name: ptinsight-latencytracker
+    state: restarted

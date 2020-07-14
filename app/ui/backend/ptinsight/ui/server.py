@@ -12,9 +12,7 @@ class Server:
 
     def __init__(self, config: dict):
         static_folder = os.getcwd() + "/../frontend/dist"
-        self.app = Flask(
-            __name__, static_folder=static_folder, static_url_path="/"
-        )
+        self.app = Flask(__name__, static_folder=static_folder, static_url_path="/")
         self.socketio = SocketIO(self.app)
         self.bridge = KafkaToSocketioBridge(self.socketio, config["kafka"])
 

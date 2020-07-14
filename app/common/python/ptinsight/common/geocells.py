@@ -12,9 +12,8 @@ class SpiralingGeocellGenerator:
     multiple hundred million cells can be generated.
     """
 
-    def __init__(self, origin: Tuple[float, float], resolution: int, max_k: int):
-        self.origin = h3.geo_to_h3(*origin, resolution)
-        self.resolution = resolution
+    def __init__(self, origin_cell: int, max_k: int):
+        self.origin = origin_cell
         self.max_k = max_k
 
         self._k = 0

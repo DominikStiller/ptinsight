@@ -2,7 +2,7 @@ from datetime import datetime, timedelta
 from random import randint
 from typing import List, Tuple, Optional
 
-import h3
+import h3.api.basic_int as h3
 from google.protobuf.message import Message
 from dateutil.parser import isoparse
 
@@ -17,7 +17,10 @@ from ptinsight.common.proto.ingress.hsl_realtime_pb2 import (
 
 class HSLRealtimeParser:
     """Parser for HSL realtime events"""
-    def parse(self, vehicle_type: str, payload: dict) -> Optional[Tuple[str, datetime, Message]]:
+
+    def parse(
+        self, vehicle_type: str, payload: dict
+    ) -> Optional[Tuple[str, datetime, Message]]:
         event_type = list(payload.keys())[0].lower()
         payload = list(payload.values())[0]
         event_timestamp = isoparse(payload["tst"])
@@ -65,16 +68,50 @@ class HSLRealtimeParser:
 
 class HSLRealtimeLatencyMarkers:
     """Latency marker generator for HSL realtime events"""
-    def __init__(self, origin: Tuple[float, float], h3_resolution: int, h3_max_k: int):
-        self.origin = origin
-        self.h3_max_k = h3_max_k
-        self.generator = SpiralingGeocellGenerator(
-            origin, h3_resolution, h3_max_k
-        )
-        self.coordinate_generator = self.generator.coordinates()
 
-    def is_latency_marker(self, cell: int) -> bool:
-        return h3.h3_distance(self.origin, cell) <= self.h3_max_k
+    # Use special operator for ingress latency markers
+    LATENCY_MARKER_OPERATOR = 42000
+
+    def __init__(self, origin: Tuple[float, float], h3_resolution: int, h3_max_k: int):
+        self.origin = h3.geo_to_h3(*origin, h3_resolution)
+        self.h3_resolution = h3_resolution
+        self.h3_max_k = h3_max_k
+
+        self.coordinate_generator = SpiralingGeocellGenerator(
+            self.origin, h3_max_k
+        ).coordinates()
+
+    def check_latency_marker(self, event: Message) -> Optional[int]:
+        """
+        Checks if a message is a latency marker
+
+        Args:
+            topic: The Kafka topic
+            event: The event details protobuf message
+
+        Returns:
+            The geocell if the message is a latency marker, None otherwise
+        """
+        # Extract geocell first
+        if hasattr(event, "geocell"):
+            cell = event.geocell
+        elif hasattr(event, "latitude") and hasattr(event, "longitude"):
+            cell = h3.geo_to_h3(event.latitude, event.longitude, self.h3_resolution)
+        else:
+            return
+
+        if hasattr(event, "vehicle") and hasattr(event.vehicle, "operator"):
+            # For ingress events, we can check for the special operator
+            if event.vehicle.operator == self.LATENCY_MARKER_OPERATOR:
+                return cell
+        else:
+            # For egress events, we need to check by geocell distance
+            try:
+                if h3.h3_distance(self.origin, cell) <= self.h3_max_k:
+                    return cell
+            except SystemError:
+                # System errors can occur when the distance is too large
+                pass
 
     def generate(self, timestamp: datetime) -> List[Tuple[str, datetime, Message]]:
         def _add_common_information(event):
@@ -83,7 +120,7 @@ class HSLRealtimeLatencyMarkers:
             event.longitude = coordinates[1]
 
             event.vehicle.type = VehicleType.BUS
-            event.vehicle.operator = 42000
+            event.vehicle.operator = self.LATENCY_MARKER_OPERATOR
             event.vehicle.number = randint(100000, 2 ** 31 - 1)
 
             return event
@@ -99,24 +136,30 @@ class HSLRealtimeLatencyMarkers:
             (
                 "ingress.arrival",
                 timestamp,
-                _add_common_information(self._generate_arrival_latency_marker(timestamp)),
+                _add_common_information(
+                    self._generate_arrival_latency_marker(timestamp)
+                ),
             ),
             (
                 "ingress.departure",
                 timestamp,
-                _add_common_information(self._generate_departure_latency_marker(timestamp)),
+                _add_common_information(
+                    self._generate_departure_latency_marker(timestamp)
+                ),
             ),
         ]
 
-    def _generate_vehicle_position_latency_marker(self, timestamp: datetime) -> VehiclePosition:
+    def _generate_vehicle_position_latency_marker(
+        self, timestamp: datetime
+    ) -> VehiclePosition:
         event = VehiclePosition()
 
         event.route.id = str(randint(100000, 2 ** 31 - 1))
         event.route.direction = 1
         event.route.operating_day = timestamp.strftime("%Y-%m-%d")
-        event.route.departure_time = (
-            timestamp - timedelta(minutes=20)
-        ).strftime("%H:%M")
+        event.route.departure_time = (timestamp - timedelta(minutes=20)).strftime(
+            "%H:%M"
+        )
         event.heading = 0
         event.speed = 10
         event.acceleration = 3
@@ -128,9 +171,7 @@ class HSLRealtimeLatencyMarkers:
 
         event.stop = randint(100000, 2 ** 31 - 1)
         event.scheduled_arrival.FromDatetime(timestamp)
-        event.scheduled_departure.FromDatetime(
-            timestamp + timedelta(minutes=1)
-        )
+        event.scheduled_departure.FromDatetime(timestamp + timedelta(minutes=1))
 
         return event
 
@@ -139,8 +180,6 @@ class HSLRealtimeLatencyMarkers:
 
         event.stop = randint(100000, 2 ** 31 - 1)
         event.scheduled_arrival.FromDatetime(timestamp)
-        event.scheduled_departure.FromDatetime(
-            timestamp + timedelta(minutes=1)
-        )
+        event.scheduled_departure.FromDatetime(timestamp + timedelta(minutes=1))
 
         return event

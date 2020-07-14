@@ -86,6 +86,8 @@ var streetsLayerDark = tileLayer.provider("CartoDB.DarkMatter");
 const map = lmap("map-container", {
   // Zoom on Helsinki initially
   center: [60.2199, 24.9284],
+  // Point Nemo (origin of latency markers)
+  // center: [-48.875, -123.393],
   zoom: 11.7,
   layers: [streetsLayerLite, vehicleCountsLayer],
 });

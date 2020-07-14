@@ -42,6 +42,8 @@ setup-ingest:
 	$(call ansible_cmd, "setup-ingest")
 setup-ui:
 	$(call ansible_cmd, "setup-ui")
+setup-latencytracker:
+	$(call ansible_cmd, "setup-latencytracker")
 deploy:
 	$(call ansible_cmd, "deploy")
 deploy-kafka:
@@ -52,3 +54,5 @@ deploy-ingest:
 	$(call ansible_cmd, "deploy-ingest")
 deploy-ui:
 	$(call ansible_cmd, "deploy-ui")
+deploy-latencytracker:
+	$(call ansible_cmd, "deploy-latencytracker")

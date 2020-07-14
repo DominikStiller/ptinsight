@@ -29,6 +29,7 @@ For general documentations, see `docs`. For component-specific documentation, se
 * `common`: Common libraries shared between components, including protobuf definitions
 * `docs`: Detailed docs for system-wide components
 * `ingest`: Component for ingesting external events into the PT Insight system
+* `latencytracker`: Component for tracking end-to-end latency of the PT Insight system
 * `processing`: Component for detecting complex events
 * `terraform`: Terraform configuration files for cloud infrastructure setup
 * `ui`: Component for visualizing events
@@ -67,6 +68,7 @@ make setup-kafka
 make setup-processing
 make setup-ingest
 make setup-ui
+make setup-latencytracker
 ```
 
 4. Deploy applications. Rerun this step when you change application code.
@@ -78,6 +80,7 @@ make deploy-kafka
 make deploy-processing
 make deploy-ingest
 make deploy-ui
+make deploy-latencytracker
 ```
 
 5. Open the UI in your browser
@@ -93,6 +96,7 @@ Navigate to http://ui-host:8080/
 ./ssh.sh processing 2
 ./ssh.sh ingest
 ./ssh.sh ui
+./ssh.sh latencytracker
 ```
 
 7. Destroy infrastructure when it is not needed anymore

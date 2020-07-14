@@ -13,6 +13,7 @@ from ptinsight.common import (
     EmergencyStop,
     VehicleType,
 )
+from ptinsight.common.events import unpack_event_details
 from ptinsight.common.serialize import deserialize
 
 logger = logging.getLogger(__name__)
@@ -49,51 +50,38 @@ class KafkaToSocketioBridge:
         except NoBrokersAvailable:
             logger.error("Cannot connect to Kafka bootstrap servers")
 
-    def _emit(self, topic, event: Event):
-        if topic == "egress.vehicle-count":
-            vehicle_count = VehicleCount()
-            event.details.Unpack(vehicle_count)
+    def _emit(self, topic: str, event: Event):
+        details = unpack_event_details(topic, event)
 
+        if topic == "egress.vehicle-count":
             data = {
-                "geocell": h3.h3_to_string(vehicle_count.geocell),
-                "count": vehicle_count.count,
+                "geocell": h3.h3_to_string(details.geocell),
+                "count": details.count,
             }
         elif topic == "egress.delay-statistics":
-            delay_statistics = DelayStatistics()
-            event.details.Unpack(delay_statistics)
-
             data = {
-                "geocell": h3.h3_to_string(delay_statistics.geocell),
-                "p50": delay_statistics.percentile50th,
-                "p90": delay_statistics.percentile90th,
-                "p99": delay_statistics.percentile99th,
+                "geocell": h3.h3_to_string(details.geocell),
+                "p50": details.percentile50th,
+                "p90": details.percentile90th,
+                "p99": details.percentile99th,
             }
         elif topic == "egress.flow-direction":
-            flow_direction = FlowDirection()
-            event.details.Unpack(flow_direction)
-
             data = {
-                "edge": h3.h3_to_string(flow_direction.geocells_edge),
-                "count": flow_direction.count,
+                "edge": h3.h3_to_string(details.geocells_edge),
+                "count": details.count,
             }
         elif topic == "egress.final-stop-count":
-            final_stop_count = FinalStopCount()
-            event.details.Unpack(final_stop_count)
-
             data = {
-                "geocell": h3.h3_to_string(final_stop_count.geocell),
-                "count": final_stop_count.count,
+                "geocell": h3.h3_to_string(details.geocell),
+                "count": details.count,
             }
         elif topic == "egress.emergency-stop":
-            emergency_stop = EmergencyStop()
-            event.details.Unpack(emergency_stop)
-
             data = {
-                "veh_type": VehicleType.Name(emergency_stop.vehicle_type).lower(),
-                "lat": emergency_stop.latitude,
-                "lon": emergency_stop.longitude,
-                "max_dec": emergency_stop.max_deceleration,
-                "speed_diff": emergency_stop.speed_diff,
+                "veh_type": VehicleType.Name(details.vehicle_type).lower(),
+                "lat": details.latitude,
+                "lon": details.longitude,
+                "max_dec": details.max_deceleration,
+                "speed_diff": details.speed_diff,
             }
         else:
             return

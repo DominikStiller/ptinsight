@@ -1,0 +1,12 @@
+---
+logging:
+  level: info
+
+kafka:
+  protobuf_format: json
+  bootstrap_servers:
+    - kafka-public-ip:9093
+
+latency_markers:
+  h3_resolution: 9
+  h3_max_k: 10000
