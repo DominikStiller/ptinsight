@@ -26,6 +26,8 @@ sources:
     processor:
       type: hsl-realtime
       config:
+        # This is enough for multiple hundred million generations
         h3_resolution: 9
+        h3_max_k: 10000
         vehicle_types: bus,tram,train
         event_types: ars,dep

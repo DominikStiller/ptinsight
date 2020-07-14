@@ -178,7 +178,7 @@ class MQTTRecordingIngestor(Ingestor):
                 threading.Thread(target=self._emit_latency_markers).start()
                 threading.Timer(interval, _run).start()
 
-            t = threading.Timer(interval + 1, _run)
+            t = threading.Timer(interval, _run)
             t.setDaemon(False)
             t.start()
 

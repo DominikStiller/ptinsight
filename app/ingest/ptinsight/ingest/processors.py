@@ -7,10 +7,8 @@ from datetime import datetime
 from typing import Tuple, Optional, List
 
 import paho.mqtt.client as mqtt
-from dateutil.parser import isoparse
 from google.protobuf.message import Message
-from ptinsight.common import Arrival, Departure, VehiclePosition, VehicleType
-from ptinsight.common.hslrealtime import LatencyMarker
+from ptinsight.common.hslrealtime import HSLRealtimeParser, HSLRealtimeLatencyMarkers
 
 
 class Processor(abc.ABC):
@@ -66,7 +64,15 @@ class HSLRealtimeProcessor(MQTTProcessor):
         self.event_types = config["event_types"].split(",")
         self.vehicle_types = config["vehicle_types"].split(",")
         self._latest_timestamp = None
-        self._latency_markers = None
+        self._parser = HSLRealtimeParser()
+
+        # Use "Point Nemo" as latency marker origin since we can assume no real events come from there
+        origin = (-48.875, -123.393)
+        h3_resolution = int(self.config["h3_resolution"])
+        h3_max_k = int(self.config["h3_max_k"])
+        self._latency_markers = HSLRealtimeLatencyMarkers(
+            origin, h3_resolution, h3_max_k
+        )
 
     @staticmethod
     def name():
@@ -97,62 +103,23 @@ class HSLRealtimeProcessor(MQTTProcessor):
         if not vehicle_type:
             return
 
-        event_type = list(payload.keys())[0].lower()
-        payload = list(payload.values())[0]
-        event_timestamp = isoparse(payload["tst"])
-        if not self._latest_timestamp or event_timestamp > self._latest_timestamp:
-            self._latest_timestamp = event_timestamp
+        if parsed := self._parser.parse(vehicle_type, payload):
+            event_type, event_timestamp, event = parsed
 
-        if not payload["lat"] or not payload["long"]:
-            return
+            if not self._latest_timestamp or event_timestamp > self._latest_timestamp:
+                self._latest_timestamp = event_timestamp
 
-        if event_type == "ars":
-            target_topic = "ingress.arrival"
-            event = Arrival()
+            target_topic = (
+                "ingress."
+                + {"ars": "arrival", "dep": "departure", "vp": "vehicle-position"}[
+                    event_type
+                ]
+            )
 
-            event.stop = int(payload["stop"])
-            event.scheduled_arrival.FromJsonString(payload["ttarr"])
-            event.scheduled_departure.FromJsonString(payload["ttdep"])
-        elif event_type == "dep":
-            target_topic = "ingress.departure"
-            event = Departure()
-
-            event.stop = int(payload["stop"])
-            event.scheduled_arrival.FromJsonString(payload["ttarr"])
-            event.scheduled_departure.FromJsonString(payload["ttdep"])
-        elif event_type == "vp":
-            target_topic = "ingress.vehicle-position"
-            event = VehiclePosition()
-
-            event.route.id = payload["route"]
-            # Directions in realtime API are encoded by 1 or 2, but we want to use 0 or 1
-            event.route.direction = bool(int(payload["dir"]) - 1)
-            event.route.operating_day = payload["oday"]
-            event.route.departure_time = payload["start"]
-            if payload["hdg"]:
-                event.heading = int(payload["hdg"])
-            if payload["spd"]:
-                event.speed = float(payload["spd"])
-            if payload["acc"]:
-                event.acceleration = float(payload["acc"])
-        else:
-            return
-
-        event.latitude = float(payload["lat"])
-        event.longitude = float(payload["long"])
-        event.vehicle.type = VehicleType.Value(vehicle_type.upper())
-        event.vehicle.operator = int(payload["oper"])
-        event.vehicle.number = int(payload["veh"])
-
-        return target_topic, event_timestamp, event
+            return target_topic, event_timestamp, event
 
     def generate_latency_markers(self) -> List[Tuple[str, datetime, Message]]:
         if not self._latest_timestamp:
             # No real records have been processed yet
             return []
-        if not self._latency_markers:
-            # Use "Point Nemo" as origin since we can assume no real events come from there
-            origin = (-48.875, -123.393)
-            h3_resolution = int(self.config["h3_resolution"])
-            self._latency_markers = LatencyMarker(origin, h3_resolution)
         return self._latency_markers.generate(self._latest_timestamp)
