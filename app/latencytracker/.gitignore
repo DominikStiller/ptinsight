@@ -181,3 +181,4 @@ fabric.properties
 poetry.lock
 /config/latencytracker.yaml
 recordings/
+plots/

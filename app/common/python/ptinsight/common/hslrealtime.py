@@ -91,7 +91,7 @@ class HSLRealtimeLatencyMarkers:
         Returns:
             The geocell if the message is a latency marker, None otherwise
         """
-        # Extract geocell first
+        # Geocells are used to identify and track latency markers
         if hasattr(event, "geocell"):
             cell = event.geocell
         elif hasattr(event, "latitude") and hasattr(event, "longitude"):

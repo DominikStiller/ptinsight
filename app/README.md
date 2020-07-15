@@ -1,7 +1,7 @@
 # PT Insight - Real-Time Analysis of Public Transportation Data
 
 This is a demo application for large-scale complex event processing. It will be referred to as "PT Insight" (Public Transportation Insight).
-For general documentations, see `docs`. For component-specific documentation, see their folders.
+For general documentation, see `docs`. For component-specific documentation, see their folders.
 
 
 ## Use Case
