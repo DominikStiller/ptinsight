@@ -2,7 +2,7 @@ import csv
 import os
 from datetime import datetime
 
-from ptinsight.common.latency import LatencyMarkerRecord
+from ptinsight.common.latency import LatencyMarker
 
 
 class Recorder:
@@ -19,7 +19,7 @@ class Recorder:
             buffering=1,
         )
         self.writer = csv.writer(self.file)
-        self.writer.writerow(LatencyMarkerRecord.tuple_columns())
+        self.writer.writerow(LatencyMarker.tuple_columns())
 
-    def write(self, marker: LatencyMarkerRecord):
+    def write(self, marker: LatencyMarker):
         self.writer.writerow(marker.as_tuple())

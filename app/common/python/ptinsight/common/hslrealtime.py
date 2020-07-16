@@ -113,30 +113,39 @@ class HSLRealtimeLatencyMarkers:
                 pass
 
     def generate(self, timestamp: datetime) -> List[Tuple[str, datetime, Message]]:
-        def _add_common_information(event: Message) -> Message:
-            coordinates = next(self.coordinate_generator)
-            event.latitude = coordinates[0]
-            event.longitude = coordinates[1]
-
-            event.vehicle.type = VehicleType.BUS
-            event.vehicle.operator = self.LATENCY_MARKER_OPERATOR
-            event.vehicle.number = randint(100000, 2 ** 31 - 1)
-
-            return event
-
-        markers = [
-            (
-                "ingress.vehicle-position",
-                self._generate_vehicle_position_latency_marker(timestamp),
-            ),
-            ("ingress.arrival", self._generate_arrival_latency_marker(timestamp)),
-            ("ingress.departure", self._generate_departure_latency_marker(timestamp)),
-        ]
-
         return [
-            (topic, timestamp, _add_common_information(event))
-            for topic, event in markers
+            *[
+                (
+                    "ingress.vehicle-position",
+                    timestamp + timedelta(milliseconds=i),
+                    event,
+                )
+                for i, event in enumerate(
+                    self._generate_emergency_stop_latency_markers(timestamp)
+                )
+            ],
+            (
+                "ingress.arrival",
+                timestamp,
+                self._generate_arrival_latency_marker(timestamp),
+            ),
+            (
+                "ingress.departure",
+                timestamp,
+                self._generate_departure_latency_marker(timestamp),
+            ),
         ]
+
+    def _add_common_information(self, event: Message) -> Message:
+        coordinates = next(self.coordinate_generator)
+        event.latitude = coordinates[0]
+        event.longitude = coordinates[1]
+
+        event.vehicle.type = VehicleType.BUS
+        event.vehicle.operator = self.LATENCY_MARKER_OPERATOR
+        event.vehicle.number = randint(100000, 2 ** 31 - 1)
+
+        return event
 
     def _generate_vehicle_position_latency_marker(
         self, timestamp: datetime
@@ -153,7 +162,26 @@ class HSLRealtimeLatencyMarkers:
         event.speed = 10
         event.acceleration = 3
 
-        return event
+        return self._add_common_information(event)
+
+    def _generate_emergency_stop_latency_markers(
+        self, timestamp: datetime
+    ) -> List[VehiclePosition]:
+        markers: List[VehiclePosition] = []
+
+        # Use same vehicle number for all events in pattern because emergency stops are keyed by vehicle
+        vehicle_number = randint(100000, 2 ** 31 - 1)
+        for i in range(3):
+            marker = self._generate_vehicle_position_latency_marker(timestamp)
+            marker.vehicle.number = vehicle_number
+            markers.append(marker)
+
+        # Generate emergency stop pattern
+        markers[0].speed = 12
+        markers[1].acceleration = -1
+        markers[2].speed = 0
+
+        return markers
 
     def _generate_arrival_latency_marker(self, timestamp: datetime) -> Arrival:
         event = Arrival()
@@ -162,7 +190,7 @@ class HSLRealtimeLatencyMarkers:
         event.scheduled_arrival.FromDatetime(timestamp)
         event.scheduled_departure.FromDatetime(timestamp + timedelta(minutes=1))
 
-        return event
+        return self._add_common_information(event)
 
     def _generate_departure_latency_marker(self, timestamp: datetime) -> Departure:
         event = Departure()
@@ -171,4 +199,4 @@ class HSLRealtimeLatencyMarkers:
         event.scheduled_arrival.FromDatetime(timestamp)
         event.scheduled_departure.FromDatetime(timestamp + timedelta(minutes=1))
 
-        return event
+        return self._add_common_information(event)

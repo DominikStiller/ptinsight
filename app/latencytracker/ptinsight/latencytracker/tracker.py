@@ -7,7 +7,7 @@ from kafka.errors import NoBrokersAvailable
 from ptinsight.common import Event
 from ptinsight.common.events import unpack_event_details
 from ptinsight.common.hslrealtime import HSLRealtimeLatencyMarkers
-from ptinsight.common.latency import LatencyMarkerRecord
+from ptinsight.common.latency import LatencyMarker
 from ptinsight.common.serialize import deserialize
 
 from ptinsight.latencytracker.recorder import Recorder
@@ -31,7 +31,7 @@ class LatencyTracker:
             origin, self.h3_resolution, h3_max_k
         )
 
-        self.seen_markers: Dict[int, LatencyMarkerRecord] = ExpiringDict(
+        self.seen_markers: Dict[int, LatencyMarker] = ExpiringDict(
             max_len=10000, max_age_seconds=30
         )
 
@@ -55,20 +55,18 @@ class LatencyTracker:
             logger.error("Cannot connect to Kafka bootstrap servers")
 
     def _process_ingress(self, geocell: int, event: Event):
-        marker = LatencyMarkerRecord()
+        marker = LatencyMarker()
         marker.mark_ingress(event)
         self.seen_markers[geocell] = marker
 
     def _process_egress(self, topic: str, geocell: int, event: Event):
         if geocell in self.seen_markers:
-            logger.info("Processing egress marker")
-
+            job = topic[7:]
             marker = self.seen_markers[geocell]
-            marker.mark_egress(event)
-            marker.job = topic[7:]
 
-            self.recorder.write(marker)
-
-            # Remove markers that were observed end-to-end so that they are only counted once
+            # Ensure that each marker is observed only once for each job
             # Otherwise they would appear with increasing latency when being contained in multiple sliding windows
-            del self.seen_markers[geocell]
+            if not job in marker.seen_jobs:
+                logger.info(f"Recording egress marker for {job}")
+                marker.mark_egress(event, job)
+                self.recorder.write(marker)

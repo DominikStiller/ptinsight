@@ -5,9 +5,9 @@ from pandas import DataFrame
 from ptinsight.common import Event
 
 
-class LatencyMarkerRecord:
+class LatencyMarker:
     def __init__(self):
-        self.job = None
+        self.seen_jobs = []
         self.ingress_ingestion_timestamp = None
         self.ingress_consumption_timestamp = None
         self.egress_ingestion_timestamp = None
@@ -17,13 +17,14 @@ class LatencyMarkerRecord:
         self.ingress_ingestion_timestamp = event.ingestion_timestamp.ToMilliseconds()
         self.ingress_consumption_timestamp = int(datetime.now().timestamp() * 1000)
 
-    def mark_egress(self, event: Event):
+    def mark_egress(self, event: Event, job: str):
+        self.seen_jobs.append(job)
         self.egress_ingestion_timestamp = event.ingestion_timestamp.ToMilliseconds()
         self.egress_consumption_timestamp = int(datetime.now().timestamp() * 1000)
 
     def as_tuple(self):
         return (
-            self.job,
+            self.seen_jobs[-1],
             self.ingress_ingestion_timestamp,
             self.ingress_consumption_timestamp,
             self.egress_ingestion_timestamp,
