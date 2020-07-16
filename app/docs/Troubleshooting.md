@@ -1,15 +1,24 @@
 # Troubleshooting
 
-This is a list of common problems and their solutions.
+This is a list of common problems and possible solutions.
 
 
 ## AWS
 
-## Cannot connect to EC2 instances
+### Cannot connect to EC2 instances
 #### Problem
 Your connections are refused on all ports like SSH and HTTP.
 #### Solution
 Check if your IP address block has been added to the allowed ranges in `terraform/variables.tf`.
+
+
+## Flink
+
+### Windows are not triggered when using event time
+#### Problem
+When using the event time stream characteristic, event time windows are not being triggered. This often happens when switching between recorded and live data.
+#### Solution
+Operator watermarks always increase monotonously. When recorded data with a much earlier timestamp than the current time are processed after the job already processed live data, the watermark has advanced too far and the recorded data will be dropped. Restart the job to reset watermarks.
 
 
 ## Gradle

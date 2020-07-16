@@ -16,6 +16,7 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
+import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
@@ -25,11 +26,11 @@ import org.slf4j.LoggerFactory;
  * Detects emergency stops by checking if a vehicle decelerates from over 10 m/s to less than 1 m/s
  * within 10 seconds
  */
-public class EmergencyStopDetectionJob extends Job {
+public class EmergencyStopDetectionTableJob extends Job {
 
-  private static final Logger LOG = LoggerFactory.getLogger(EmergencyStopDetectionJob.class);
+  private static final Logger LOG = LoggerFactory.getLogger(EmergencyStopDetectionTableJob.class);
 
-  public EmergencyStopDetectionJob() {
+  public EmergencyStopDetectionTableJob() {
     super("Emergency Stop Detection");
   }
 
@@ -61,7 +62,7 @@ public class EmergencyStopDetectionJob extends Job {
     tableEnv
         .toAppendStream(emergencyStopTable, Row.class)
         .process(new OutputProcessFunction())
-        .addSink(sink("egress.emergency-stop"));
+            .addSink(sink("egress.emergency-stop"));
   }
 
   private static class VehiclePositionTableTupleBuilderProcessFunction

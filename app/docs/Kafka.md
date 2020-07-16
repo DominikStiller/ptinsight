@@ -8,16 +8,17 @@ Every topic only contains protobuf messages of a single type. Topics are prefixe
 
 All topics are replicated on all 3 hosts and have two partitions. Records are randomly assigned to a partition, i.e. no keys are used and the order of records is only preserved within a partition.
 
-| Topic                   | Description                            | Source                | Protobuf Type                                   |
-| ----------------------- | -------------------------------------- | --------------------- | ----------------------------------------------- |
-| ingress.arrival         | Arrival of vehicle at stop             | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Arrival         |
-| ingress.departure       | Departure of vehicle from stop         | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Departure       |
-| ingess.vehicle-position | Position and speed of vehicle          | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.VehiclePosition |
-| egress.vehicle-count    | Number of vehicles per geocell         | PT Insight Processing | com.dxc.ptinsight.proto.egress.VehicleCount     |
-| egress.delay-statistics | Arrival delay statistics per cell      | PT Insight Processing | com.dxc.ptinsight.proto.egress.DelayStatistics  |
-| egress.flow-direction   | Flow direction between cells           | PT Insight Processing | com.dxc.ptinsight.proto.egress.FlowDirection    |
-| egress.final-stop-count | Number of vehicles per final stop cell | PT Insight Processing | com.dxc.ptinsight.proto.egress.FinalStopCount   |
-| egress.emergency-stop   | High deceleration of vehicle           | PT Insight Processing | com.dxc.ptinsight.proto.egress.EmergencyStop    |
+| Topic                           | Description                                      | Source                | Protobuf Type                                   |
+| ------------------------------- | ------------------------------------------------ | --------------------- | ----------------------------------------------- |
+| ingress.arrival                 | Arrival of vehicle at stop                       | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Arrival         |
+| ingress.departure               | Departure of vehicle from stop                   | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Departure       |
+| ingess.vehicle-position         | Position and speed of vehicle                    | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.VehiclePosition |
+| egress.vehicle-count            | Number of vehicles per geocell                   | PT Insight Processing | com.dxc.ptinsight.proto.egress.VehicleCount     |
+| egress.delay-statistics         | Arrival delay statistics per cell                | PT Insight Processing | com.dxc.ptinsight.proto.egress.DelayStatistics  |
+| egress.flow-direction           | Flow direction between cells                     | PT Insight Processing | com.dxc.ptinsight.proto.egress.FlowDirection    |
+| egress.final-stop-count         | Number of vehicles per final stop cell           | PT Insight Processing | com.dxc.ptinsight.proto.egress.FinalStopCount   |
+| egress.emergency-stop-table     | High deceleration of vehicle using table API     | PT Insight Processing | com.dxc.ptinsight.proto.egress.EmergencyStop    |
+| egress.emergency-stop-streaming | High deceleration of vehicle using streaming API | PT Insight Processing | com.dxc.ptinsight.proto.egress.EmergencyStop    |
 
 
 ### Adding a new topic

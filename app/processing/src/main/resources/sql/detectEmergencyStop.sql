@@ -14,7 +14,7 @@ MATCH_RECOGNIZE (
     AFTER MATCH SKIP PAST LAST ROW
     PATTERN (cruising braking+ stopped) WITHIN INTERVAL '10' SECOND
     DEFINE
-        cruising AS cruising.speed > 10,
+        cruising AS cruising.speed >= 10,
         braking AS braking.acceleration < 0,
         stopped AS stopped.speed < 1
 )

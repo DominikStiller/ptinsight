@@ -23,7 +23,8 @@ _TOPIC_TO_PROTOBUF_MAPPING = {
     "egress.delay-statistics": DelayStatistics,
     "egress.flow-direction": FlowDirection,
     "egress.final-stop-count": FinalStopCount,
-    "egress.emergency-stop": EmergencyStop,
+    "egress.emergency-stop-table": EmergencyStop,
+    "egress.emergency-stop-streaming": EmergencyStop,
 }
 
 

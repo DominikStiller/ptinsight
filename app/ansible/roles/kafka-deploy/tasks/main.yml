@@ -12,4 +12,5 @@
     - egress.delay-statistics
     - egress.flow-direction
     - egress.final-stop-count
-    - egress.emergency-stop
+    - egress.emergency-stop-table
+    - egress.emergency-stop-streaming
