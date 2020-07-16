@@ -3,12 +3,21 @@ import { control, map as lmap, tileLayer } from "leaflet";
 import * as socketio from "socket.io-client";
 import GeocellLayer from "./layers/geocell-layer";
 import GeoedgeLayer from "./layers/geoedge-layer";
-import { LegendUi } from "./util/legend-ui";
+import { LegendUi, TimeDisplay } from "./util/legend-ui";
 import "./styles";
 import GeopointLayer from "./layers/geopoint-layer";
 
 const socket = socketio();
 const legend = new LegendUi();
+const timeDisplay = new TimeDisplay();
+timeDisplay.attachTo(legend);
+
+function subscribe(topic: string, handler: (msg: any) => void) {
+  socket.on(topic, (msg: any) => {
+    timeDisplay.update(msg.timestamp);
+    handler(msg);
+  });
+}
 
 // Vehicle counts layer
 const vehicleCountsLayer = new GeocellLayer<{
@@ -17,7 +26,7 @@ const vehicleCountsLayer = new GeocellLayer<{
   (data) => `Vehicles in the last 30 s: ${data.count}`,
   (data) => data.count
 ).addToLegend(legend);
-socket.on("egress.vehicle-count", (msg: any) => {
+subscribe("egress.vehicle-count", (msg: any) => {
   vehicleCountsLayer.updateData(msg.data.geocell, msg);
 });
 
@@ -33,7 +42,7 @@ const delayStatisticsLayer = new GeocellLayer<{
       Arrival delay in the last 5 min (99th percentile): ${data.p99} min`,
   (data) => data.p90
 ).addToLegend(legend);
-socket.on("egress.delay-statistics", (msg: any) => {
+subscribe("egress.delay-statistics", (msg: any) => {
   delayStatisticsLayer.updateData(msg.data.geocell, msg);
 });
 
@@ -41,7 +50,7 @@ socket.on("egress.delay-statistics", (msg: any) => {
 const flowDirectionLayer = new GeoedgeLayer<{
   count: number;
 }>((data) => `Vehicles in the last 5 min: ${data.count}`);
-socket.on("egress.flow-direction", (msg: any) => {
+subscribe("egress.flow-direction", (msg: any) => {
   // Keep map clean by only showing edges with more than 3 vehicles
   if (msg.data.count > 3) {
     flowDirectionLayer.updateData(msg.data.edge, msg);
@@ -55,7 +64,7 @@ const finalStopCountsLayer = new GeocellLayer<{
   (data) => `Vehicles bound for here in the last 5 min: ${data.count}`,
   (data) => data.count
 ).addToLegend(legend);
-socket.on("egress.final-stop-count", (msg: any) => {
+subscribe("egress.final-stop-count", (msg: any) => {
   finalStopCountsLayer.updateData(msg.data.geocell, msg);
 });
 
@@ -75,7 +84,7 @@ const emergencyStopLayer = new GeopointLayer<{
       Maximum deceleration: ${data.max_dec.toFixed(1)} m/s<sup>2</sup>`,
   (data) => -data.max_dec
 ).addToLegend(legend);
-socket.on("egress.emergency-stop", (msg: any) => {
+subscribe("egress.emergency-stop-table", (msg: any) => {
   emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);
 });
 

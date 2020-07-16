@@ -31,7 +31,7 @@ public class EmergencyStopDetectionTableJob extends Job {
   private static final Logger LOG = LoggerFactory.getLogger(EmergencyStopDetectionTableJob.class);
 
   public EmergencyStopDetectionTableJob() {
-    super("Emergency Stop Detection");
+    super("Emergency Stop Detection Table");
   }
 
   @Override
@@ -62,7 +62,7 @@ public class EmergencyStopDetectionTableJob extends Job {
     tableEnv
         .toAppendStream(emergencyStopTable, Row.class)
         .process(new OutputProcessFunction())
-            .addSink(sink("egress.emergency-stop"));
+            .addSink(sink("egress.emergency-stop-table"));
   }
 
   private static class VehiclePositionTableTupleBuilderProcessFunction

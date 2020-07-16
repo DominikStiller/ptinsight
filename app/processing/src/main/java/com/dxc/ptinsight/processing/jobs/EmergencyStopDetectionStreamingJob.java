@@ -28,7 +28,7 @@ public class EmergencyStopDetectionStreamingJob extends Job {
       LoggerFactory.getLogger(EmergencyStopDetectionStreamingJob.class);
 
   public EmergencyStopDetectionStreamingJob() {
-    super("Emergency Stop Detection");
+    super("Emergency Stop Detection Streaming");
   }
 
   @Override
@@ -67,7 +67,7 @@ public class EmergencyStopDetectionStreamingJob extends Job {
 
     CEP.pattern(vehiclePositionStream, emergencyStopPattern)
         .process(new OutputProcessFunction())
-        .addSink(sink("egress.emergency-stop"));
+        .addSink(sink("egress.emergency-stop-streaming"));
   }
 
   private static class OutputProcessFunction

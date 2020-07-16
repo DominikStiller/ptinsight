@@ -37,6 +37,38 @@ export class LegendUi {
 }
 
 /**
+ * A monotonically increasing text display for timestamp
+ */
+export class TimeDisplay {
+  private text: D3Selection;
+  private latestTimestamp: number = 0;
+
+  constructor() {
+    this.text = create("svg:text")
+      .attr("x", 80)
+      .attr("y", 24)
+      .attr("font-size", 24);
+  }
+
+  public update(timestamp: number): void {
+    if (timestamp > this.latestTimestamp) {
+      this.latestTimestamp = timestamp;
+
+      let date = new Date(timestamp);
+      this.text.text(date.toUTCString());
+    }
+  }
+
+  public attachTo(legend: LegendUi): void {
+    legend.addContent(this.text);
+  }
+
+  public removeFrom(legend: LegendUi): void {
+    legend.removeContent(this.text);
+  }
+}
+
+/**
  * A colorbar with a color gradient that is mapped to a number range
  */
 export class ColorBar {
@@ -72,18 +104,18 @@ export class ColorBar {
       .attr("stop-color", (d: string) => d);
 
     this.bar = create("svg:rect")
-      .attr("x", "180")
+      .attr("x", "480")
       .attr("width", 20)
       .attr("height", 300)
       .attr("fill", `url(#gradient-${this.name})`);
 
     this.minText = create("svg:text")
-      .attr("x", "175")
+      .attr("x", "475")
       .attr("y", "300")
       .style("text-anchor", "end");
 
     this.maxText = create("svg:text")
-      .attr("x", "175")
+      .attr("x", "475")
       .attr("y", "20")
       .attr("text-anchor", "end");
   }
