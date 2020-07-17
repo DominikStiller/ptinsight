@@ -21,6 +21,9 @@ pandas = "^1.0.5"
 
 [tool.poetry.dev-dependencies]
 black = ">=19.10b0"
+matplotlib = "^3.3.0"
+pandas = "^1.0.5"
+seaborn = "^0.10.1"
 
 [tool.black]
 # https://black.readthedocs.io/en/stable/pyproject_toml.html#configuration-format

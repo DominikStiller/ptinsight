@@ -7,7 +7,7 @@ import re
 import sched
 import threading
 import time
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import final, Literal
 
 import boto3

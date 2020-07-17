@@ -74,9 +74,9 @@ public abstract class Job {
     consumer.setStartFromLatest();
     consumer.assignTimestampsAndWatermarks(
         WatermarkStrategy.<Event>forBoundedOutOfOrderness(Duration.ofSeconds(1))
-            .withTimestampAssigner((element, recordTimestamp) ->
-//                System.currentTimeMillis()));
-                        Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli()));
+            .withTimestampAssigner(
+                (element, recordTimestamp) ->
+                    Timestamps.toInstant(element.getEventTimestamp()).toEpochMilli()));
     return env.addSource(consumer).map(new ExtractDetailMapFunction<>(clazz));
   }
 

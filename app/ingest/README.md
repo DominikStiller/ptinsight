@@ -6,9 +6,6 @@ It receives messages from sources specified in the configuration and transforms 
 Invalid and unwanted events are filtered out so all Kafka topics contain valid messages.
 
 
-
-
-
 ## Prerequisites
 * Python 3.8
 * poetry

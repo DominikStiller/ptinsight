@@ -16,7 +16,6 @@ import org.apache.flink.api.common.functions.RichMapFunction;
 import org.apache.flink.api.java.tuple.Tuple6;
 import org.apache.flink.configuration.Configuration;
 import org.apache.flink.streaming.api.functions.ProcessFunction;
-import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
 import org.apache.flink.types.Row;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
@@ -62,7 +61,7 @@ public class EmergencyStopDetectionTableJob extends Job {
     tableEnv
         .toAppendStream(emergencyStopTable, Row.class)
         .process(new OutputProcessFunction())
-            .addSink(sink("egress.emergency-stop-table"));
+        .addSink(sink("egress.emergency-stop-table"));
   }
 
   private static class VehiclePositionTableTupleBuilderProcessFunction
