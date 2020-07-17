@@ -32,7 +32,7 @@ class LatencyTracker:
         )
 
         self.seen_markers: Dict[int, LatencyMarker] = ExpiringDict(
-            max_len=10000, max_age_seconds=30
+            max_len=100000, max_age_seconds=300
         )
 
         self.recorder = Recorder()

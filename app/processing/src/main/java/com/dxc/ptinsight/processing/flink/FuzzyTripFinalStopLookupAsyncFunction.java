@@ -49,7 +49,8 @@ public class FuzzyTripFinalStopLookupAsyncFunction
         CacheBuilder.newBuilder()
             .expireAfterAccess(20, TimeUnit.MINUTES)
             // There are usually about 1000 unique routes at any time
-            .maximumSize(1500)
+            // Latency markers inflate the cache since they all have different keys
+            .maximumSize(10000)
             .removalListener(x -> currentCacheSize = cache.size())
             .build();
 
