@@ -6,6 +6,9 @@ import logging
 import re
 import sched
 import threading
+from concurrent.futures import wait, ProcessPoolExecutor
+from concurrent.futures.thread import ThreadPoolExecutor
+
 import time
 from datetime import datetime
 from typing import final, Literal
@@ -109,36 +112,79 @@ class MQTTRecordingIngestor(Ingestor):
         self.file = boto3.resource("s3").Object(self.bucket, self.key)
 
     def start(self):
-        logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
-
-        lines = map(lambda l: l.decode(), self.file.get()["Body"].iter_lines())
-
-        original_broker = next(lines)[8:]
-        original_topics = next(lines)[8:]
-        original_t_start = datetime.fromisoformat(next(lines)[12:]).replace(
+        header_body, header_lines = self._open_file()
+        original_broker = next(header_lines)[8:]
+        original_topics = next(header_lines)[8:]
+        original_t_start = datetime.fromisoformat(next(header_lines)[12:]).replace(
             microsecond=0
         )
-        next(lines)
+        header_body.close()
 
         logger.info(f"Recorded from {original_broker} at {str(original_t_start)}")
         logger.info(f"Topics: {original_topics}\n")
+        logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
 
         self._start_latency_marker_generator()
-        self._start_scheduler(lines)
+        self._start_schedulers()
 
-    def _start_scheduler(self, lines):
+    def _open_file(self, range_start: int = 0):
+        body = self.file.get(Range=f"bytes={range_start}-")["Body"]
+        return body, map(lambda l: l.decode(), body.iter_lines())
+
+    def _start_schedulers(self):
+        if "volume_scaling_factor" in self.config:
+            scaling_factor = int(self.config["volume_scaling_factor"])
+            if scaling_factor < 1:
+                raise ValueError("Volume scale must be an integer >= 1")
+        else:
+            scaling_factor = 1
+
+        if "volume_scaling_offset_mb" in self.config:
+            scaling_offset = int(self.config["volume_scaling_offset_mb"])
+            if scaling_offset < 0:
+                raise ValueError("Volume scaling offset must be a positive integer")
+        else:
+            scaling_offset = 0
+
+        logger.info(
+            f"Scaling factor: {scaling_factor}   Scaling offset: {scaling_offset} MB"
+        )
+
+        with ThreadPoolExecutor(scaling_factor) as executor:
+            threads = []
+
+            for i in range(scaling_factor):
+                threads.append(
+                    executor.submit(
+                        self._start_single_scheduler, i * scaling_offset * 1024 ** 2
+                    )
+                )
+
+            wait(threads)
+
+    def _start_single_scheduler(self, offset: int):
+        _, lines = self._open_file(offset)
+
+        # Skip header and partial lines caused by offset
+        for _ in range(4):
+            next(lines)
+
         # Scheduler is used to replay messages with original relative timing
         scheduler = sched.scheduler(time.perf_counter, time.sleep)
-        done = False
+        done = threading.Event()
 
         # Custom run method is necessary to prevent scheduler from exiting early because no events are scheduled yet
         def run_scheduler():
-            while not done:
+            while not done.is_set():
                 scheduler.run()
+            # Clear queue after done is set
+            scheduler.run()
 
-        thread = threading.Thread(target=run_scheduler)
-        thread.start()
+        # One thread reads the recording, the other publishes the messages
+        sched_thread = threading.Thread(target=run_scheduler)
+        sched_thread.start()
         t_start = time.perf_counter()
+        recording_start_offset = None
 
         message_regex = re.compile(r'(\S+) "(.+)" (\d) (\d) (\S*)')
         for line in lines:
@@ -151,14 +197,19 @@ class MQTTRecordingIngestor(Ingestor):
             t_offset = float(t_offset)
             payload = base64.b64decode(payload)
 
+            if recording_start_offset is None:
+                recording_start_offset = t_offset
+
+            # TODO adjust timestamps and vehicles
+
             scheduler.enterabs(
-                t_start + t_offset,
+                t_start + t_offset - recording_start_offset,
                 1,
                 functools.partial(self._process_and_ingest, topic, payload),
             )
 
-        done = True
-        thread.join()
+        done.set()
+        sched_thread.join()
 
     def _start_latency_marker_generator(self):
         if "latency_marker_interval" in self.config:

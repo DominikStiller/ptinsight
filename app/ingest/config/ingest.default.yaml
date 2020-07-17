@@ -23,6 +23,8 @@ sources:
       bucket: mqtt-recordings
       key: mqtt.hsl.fi/2020-06-02T10-31-46.rec
       latency_marker_interval: 1000
+      volume_scaling_factor: 1
+      volume_scaling_offset_mb: 1000
     processor:
       type: hsl-realtime
       config:
