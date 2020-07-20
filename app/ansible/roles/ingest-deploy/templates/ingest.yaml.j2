@@ -8,6 +8,10 @@ producer:
   bootstrap_servers:
     {{ kafka_servers | to_nice_yaml | indent(4) }}
 
+h3:
+  resolution: 9
+  max_k: 10000
+
 sources:
   # - type: mqtt
   #   config:
@@ -23,12 +27,10 @@ sources:
       bucket: mqtt-recordings
       key: mqtt.hsl.fi/2020-06-02T10-31-46.rec
       latency_marker_interval: 1000
-      volume_scaling_factor: 1
-      volume_scaling_offset_mb: 1000
+      volume_scaling_factor: 4
+      volume_scaling_offset_mb: 5000
     processor:
       type: hsl-realtime
       config:
-        h3_resolution: 9
-        h3_max_k: 10000
         vehicle_types: bus,tram,train
         event_types: ars,dep,vp

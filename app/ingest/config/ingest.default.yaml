@@ -8,6 +8,11 @@ producer:
   bootstrap_servers:
     - kafka-public-ip:9093
 
+# This is enough for multiple hundred million generations
+h3:
+  resolution: 9
+  max_k: 10000
+
 sources:
   - type: mqtt
     config:
@@ -28,8 +33,5 @@ sources:
     processor:
       type: hsl-realtime
       config:
-        # This is enough for multiple hundred million generations
-        h3_resolution: 9
-        h3_max_k: 10000
         vehicle_types: bus,tram,train
         event_types: ars,dep

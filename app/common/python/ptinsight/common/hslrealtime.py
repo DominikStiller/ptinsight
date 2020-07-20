@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from random import randint
+from random import randint, uniform
 from typing import List, Tuple, Optional
 
 import h3.api.basic_int as h3
@@ -64,6 +64,22 @@ class HSLRealtimeParser:
         event.vehicle.number = int(payload["veh"])
 
         return event_type, event_timestamp, event
+
+    def adjust_payload(
+        self,
+        i: int,
+        event: Message,
+        event_timestamp: datetime,
+        latest_timestamp: datetime,
+    ) -> Tuple[datetime, Message]:
+        if abs(event_timestamp - latest_timestamp) > timedelta(seconds=1):
+            # Set event timestamp to within 1 seconds of latest known timestamp
+            event_timestamp = latest_timestamp + timedelta(seconds=uniform(-1, 1))
+        # There are 21 operators with numbers between 3 and 90
+        # https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/#operators
+        event.vehicle.operator += i * 100
+
+        return event_timestamp, event
 
 
 class HSLRealtimeLatencyMarkers:

@@ -2,8 +2,10 @@ from __future__ import annotations
 
 import abc
 import functools
+from random import randint
+
 import itertools
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Tuple, Optional, List
 
 import paho.mqtt.client as mqtt
@@ -25,7 +27,7 @@ class Processor(abc.ABC):
 
     @abc.abstractmethod
     def process(
-        self, source: str, payload: dict
+        self, source: str, payload: dict, i: int = 0
     ) -> Optional[Tuple[str, datetime, Message]]:
         """
         Filters and transforms message from the raw format and the internal event format
@@ -33,6 +35,7 @@ class Processor(abc.ABC):
         Args:
             source: The source of the message, e.g., an MQTT topic
             payload: The payload that contains the event data
+            i: The ascending number of the scheduler in case of volume scaling
 
         Returns:
             A tuple of the Kafka topic, the event time and the protobuf message, or None if the message should be dismissed
@@ -67,8 +70,8 @@ class HSLRealtimeProcessor(MQTTProcessor):
 
         # Use "Point Nemo" as latency marker origin since we can assume no real events come from there
         origin = (-48.875, -123.393)
-        h3_resolution = int(config["h3_resolution"])
-        h3_max_k = int(config["h3_max_k"])
+        h3_resolution = int(config["h3"]["resolution"])
+        h3_max_k = int(config["h3"]["max_k"])
         self._latency_markers = HSLRealtimeLatencyMarkers(
             origin, h3_resolution, h3_max_k
         )
@@ -96,7 +99,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
                 return vehicle
 
     def process(
-        self, source: str, payload: dict
+        self, source: str, payload: dict, i: int = 0
     ) -> Optional[Tuple[str, datetime, Message]]:
         vehicle_type = self._get_vehicle_type(source)
         if not vehicle_type:
@@ -105,8 +108,18 @@ class HSLRealtimeProcessor(MQTTProcessor):
         if parsed := self._parser.parse(vehicle_type, payload):
             event_type, event_timestamp, event = parsed
 
-            if not self._latest_timestamp or event_timestamp > self._latest_timestamp:
-                self._latest_timestamp = event_timestamp
+            if i == 0:
+                # Only use primary recording as timestamp source
+                if (
+                    not self._latest_timestamp
+                    or event_timestamp > self._latest_timestamp
+                ):
+                    self._latest_timestamp = event_timestamp
+            else:
+                # Adjust non-primary payload to prevent collisions when scaling volume
+                event_timestamp, event = self._parser.adjust_payload(
+                    i, event, event_timestamp, self._latest_timestamp
+                )
 
             target_topic = (
                 "ingress."

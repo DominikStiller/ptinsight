@@ -11,7 +11,7 @@ from concurrent.futures.thread import ThreadPoolExecutor
 
 import time
 from datetime import datetime
-from typing import final, Literal
+from typing import final, Literal, Union
 
 import boto3
 import paho.mqtt.client as mqtt
@@ -112,7 +112,7 @@ class MQTTRecordingIngestor(Ingestor):
         self.file = boto3.resource("s3").Object(self.bucket, self.key)
 
     def start(self):
-        header_body, header_lines = self._open_file()
+        header_body, header_lines = self._open_recording()
         original_broker = next(header_lines)[8:]
         original_topics = next(header_lines)[8:]
         original_t_start = datetime.fromisoformat(next(header_lines)[12:]).replace(
@@ -127,7 +127,7 @@ class MQTTRecordingIngestor(Ingestor):
         self._start_latency_marker_generator()
         self._start_schedulers()
 
-    def _open_file(self, range_start: int = 0):
+    def _open_recording(self, range_start: int = 0):
         body = self.file.get(Range=f"bytes={range_start}-")["Body"]
         return body, map(lambda l: l.decode(), body.iter_lines())
 
@@ -151,19 +151,17 @@ class MQTTRecordingIngestor(Ingestor):
         )
 
         with ThreadPoolExecutor(scaling_factor) as executor:
-            threads = []
-
-            for i in range(scaling_factor):
-                threads.append(
+            wait(
+                [
                     executor.submit(
-                        self._start_single_scheduler, i * scaling_offset * 1024 ** 2
+                        self._start_single_scheduler, i, i * scaling_offset * 1024 ** 2
                     )
-                )
+                    for i in range(scaling_factor)
+                ]
+            )
 
-            wait(threads)
-
-    def _start_single_scheduler(self, offset: int):
-        _, lines = self._open_file(offset)
+    def _start_single_scheduler(self, i: int, offset: int):
+        _, lines = self._open_recording(offset)
 
         # Skip header and partial lines caused by offset
         for _ in range(4):
@@ -195,21 +193,26 @@ class MQTTRecordingIngestor(Ingestor):
 
             t_offset, topic, _, _, payload = message_regex.match(line).groups()
             t_offset = float(t_offset)
-            payload = base64.b64decode(payload)
+            payload = json.loads(base64.b64decode(payload))
 
             if recording_start_offset is None:
                 recording_start_offset = t_offset
 
-            # TODO adjust timestamps and vehicles
-
             scheduler.enterabs(
                 t_start + t_offset - recording_start_offset,
                 1,
-                functools.partial(self._process_and_ingest, topic, payload),
+                functools.partial(self._process_and_ingest, topic, payload, i),
             )
 
         done.set()
         sched_thread.join()
+
+    def _process_and_ingest(self, topic: str, payload: dict, i: int):
+        if processed := self.processor.process(topic, payload, i):
+            target_topic, event_timestamp, details = processed
+            self._ingest(
+                target_topic, _create_event(event_timestamp, details),
+            )
 
     def _start_latency_marker_generator(self):
         if "latency_marker_interval" in self.config:
@@ -228,13 +231,6 @@ class MQTTRecordingIngestor(Ingestor):
     def _emit_latency_markers(self):
         markers = self.processor.generate_latency_markers()
         for target_topic, event_timestamp, details in markers:
-            self._ingest(
-                target_topic, _create_event(event_timestamp, details),
-            )
-
-    def _process_and_ingest(self, topic: str, payload: str):
-        if processed := self.processor.process(topic, json.loads(payload)):
-            target_topic, event_timestamp, details = processed
             self._ingest(
                 target_topic, _create_event(event_timestamp, details),
             )

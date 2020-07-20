@@ -57,7 +57,7 @@ for source in config["sources"]:
         continue
 
     processor_type = source["processor"]["type"]
-    processor_config = source["processor"]["config"]
+    processor_config = {**source["processor"]["config"], "h3": {**config["h3"]}}
     processor = processors[processor_type](processor_config)
 
     ingestors.append(ingestor_class(ingestor_config, processor))
