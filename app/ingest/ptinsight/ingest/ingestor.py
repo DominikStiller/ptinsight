@@ -1,12 +1,13 @@
 import abc
 import base64
+import bz2
 import functools
 import json
 import logging
 import re
 import sched
 import threading
-from concurrent.futures import wait, ProcessPoolExecutor
+from concurrent.futures import wait
 from concurrent.futures.thread import ThreadPoolExecutor
 
 import time
@@ -110,6 +111,7 @@ class MQTTRecordingIngestor(Ingestor):
         self.processor = processor
 
         self.file = boto3.resource("s3").Object(self.bucket, self.key)
+        self.skip_offset_barrier = None
 
     def start(self):
         header_body, header_lines = self._open_recording()
@@ -127,9 +129,24 @@ class MQTTRecordingIngestor(Ingestor):
         self._start_latency_marker_generator()
         self._start_schedulers()
 
-    def _open_recording(self, range_start: int = 0):
-        body = self.file.get(Range=f"bytes={range_start}-")["Body"]
-        return body, map(lambda l: l.decode(), body.iter_lines())
+    def _open_recording(self):
+        body = self.file.get()["Body"]
+        if self.key.endswith(".bz2"):
+            return body, self._bz2_iter_lines(body)
+        else:
+            return body, map(lambda l: l.decode(), body.iter_lines())
+
+    def _bz2_iter_lines(self, file):
+        try:
+            bz2_file = bz2.open(file)
+            while line := bz2_file.readline():
+                line = line.decode()
+                if line.endswith("\r\n"):
+                    yield line[:-2]
+                elif line.endswith("\n") or line.endswith("\r"):
+                    yield line[:-1]
+        except Exception as e:
+            print(e)
 
     def _start_schedulers(self):
         if "volume_scaling_factor" in self.config:
@@ -139,33 +156,38 @@ class MQTTRecordingIngestor(Ingestor):
         else:
             scaling_factor = 1
 
-        if "volume_scaling_offset_mb" in self.config:
-            scaling_offset = int(self.config["volume_scaling_offset_mb"])
+        if "volume_scaling_offset_lines" in self.config:
+            scaling_offset = int(self.config["volume_scaling_offset_lines"])
             if scaling_offset < 0:
                 raise ValueError("Volume scaling offset must be a positive integer")
         else:
             scaling_offset = 0
 
         logger.info(
-            f"Scaling factor: {scaling_factor}   Scaling offset: {scaling_offset} MB"
+            f"Scaling factor: {scaling_factor}   Scaling offset: {scaling_offset} lines"
         )
 
+        self.skip_offset_barrier = threading.Barrier(scaling_factor)
         with ThreadPoolExecutor(scaling_factor) as executor:
             wait(
                 [
-                    executor.submit(
-                        self._start_single_scheduler, i, i * scaling_offset * 1024 ** 2
-                    )
+                    executor.submit(self._start_single_scheduler, i, i * scaling_offset)
                     for i in range(scaling_factor)
                 ]
             )
 
     def _start_single_scheduler(self, i: int, offset: int):
-        _, lines = self._open_recording(offset)
+        _, lines = self._open_recording()
 
         # Skip header and partial lines caused by offset
         for _ in range(4):
             next(lines)
+
+        for _ in range(offset):
+            next(lines)
+
+        logger.info(f"Scheduler {i+1} of {self.skip_offset_barrier.parties} ready")
+        self.skip_offset_barrier.wait()
 
         # Scheduler is used to replay messages with original relative timing
         scheduler = sched.scheduler(time.perf_counter, time.sleep)
@@ -203,6 +225,7 @@ class MQTTRecordingIngestor(Ingestor):
                 1,
                 functools.partial(self._process_and_ingest, topic, payload, i),
             )
+            # break
 
         done.set()
         sched_thread.join()

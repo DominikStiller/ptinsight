@@ -8,7 +8,7 @@
 - name: install common packages
   become: true
   package:
-    name: htop, wget, zip, unzip, tmux, chrony, tree, nc
+    name: htop, wget, zip, unzip, lbzip2, tmux, chrony, tree, nc
     state: present
 
 - name: add Amazon Time Sync server

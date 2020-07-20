@@ -63,7 +63,7 @@ make apply
 make deploy
 ```
 
-4. Start recording and upload to S3 afterwards
+4. Start recording and upload compressed to S3 afterwards
 ```
 ./ssh.sh
 cd deploy
