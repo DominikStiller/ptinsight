@@ -4,10 +4,11 @@
   service:
     name: flink-jobmanager
     state: restarted
-  when: is_job_manager
+  when: is_master
 
 - name: restart the Flink task manager service
   become: true
   service:
     name: flink-taskmanager
     state: restarted
+  when: is_worker

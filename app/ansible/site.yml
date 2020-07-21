@@ -51,25 +51,38 @@
     - role: kafka-deploy
       tags: [deploy, deploy-kafka]
 
-- name: set up processing cluster
-  hosts: processing
+- name: set up Flink master cluster
+  hosts: flink_master
   vars:
     - source_path: "{{ playbook_dir }}/../processing"
     - deploy_path: /opt/ptinsight/processing
     - deploy_user: flink
     - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
     - build_processing: true
+    - is_master: true
   pre_tasks:
-    - name: set job manager flag
+    - name: set first job manager flag
       tags: setup, setup-processing, deploy, deploy-processing
       set_fact:
-        is_first_job_manager: "{{ inventory_hostname == groups['processing'][0] }}"
+        is_first_master: "{{ inventory_hostname == groups['flink_master'][0] }}"
   roles:
     - role: ../ansible/roles/flink
       tags: [setup, setup-processing]
     - role: processing-deploy
       tags: [deploy, deploy-processing]
-      when: is_first_job_manager
+      when: is_first_master
+
+- name: set up Flink worker cluster
+  hosts: flink_worker
+  vars:
+    - source_path: "{{ playbook_dir }}/../processing"
+    - deploy_path: /opt/ptinsight/processing
+    - deploy_user: flink
+    - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
+    - is_worker: true
+  roles:
+    - role: ../ansible/roles/flink
+      tags: [setup, setup-processing]
 
 - name: set up latency tracker cluster
   hosts: latencytracker

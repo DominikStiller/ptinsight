@@ -86,7 +86,7 @@
     name: flink-jobmanager
     state: started
     enabled: yes
-  when: is_job_manager
+  when: is_master
 
 - name: start the Flink task manager service
   become: true
@@ -94,3 +94,4 @@
     name: flink-taskmanager
     state: started
     enabled: yes
+  when: is_worker

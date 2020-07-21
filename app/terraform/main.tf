@@ -149,39 +149,38 @@ resource "aws_security_group" "kafka" {
 }
 # ---- << Kafka -----------------------------
 
-# ---- >> Processing ------------------------
-resource "aws_instance" "processing" {
-    count = 3
+# ---- >> Flink Master ----------------------
+resource "aws_instance" "flink_master" {
+    count = 1
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.xlarge"
+    instance_type          = "t3.small"
     key_name               = aws_key_pair.deploy.key_name
-    iam_instance_profile   = aws_iam_instance_profile.processing.name
+    iam_instance_profile   = aws_iam_instance_profile.flink_master.name
 
-    vpc_security_group_ids = [aws_security_group.processing.id]
+    vpc_security_group_ids = [aws_security_group.flink_master.id]
     subnet_id              = aws_subnet.main.id
 
     root_block_device {
         delete_on_termination = true
-        volume_size = 16
     }
 
     tags = {
-        Name = "${local.name_prefix}processing-${count.index}"
-        AnsibleGroups = "processing"
+        Name = "${local.name_prefix}flink-master-${count.index}"
+        AnsibleGroups = "flink_master"
         AnsibleVar_ansible_user = "centos"
         AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }
 }
 
-resource "aws_iam_instance_profile" "processing" {
-    name = "${local.name_prefix}processing"
-    role = aws_iam_role.processing.name
+resource "aws_iam_instance_profile" "flink_master" {
+    name = "${local.name_prefix}flink_master"
+    role = aws_iam_role.flink_master.name
 }
 
-resource "aws_iam_role" "processing" {
+resource "aws_iam_role" "flink_master" {
 
-    name = "${local.name_prefix}processing"
+    name = "${local.name_prefix}flink_master"
 
     assume_role_policy = <<EOF
 {
@@ -199,9 +198,9 @@ resource "aws_iam_role" "processing" {
 EOF
 }
 
-resource "aws_iam_role_policy" "processing_s3_read_write_flink" {
+resource "aws_iam_role_policy" "flink_master_s3" {
 
-    role = aws_iam_role.processing.name
+    role = aws_iam_role.flink_master.name
 
     policy = <<EOF
 {
@@ -222,9 +221,9 @@ resource "aws_iam_role_policy" "processing_s3_read_write_flink" {
 EOF
 }
 
-resource "aws_security_group" "processing" {
+resource "aws_security_group" "flink_master" {
 
-    name   = "${local.name_prefix}processing"
+    name   = "${local.name_prefix}flink_master"
     vpc_id = aws_vpc.main.id
 
     ingress {
@@ -258,7 +257,110 @@ resource "aws_security_group" "processing" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
-# ---- << Processing ------------------------
+# ---- << Flink Master ----------------------
+
+# ---- >> Flink Worker ----------------------
+resource "aws_instance" "flink_worker" {
+    count = 6
+
+    ami                    = "ami-04cf43aca3e6f3de3"
+    instance_type          = "t3.large"
+    key_name               = aws_key_pair.deploy.key_name
+    iam_instance_profile   = aws_iam_instance_profile.flink_worker.name
+
+    vpc_security_group_ids = [aws_security_group.flink_worker.id]
+    subnet_id              = aws_subnet.main.id
+
+    root_block_device {
+        delete_on_termination = true
+        volume_size = 8
+    }
+
+    tags = {
+        Name = "${local.name_prefix}flink-worker-${count.index}"
+        AnsibleGroups = "flink_worker"
+        AnsibleVar_ansible_user = "centos"
+        AnsibleVar_ansible_ssh_private_key = var.ssh_key
+    }
+}
+
+resource "aws_iam_instance_profile" "flink_worker" {
+    name = "${local.name_prefix}flink_worker"
+    role = aws_iam_role.flink_worker.name
+}
+
+resource "aws_iam_role" "flink_worker" {
+
+    name = "${local.name_prefix}flink_worker"
+
+    assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "flink_worker_s3" {
+
+    role = aws_iam_role.flink_worker.name
+
+    policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "${aws_s3_bucket.flink.arn}"
+        },
+        {
+            "Effect": "Allow",
+            "Action": "s3:*",
+            "Resource": "${aws_s3_bucket.flink.arn}/*"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_security_group" "flink_worker" {
+
+    name   = "${local.name_prefix}flink_worker"
+    vpc_id = aws_vpc.main.id
+
+    ingress {
+        description = "All from VPC"
+        from_port   = 0
+        to_port     = 0
+        protocol    = -1
+        cidr_blocks = [aws_vpc.main.cidr_block]
+    }
+
+    ingress {
+        description = "SSH from trusted CIDRs"
+        from_port   = 22
+        to_port     = 22
+        protocol    = "tcp"
+        cidr_blocks = var.trusted_cidr
+    }
+
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = -1
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+# ---- << Flink Worker ----------------------
 
 # ---- >> Ingest ----------------------------
 resource "aws_instance" "ingest" {
@@ -553,8 +655,11 @@ resource "aws_s3_bucket" "flink" {
 output "kafka_host" {
     value = aws_instance.kafka.*.public_ip
 }
-output "processing_host" {
-    value = aws_instance.processing.*.public_ip
+output "flink_master_host" {
+    value = aws_instance.flink_master.*.public_ip
+}
+output "flink_worker_host" {
+    value = aws_instance.flink_worker.*.public_ip
 }
 output "ingest_host" {
     value = aws_instance.ingest.public_ip

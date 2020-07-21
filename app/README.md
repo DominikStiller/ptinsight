@@ -25,12 +25,13 @@ For general documentation, see `docs`. For component-specific documentation, see
 
 
 ## Directory Structure
+* `analysis`: Jupyter notebooks for latency and data analysis
 * `ansible`: Ansible playbook and roles to setup and deploy the PT Insight system
 * `common`: Common libraries shared between components, including protobuf definitions
 * `docs`: Detailed docs for system-wide components
 * `ingest`: Component for ingesting external events into the PT Insight system
 * `latencytracker`: Component for tracking end-to-end latency of the PT Insight system
-* `processing`: Component for detecting complex events
+* `processing`: Component for performing streaming analytics (Flink jobs)
 * `terraform`: Terraform configuration files for cloud infrastructure setup
 * `ui`: Component for visualizing events
 
@@ -91,9 +92,9 @@ Navigate to http://ui-host:8080/
 
 6. SSH into the servers
 ```
-./ssh.sh processing 0  # Flink + Kafka + Zookeeper
-./ssh.sh processing 1
-./ssh.sh processing 2
+./ssh.sh kafka [0-2]
+./ssh.sh flink_master
+./ssh.sh flink_worker [0-5]
 ./ssh.sh ingest
 ./ssh.sh ui
 ./ssh.sh latencytracker
@@ -106,6 +107,3 @@ make destroy
 
 ## Links
 * List of Helsinki APIs: https://www.notion.so/faa753c34e1f469d92750c13f7f9d0d8?v=ba0f9f25b9a34d31afba6d05db2ffa96
-
-## Todo
-* Use Prometheus for metrics monitoring
