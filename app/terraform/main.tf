@@ -61,16 +61,16 @@ resource "aws_key_pair" "deploy" {
     public_key = file("${var.ssh_key}.pub")
 }
 
-# ---- >> Core (Processing + Kafka) ---------------
-resource "aws_instance" "core" {
+# ---- >> Kafka ------------------------------
+resource "aws_instance" "kafka" {
     count = 3
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.xlarge"
+    instance_type          = "t3.small"
     key_name               = aws_key_pair.deploy.key_name
-    iam_instance_profile   = aws_iam_instance_profile.core.name
+    iam_instance_profile   = aws_iam_instance_profile.kafka.name
 
-    vpc_security_group_ids = [aws_security_group.core.id]
+    vpc_security_group_ids = [aws_security_group.kafka.id]
     subnet_id              = aws_subnet.main.id
 
     root_block_device {
@@ -79,21 +79,21 @@ resource "aws_instance" "core" {
     }
 
     tags = {
-        Name = "${local.name_prefix}core-${count.index}"
-        AnsibleGroups = "processing,kafka,zookeeper"
+        Name = "${local.name_prefix}kafka-${count.index}"
+        AnsibleGroups = "kafka,zookeeper"
         AnsibleVar_ansible_user = "centos"
         AnsibleVar_ansible_ssh_private_key = var.ssh_key
     }
 }
 
-resource "aws_iam_instance_profile" "core" {
-    name = "${local.name_prefix}core"
-    role = aws_iam_role.core.name
+resource "aws_iam_instance_profile" "kafka" {
+    name = "${local.name_prefix}kafka"
+    role = aws_iam_role.kafka.name
 }
 
-resource "aws_iam_role" "core" {
+resource "aws_iam_role" "kafka" {
 
-    name = "${local.name_prefix}core"
+    name = "${local.name_prefix}kafka"
 
     assume_role_policy = <<EOF
 {
@@ -111,9 +111,97 @@ resource "aws_iam_role" "core" {
 EOF
 }
 
-resource "aws_iam_role_policy" "core_s3_read_write_flink" {
+resource "aws_security_group" "kafka" {
 
-    role = aws_iam_role.core.name
+    name   = "${local.name_prefix}kafka"
+    vpc_id = aws_vpc.main.id
+
+    ingress {
+        description = "All from VPC"
+        from_port   = 0
+        to_port     = 0
+        protocol    = -1
+        cidr_blocks = [aws_vpc.main.cidr_block]
+    }
+
+    ingress {
+        description = "SSH from trusted CIDRs"
+        from_port   = 22
+        to_port     = 22
+        protocol    = "tcp"
+        cidr_blocks = var.trusted_cidr
+    }
+
+    ingress {
+        description = "Kafka from trusted CIDRs"
+        from_port   = 9093
+        to_port     = 9093
+        protocol    = "tcp"
+        cidr_blocks = var.trusted_cidr
+    }
+
+    egress {
+        from_port   = 0
+        to_port     = 0
+        protocol    = -1
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+}
+# ---- << Kafka -----------------------------
+
+# ---- >> Processing ------------------------
+resource "aws_instance" "processing" {
+    count = 3
+
+    ami                    = "ami-04cf43aca3e6f3de3"
+    instance_type          = "t3.xlarge"
+    key_name               = aws_key_pair.deploy.key_name
+    iam_instance_profile   = aws_iam_instance_profile.processing.name
+
+    vpc_security_group_ids = [aws_security_group.processing.id]
+    subnet_id              = aws_subnet.main.id
+
+    root_block_device {
+        delete_on_termination = true
+        volume_size = 16
+    }
+
+    tags = {
+        Name = "${local.name_prefix}processing-${count.index}"
+        AnsibleGroups = "processing"
+        AnsibleVar_ansible_user = "centos"
+        AnsibleVar_ansible_ssh_private_key = var.ssh_key
+    }
+}
+
+resource "aws_iam_instance_profile" "processing" {
+    name = "${local.name_prefix}processing"
+    role = aws_iam_role.processing.name
+}
+
+resource "aws_iam_role" "processing" {
+
+    name = "${local.name_prefix}processing"
+
+    assume_role_policy = <<EOF
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Action": "sts:AssumeRole",
+            "Principal": {
+                "Service": "ec2.amazonaws.com"
+            },
+            "Effect": "Allow"
+        }
+    ]
+}
+EOF
+}
+
+resource "aws_iam_role_policy" "processing_s3_read_write_flink" {
+
+    role = aws_iam_role.processing.name
 
     policy = <<EOF
 {
@@ -134,9 +222,9 @@ resource "aws_iam_role_policy" "core_s3_read_write_flink" {
 EOF
 }
 
-resource "aws_security_group" "core" {
+resource "aws_security_group" "processing" {
 
-    name   = "${local.name_prefix}core"
+    name   = "${local.name_prefix}processing"
     vpc_id = aws_vpc.main.id
 
     ingress {
@@ -163,14 +251,6 @@ resource "aws_security_group" "core" {
         cidr_blocks = var.trusted_cidr
     }
 
-    ingress {
-        description = "Kafka from trusted CIDRs"
-        from_port   = 9093
-        to_port     = 9093
-        protocol    = "tcp"
-        cidr_blocks = var.trusted_cidr
-    }
-
     egress {
         from_port   = 0
         to_port     = 0
@@ -178,7 +258,7 @@ resource "aws_security_group" "core" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
-# ---- << Core ------------------------------
+# ---- << Processing ------------------------
 
 # ---- >> Ingest ----------------------------
 resource "aws_instance" "ingest" {
@@ -470,8 +550,11 @@ resource "aws_s3_bucket" "flink" {
 #      Output Values
 # --------------------------------------------
 
-output "core_host" {
-    value = aws_instance.core.*.public_ip
+output "kafka_host" {
+    value = aws_instance.kafka.*.public_ip
+}
+output "processing_host" {
+    value = aws_instance.processing.*.public_ip
 }
 output "ingest_host" {
     value = aws_instance.ingest.public_ip

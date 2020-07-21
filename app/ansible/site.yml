@@ -58,6 +58,7 @@
     - deploy_path: /opt/ptinsight/processing
     - deploy_user: flink
     - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
+    - build_processing: true
   pre_tasks:
     - name: set job manager flag
       tags: setup, setup-processing, deploy, deploy-processing
@@ -70,17 +71,17 @@
       tags: [deploy, deploy-processing]
       when: is_first_job_manager
 
-- name: set up Ingest cluster
-  hosts: ingest
+- name: set up latency tracker cluster
+  hosts: latencytracker
   vars:
-    - source_path: "{{ playbook_dir }}/../ingest"
+    - source_path: "{{ playbook_dir }}/../latencytracker"
     - deploy_path: /opt/ptinsight
     - deploy_user: ptinsight
   roles:
     - role: ../ansible/roles/python
-      tags: [setup, setup-ingest]
-    - role: ingest-deploy
-      tags: [deploy, deploy-ingest]
+      tags: [setup, setup-latencytracker]
+    - role: latencytracker-deploy
+      tags: [deploy, deploy-latencytracker]
 
 - name: set up UI cluster
   hosts: ui
@@ -94,14 +95,14 @@
     - role: ui-deploy
       tags: [deploy, deploy-ui]
 
-- name: set up latency tracker cluster
-  hosts: latencytracker
+- name: set up Ingest cluster
+  hosts: ingest
   vars:
-    - source_path: "{{ playbook_dir }}/../latencytracker"
+    - source_path: "{{ playbook_dir }}/../ingest"
     - deploy_path: /opt/ptinsight
     - deploy_user: ptinsight
   roles:
     - role: ../ansible/roles/python
-      tags: [setup, setup-latencytracker]
-    - role: latencytracker-deploy
-      tags: [deploy, deploy-latencytracker]
+      tags: [setup, setup-ingest]
+    - role: ingest-deploy
+      tags: [deploy, deploy-ingest]

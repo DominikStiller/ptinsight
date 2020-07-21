@@ -116,6 +116,8 @@ class HSLRealtimeProcessor(MQTTProcessor):
                 ):
                     self._latest_timestamp = event_timestamp
             else:
+                if not self._latest_timestamp:
+                    return
                 # Adjust non-primary payload to prevent collisions when scaling volume
                 event_timestamp, event = self._parser.adjust_payload(
                     i, event, event_timestamp, self._latest_timestamp

@@ -8,6 +8,7 @@
       - shadowJar
     chdir: "{{ source_path }}"
   delegate_to: localhost
+  when: build_processing
 
 - name: create deploy directory
   become: true

@@ -59,7 +59,7 @@ class Ingestor(abc.ABC):
 
     @final
     def _ingest(self, topic: str, event: Event):
-        logger.info(f"Ingesting event to {topic}")
+        logger.debug(f"Ingesting event to {topic}")
 
         value = serialize(event, format=self._protobuf_format)
         if isinstance(value, str):
@@ -137,16 +137,13 @@ class MQTTRecordingIngestor(Ingestor):
             return body, map(lambda l: l.decode(), body.iter_lines())
 
     def _bz2_iter_lines(self, file):
-        try:
-            bz2_file = bz2.open(file)
-            while line := bz2_file.readline():
-                line = line.decode()
-                if line.endswith("\r\n"):
-                    yield line[:-2]
-                elif line.endswith("\n") or line.endswith("\r"):
-                    yield line[:-1]
-        except Exception as e:
-            print(e)
+        bz2_file = bz2.open(file)
+        while line := bz2_file.readline():
+            line = line.decode()
+            if line.endswith("\r\n"):
+                yield line[:-2]
+            elif line.endswith("\n") or line.endswith("\r"):
+                yield line[:-1]
 
     def _start_schedulers(self):
         if "volume_scaling_factor" in self.config:
@@ -225,7 +222,6 @@ class MQTTRecordingIngestor(Ingestor):
                 1,
                 functools.partial(self._process_and_ingest, topic, payload, i),
             )
-            # break
 
         done.set()
         sched_thread.join()

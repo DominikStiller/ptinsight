@@ -1,6 +1,6 @@
 ---
 logging:
-  level: warning
+  level: info
 
 producer:
   type: kafka
@@ -27,7 +27,7 @@ sources:
       bucket: mqtt-recordings
       key: mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2
       latency_marker_interval: 1000
-      volume_scaling_factor: 4
+      volume_scaling_factor: 2
       volume_scaling_offset_lines: 100000
     processor:
       type: hsl-realtime
