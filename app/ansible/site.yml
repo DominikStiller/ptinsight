@@ -58,8 +58,8 @@
     - deploy_path: /opt/ptinsight/processing
     - deploy_user: flink
     - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
-    - build_processing: true
     - is_master: true
+    - build_processing: true
   pre_tasks:
     - name: set first job manager flag
       tags: setup, setup-processing, deploy, deploy-processing

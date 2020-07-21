@@ -20,6 +20,13 @@ def plot_init():
     )
 
 
+def plot_subplot(n: int, cols: int = 1):
+    fig, axs = plt.subplots(n, cols, sharex="col", figsize=[22, 6 * n])
+    if n * cols == 1:
+        axs = [axs]
+    return fig, axs
+
+
 def plot_format(fig: Figure = None, space_factor: float = 1):
     """Format the plot using the common style"""
     if fig is None:

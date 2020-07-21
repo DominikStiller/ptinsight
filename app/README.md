@@ -94,7 +94,7 @@ Navigate to http://ui-host:8080/
 ```
 ./ssh.sh kafka [0-2]
 ./ssh.sh flink_master
-./ssh.sh flink_worker [0-5]
+./ssh.sh flink_worker [0-3]
 ./ssh.sh ingest
 ./ssh.sh ui
 ./ssh.sh latencytracker
