@@ -1,6 +1,6 @@
 # Latency Recording
 
-Latencies can be recorded using the latency tracker as described [here](Latency Tracker.md). Multiple runs are necessary to test different configurations and increase the sample size.
+Latencies can be recorded using the latency tracker which is described [here](Latency%20Tracking.md). Multiple runs are necessary to test different configurations and increase the sample size.
 This document describes the recording process.
 
 1. Stop the ingest and latency tracker components.
