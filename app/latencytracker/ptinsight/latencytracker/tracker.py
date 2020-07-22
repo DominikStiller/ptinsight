@@ -67,6 +67,6 @@ class LatencyTracker:
             # Ensure that each marker is observed only once for each job
             # Otherwise they would appear with increasing latency when being contained in multiple sliding windows
             if not job in marker.seen_jobs:
-                logger.info(f"Recording egress marker for {job}")
+                logger.debug(f"Recording egress marker for {job}")
                 marker.mark_egress(event, job)
                 self.recorder.write(marker)

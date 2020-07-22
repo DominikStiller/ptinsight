@@ -3,7 +3,7 @@ logging:
   level: warning
 
 kafka:
-  protobuf_format: json
+  protobuf_format: binary
   bootstrap_servers:
     {{ kafka_servers | to_nice_yaml | indent(4) }}
 

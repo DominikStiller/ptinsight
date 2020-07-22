@@ -84,7 +84,7 @@ const emergencyStopLayer = new GeopointLayer<{
       Maximum deceleration: ${data.max_dec.toFixed(1)} m/s<sup>2</sup>`,
   (data) => -data.max_dec
 ).addToLegend(legend);
-subscribe("egress.emergency-stop-table", (msg: any) => {
+subscribe("egress.emergency-stop-streaming", (msg: any) => {
   emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);
 });
 

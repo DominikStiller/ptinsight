@@ -39,7 +39,7 @@ class KafkaToSocketioBridge:
                     "egress.delay-statistics",
                     "egress.flow-direction",
                     "egress.final-stop-count",
-                    "egress.emergency-stop-table",
+                    "egress.emergency-stop-streaming",
                 ]
             )
             for message in self.consumer:
@@ -75,7 +75,7 @@ class KafkaToSocketioBridge:
                 "geocell": h3.h3_to_string(details.geocell),
                 "count": details.count,
             }
-        elif topic == "egress.emergency-stop-table":
+        elif topic == "egress.emergency-stop-streaming":
             data = {
                 "veh_type": VehicleType.Name(details.vehicle_type).lower(),
                 "lat": details.latitude,

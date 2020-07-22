@@ -5,6 +5,12 @@
     name: epel-release
     state: present
 
+- name: update certificates
+  become: true
+  package:
+    name: ca-certificates
+    state: latest
+
 - name: install common packages
   become: true
   package:

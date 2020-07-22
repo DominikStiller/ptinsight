@@ -13,6 +13,7 @@ import org.apache.flink.cep.functions.PatternProcessFunction;
 import org.apache.flink.cep.nfa.aftermatch.AfterMatchSkipStrategy;
 import org.apache.flink.cep.pattern.Pattern;
 import org.apache.flink.cep.pattern.conditions.SimpleCondition;
+import org.apache.flink.streaming.api.functions.sink.DiscardingSink;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.util.Collector;
 import org.slf4j.Logger;
@@ -90,7 +91,7 @@ public class EmergencyStopDetectionStreamingJob extends Job {
               .setMaxDeceleration((float) maxDeceleration.orElse(0))
               .setVehicleType(stopped.getVehicle().getType())
               .build();
-      out.collect(output(details, Instant.ofEpochMilli(ctx.timestamp())));
+      out.collect(output(details, ctx.timestamp()));
     }
   }
 }

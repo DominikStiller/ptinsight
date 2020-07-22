@@ -92,7 +92,11 @@ public abstract class Job {
   }
 
   protected static Event output(Message details, TimeWindow window) {
-    return output(details, Instant.ofEpochMilli(window.getEnd()));
+    return output(details, window.getEnd());
+  }
+
+  protected static Event output(Message details, long eventTimestampMillis) {
+    return output(details, Instant.ofEpochMilli(eventTimestampMillis));
   }
 
   protected static Event output(Message details, Instant eventTimestamp) {

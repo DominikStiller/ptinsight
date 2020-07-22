@@ -21,10 +21,12 @@ def serialize(event: Event, format="binary") -> Union[str, bytes]:
         raise Exception("Unknown protobuf wire format")
 
 
-def deserialize(event: bytes, format="binary") -> Event:
+def deserialize(data: bytes, format="binary") -> Event:
+    event = Event()
     if format == "binary":
-        return Event.ParseFromString(event)
+        event.ParseFromString(data)
     elif format == "json" or format == "json-pretty":
-        return Parse(event, Event())
+        Parse(data, event)
     else:
         raise Exception("Unknown protobuf wire format")
+    return event
