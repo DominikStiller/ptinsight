@@ -21,13 +21,13 @@
 
     - name: download and untar Flink
       unarchive:
-        src: "{{ flink_mirror.json.preferred }}/flink/flink-1.11.0/flink-1.11.0-bin-scala_2.12.tgz"
+        src: "{{ flink_mirror.json.preferred }}/flink/flink-1.11.1/flink-1.11.1-bin-scala_2.12.tgz"
         dest: /opt
         remote_src: yes
 
     - name: add generic Flink symlink
       file:
-        src: /opt/flink-1.11.0
+        src: /opt/flink-1.11.1
         dest: /opt/flink
         state: link
 
@@ -38,8 +38,8 @@
 
     - name: download s3-fs-presto plugin
       get_url:
-        url: https://repo1.maven.org/maven2/org/apache/flink/flink-s3-fs-presto/1.11.0/flink-s3-fs-presto-1.11.0.jar
-        dest: /opt/flink/plugins/s3-fs-presto/flink-s3-fs-presto-1.11.0.jar
+        url: https://repo1.maven.org/maven2/org/apache/flink/flink-s3-fs-presto/1.11.1/flink-s3-fs-presto-1.11.1.jar
+        dest: /opt/flink/plugins/s3-fs-presto/flink-s3-fs-presto-1.11.1.jar
 
     - name: set Flink permissions
       file:
@@ -50,7 +50,7 @@
         group: flink
     
   when: >
-    flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.11.0')
+    flink_version.rc != 0 or not flink_version.stdout is match('Version: 1.11.1')
 
 - name: Copy Flink job manager service file
   become: true

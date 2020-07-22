@@ -24,7 +24,7 @@ mainClassName = 'com.dxc.ptinsight.processing.EntryPoint'
 
 ext {
     javaVersion = '1.11'
-    flinkVersion = '1.11.0'
+    flinkVersion = '1.11.1'
     scalaBinaryVersion = '2.12'
 }
 
