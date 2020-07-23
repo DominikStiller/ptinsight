@@ -43,7 +43,9 @@ const delayStatisticsLayer = new GeocellLayer<{
   (data) => data.p90
 ).addToLegend(legend);
 subscribe("egress.delay-statistics", (msg: any) => {
-  delayStatisticsLayer.updateData(msg.data.geocell, msg);
+  if (msg.data.p90 >= 0) {
+    delayStatisticsLayer.updateData(msg.data.geocell, msg);
+  }
 });
 
 // Flow direction layer

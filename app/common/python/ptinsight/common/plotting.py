@@ -21,13 +21,13 @@ def plot_init():
 
 
 def plot_subplot(n: int = 1, cols: int = 1):
-    fig, axs = plt.subplots(n, cols, sharex="col", figsize=[22, 6 * n])
+    fig, axs = plt.subplots(n, cols, sharex="col", figsize=[22, 6 * n], constrained_layout=True)
     if n * cols == 1:
         axs = [axs]
     return fig, axs
 
 
-def plot_format(fig: Figure = None, space_factor: float = 1):
+def plot_format(fig: Figure = None):
     """Format the plot using the common style"""
     if fig is None:
         fig = plt.gcf()
@@ -38,14 +38,12 @@ def plot_format(fig: Figure = None, space_factor: float = 1):
         ax.grid(b=True, which="major", linewidth=1.0)
         ax.grid(b=True, which="minor", linewidth=0.5, linestyle="-.")
 
-    fig.tight_layout(h_pad=0.4 * space_factor, w_pad=0.4 * space_factor)
-
 
 def plot_save(name: str, format: str = "png"):
     """Save the plot to the plots folder"""
     if format is not None:
         os.makedirs("plots", exist_ok=True)
-        plt.savefig(f"plots/plot_{name}.{format}")
+        plt.savefig(f"plots/plot_{name}.{format}", dpi=300)
 
 
 def add_relative_time(data: DataFrame, col: str):

@@ -8,14 +8,12 @@ from ptinsight.common import Event
 class LatencyMarker:
     def __init__(self):
         self.seen_jobs = []
-        self.event_timestamp = None
         self.ingress_ingestion_timestamp = None
         self.ingress_consumption_timestamp = None
         self.egress_ingestion_timestamp = None
         self.egress_consumption_timestamp = None
 
     def mark_ingress(self, event: Event):
-        self.event_timestamp = event.event_timestamp.ToMilliseconds()
         self.ingress_ingestion_timestamp = event.ingestion_timestamp.ToMilliseconds()
         self.ingress_consumption_timestamp = int(datetime.now().timestamp() * 1000)
 
@@ -27,7 +25,6 @@ class LatencyMarker:
     def as_tuple(self):
         return (
             self.seen_jobs[-1],
-            self.event_timestamp,
             self.ingress_ingestion_timestamp,
             self.ingress_consumption_timestamp,
             self.egress_ingestion_timestamp,
@@ -38,7 +35,6 @@ class LatencyMarker:
     def tuple_columns():
         return (
             "job",
-            "event_timestamp",
             "ingress_ingestion_timestamp",
             "ingress_consumption_timestamp",
             "egress_ingestion_timestamp",
@@ -47,9 +43,6 @@ class LatencyMarker:
 
 
 def calculate_latencies(df: DataFrame) -> None:
-    df["time_lag"] = (
-        df["ingress_ingestion_timestamp"] - df["event_timestamp"]
-    )
     df["latency_end_to_end"] = (
         df["egress_consumption_timestamp"] - df["ingress_ingestion_timestamp"]
     )

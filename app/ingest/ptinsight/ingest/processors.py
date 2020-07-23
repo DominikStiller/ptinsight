@@ -108,7 +108,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
             event_type, event_timestamp, event = parsed
 
             if i == 0:
-                # Only use primary recording as timestamp source
+                # Only use first replay as timestamp source
                 if (
                     not self._latest_timestamp
                     or event_timestamp > self._latest_timestamp
@@ -117,7 +117,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
             else:
                 if not self._latest_timestamp:
                     return
-                # Adjust non-primary payload to prevent collisions when scaling volume
+                # Adjust non-first replay payload to prevent collisions when scaling volume
                 event_timestamp, event = self._parser.adjust_payload(
                     i, event, event_timestamp, self._latest_timestamp
                 )
