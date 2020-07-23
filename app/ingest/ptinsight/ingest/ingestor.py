@@ -73,6 +73,7 @@ class MQTTIngestor(Ingestor):
 
     def __init__(self, config: dict, processor: MQTTProcessor):
         super().__init__(config, processor)
+        self.config = config
         self.host = config["host"]
         self.port = int(config["port"])
         self.processor = processor
@@ -86,6 +87,10 @@ class MQTTIngestor(Ingestor):
 
     def start(self):
         logger.info(f"Starting MQTT ingestor({self.host}:{self.port})")
+
+        _start_latency_marker_generator(
+            self.config, self.processor.generate_latency_markers, self._ingest
+        )
 
         self.client.connect(self.host, self.port, keepalive=60)
         self.client.loop_forever()
@@ -126,7 +131,9 @@ class MQTTRecordingIngestor(Ingestor):
         logger.info(f"Topics: {original_topics}\n")
         logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
 
-        self._start_latency_marker_generator()
+        _start_latency_marker_generator(
+            self.config, self.processor.generate_latency_markers, self._ingest
+        )
         self._start_schedulers()
 
     def _open_recording(self):
@@ -233,26 +240,27 @@ class MQTTRecordingIngestor(Ingestor):
                 target_topic, _create_event(event_timestamp, details),
             )
 
-    def _start_latency_marker_generator(self):
-        if "latency_marker_interval" in self.config:
-            interval = int(self.config["latency_marker_interval"]) / 1000
-            if interval <= 0:
-                return
 
-            def _run():
-                threading.Thread(target=self._emit_latency_markers).start()
-                threading.Timer(interval, _run).start()
+def _start_latency_marker_generator(config: dict, generator_fn, ingest_fn):
+    if "latency_marker_interval" in config:
+        interval = int(config["latency_marker_interval"]) / 1000
+        if interval <= 0:
+            return
 
-            t = threading.Timer(interval, _run)
-            t.setDaemon(False)
-            t.start()
+        def _run():
+            def _emit_latency_markers():
+                markers = generator_fn()
+                for target_topic, event_timestamp, details in markers:
+                    ingest_fn(
+                        target_topic, _create_event(event_timestamp, details),
+                    )
 
-    def _emit_latency_markers(self):
-        markers = self.processor.generate_latency_markers()
-        for target_topic, event_timestamp, details in markers:
-            self._ingest(
-                target_topic, _create_event(event_timestamp, details),
-            )
+            threading.Thread(target=_emit_latency_markers).start()
+            threading.Timer(interval, _run).start()
+
+        t = threading.Timer(interval, _run)
+        t.setDaemon(False)
+        t.start()
 
 
 def _create_event(event_timestamp: datetime, details: Message):
