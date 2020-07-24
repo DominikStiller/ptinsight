@@ -3,7 +3,7 @@
   become: true
   become_user: kafka
   run_once: true
-  command: "/opt/kafka/bin/kafka-topics.sh --create --zookeeper {{ zookeeper_servers | join(',') }} --replication-factor 3 --partitions 2 --if-not-exists --topic {{ item }}"
+  command: "/opt/kafka/bin/kafka-topics.sh --create --zookeeper {{ zookeeper_servers | join(',') }} --replication-factor 3 --partitions 4 --if-not-exists --topic {{ item }}"
   loop:
     - ingress.arrival
     - ingress.departure

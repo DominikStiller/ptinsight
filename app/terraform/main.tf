@@ -264,9 +264,12 @@ resource "aws_instance" "flink_worker" {
     count = 4
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.large"
+    instance_type          = "c5.2xlarge"
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_worker.name
+
+    cpu_core_count = 4
+    cpu_threads_per_core = 1
 
     vpc_security_group_ids = [aws_security_group.flink_worker.id]
     subnet_id              = aws_subnet.main.id
@@ -366,7 +369,7 @@ resource "aws_security_group" "flink_worker" {
 resource "aws_instance" "ingest" {
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.nano"
+    instance_type          = "c5.large"
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.ingest.name
 
@@ -561,7 +564,7 @@ resource "aws_security_group" "ui" {
 resource "aws_instance" "latencytracker" {
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.nano"
+    instance_type          = "t3.small"
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.latencytracker.name
 
