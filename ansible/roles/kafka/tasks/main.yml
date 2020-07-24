@@ -13,15 +13,9 @@
 - name: install Kafka as service
   become: true
   block:
-    - name: find Kafka mirror
-      uri:
-        url: https://www.apache.org/dyn/closer.cgi?as_json
-        return_content: yes
-      register: kafka_mirror
-
     - name: download and untar Kafka
       unarchive:
-        src: "{{ kafka_mirror.json.preferred }}/kafka/2.5.0/kafka_2.12-2.5.0.tgz"
+        src: "https://downloads.apache.org/kafka/2.5.0/kafka_2.12-2.5.0.tgz"
         dest: /opt
         remote_src: yes
 

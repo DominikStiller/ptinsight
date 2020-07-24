@@ -13,15 +13,9 @@
 - name: install Zookeeper as service
   become: true
   block:
-    - name: find Zookeeper mirror
-      uri:
-        url: https://www.apache.org/dyn/closer.cgi?as_json
-        return_content: yes
-      register: zookeeper_mirror
-
     - name: download and untar Zookeeper
       unarchive:
-        src: "{{ zookeeper_mirror.json.preferred }}/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz"
+        src: "https://downloads.apache.org/zookeeper/zookeeper-3.6.1/apache-zookeeper-3.6.1-bin.tar.gz"
         dest: /opt
         remote_src: yes
 

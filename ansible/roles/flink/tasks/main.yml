@@ -13,15 +13,9 @@
 - name: install Flink
   become: true
   block:
-    - name: find Flink mirror
-      uri:
-        url: https://www.apache.org/dyn/closer.cgi?as_json
-        return_content: yes
-      register: flink_mirror
-
     - name: download and untar Flink
       unarchive:
-        src: "{{ flink_mirror.json.preferred }}/flink/flink-1.11.1/flink-1.11.1-bin-scala_2.12.tgz"
+        src: "https://downloads.apache.org/flink/flink-1.11.1/flink-1.11.1-bin-scala_2.12.tgz"
         dest: /opt
         remote_src: yes
 
