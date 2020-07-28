@@ -154,7 +154,7 @@ resource "aws_instance" "flink_master" {
     count = 1
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.small"
+    instance_type          = "c5.2xlarge"
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_master.name
 
@@ -369,7 +369,7 @@ resource "aws_security_group" "flink_worker" {
 resource "aws_instance" "ingest" {
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "c5.large"
+    instance_type          = "c5.2xlarge"
     key_name               = aws_key_pair.deploy.key_name
     iam_instance_profile   = aws_iam_instance_profile.ingest.name
 

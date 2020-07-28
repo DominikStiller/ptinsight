@@ -74,7 +74,7 @@ class HSLRealtimeParser:
     ) -> Tuple[datetime, Message]:
         if abs(event_timestamp - latest_timestamp) > timedelta(seconds=1):
             # Set event timestamp to within 1 seconds of latest known timestamp
-            event_timestamp = latest_timestamp + timedelta(seconds=uniform(-1, 1))
+            event_timestamp = latest_timestamp + timedelta(seconds=uniform(-0.1, 0.1))
         # There are 21 operators with numbers between 3 and 90
         # https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/#operators
         event.vehicle.operator += i * 100
