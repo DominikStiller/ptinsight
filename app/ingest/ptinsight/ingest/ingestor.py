@@ -164,7 +164,7 @@ class MQTTRecordingIngestor(Ingestor):
 
         with multiprocessing.Manager() as manager:
             skip_offset_barrier = manager.Barrier(scaling_factor)
-            latest_timestamp = multiprocessing.Value("f")
+            latest_timestamp = multiprocessing.Value("d")
 
             pool = []
             for scheduler_index in range(scaling_factor):

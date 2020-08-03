@@ -111,19 +111,19 @@ class HSLRealtimeProcessor(MQTTProcessor):
         if parsed := self._parser.parse(vehicle_type, payload):
             event_type, event_timestamp, event = parsed
 
+            latest_timestamp = self._latest_timestamp.value
+
             if scheduler_index == 0:
                 # Only use first replay as timestamp source
-                if event_timestamp > self._latest_timestamp.value:
+                # This also eliminates the need for a lock
+                if event_timestamp > latest_timestamp:
                     self._latest_timestamp.value = event_timestamp
             else:
-                if self._latest_timestamp.value == -1:
+                if latest_timestamp <= 0:
                     return
                 # Adjust non-first replay payload to prevent collisions when scaling volume
                 event_timestamp, event = self._parser.adjust_payload(
-                    scheduler_index,
-                    event,
-                    event_timestamp,
-                    self._latest_timestamp.value,
+                    scheduler_index, event, latest_timestamp,
                 )
 
             target_topic = (
@@ -136,7 +136,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
             return target_topic, event_timestamp, event
 
     def generate_latency_markers(self) -> List[Tuple[str, float, Message]]:
-        if self._latest_timestamp.value == -1:
+        if self._latest_timestamp.value <= 0:
             # No real records have been processed yet
             return []
         return self._latency_markers.generate(self._latest_timestamp.value)
