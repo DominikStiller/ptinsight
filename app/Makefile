@@ -11,7 +11,7 @@ all: apply setup deploy
 # Terraform
 define terraform_cmd =
 	cd ${ROOT}terraform
-	terraform $(1) -auto-approve --var deployment=${USER}
+	terraform $(1) -auto-approve --var user=${USER}
 endef
 init:
 	cd ${ROOT}terraform

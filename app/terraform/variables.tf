@@ -1,5 +1,5 @@
-variable "ssh_key" {
-    description = "SSH key for EC2 instances"
+variable "ssh_privatekey" {
+    description = "SSH private key file for EC2 instances"
     default = "~/.ssh/id_rsa_eda_deploy"
 }
 
@@ -8,11 +8,11 @@ variable "trusted_cidr" {
     default = ["46.223.0.0/16"]
 }
 
-variable "deployment" {
-    description = "Prefix for AWS resources to separate deployments"
+variable "user" {
+    description = "Deployment user to use as prefix for AWS resources to separate deployments"
     default = ""
 }
 
 locals {
-    name_prefix = "${var.deployment != "" ? "${var.deployment}-" : ""}ptinsight-"
+    prefix = "${var.user != "" ? "${var.user}-" : ""}ptinsight-"
 }
