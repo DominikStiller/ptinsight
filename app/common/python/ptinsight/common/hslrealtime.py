@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from random import randint, uniform
 from typing import List, Tuple, Optional
 
@@ -7,7 +7,7 @@ from google.protobuf.message import Message
 from dateutil.parser import isoparse
 
 from ptinsight.common import VehicleType
-from ptinsight.common.geocells import SpiralingGeocellGenerator
+from ptinsight.common.geocells import SpiralingCoordinateGenerator
 from ptinsight.common.proto.ingress.hsl_realtime_pb2 import (
     VehiclePosition,
     Arrival,
@@ -20,10 +20,10 @@ class HSLRealtimeParser:
 
     def parse(
         self, vehicle_type: str, payload: dict
-    ) -> Optional[Tuple[str, datetime, Message]]:
+    ) -> Optional[Tuple[str, float, Message]]:
         event_type = list(payload.keys())[0].lower()
         payload = list(payload.values())[0]
-        event_timestamp = isoparse(payload["tst"])
+        event_timestamp = isoparse(payload["tst"]).timestamp()
 
         if not payload["lat"] or not payload["long"]:
             return
@@ -67,17 +67,17 @@ class HSLRealtimeParser:
 
     def adjust_payload(
         self,
-        i: int,
+        scheduler_index: int,
         event: Message,
-        event_timestamp: datetime,
-        latest_timestamp: datetime,
-    ) -> Tuple[datetime, Message]:
-        if abs(event_timestamp - latest_timestamp) > timedelta(seconds=1):
-            # Set event timestamp to within 1 seconds of latest known timestamp
-            event_timestamp = latest_timestamp + timedelta(seconds=uniform(-0.1, 0.1))
+        event_timestamp: float,
+        latest_timestamp: float,
+    ) -> Tuple[float, Message]:
+        if abs(event_timestamp - latest_timestamp) > 1:
+            # Set event timestamp to within 0.1 seconds of latest known timestamp
+            event_timestamp = latest_timestamp + uniform(-0.1, 0.1)
         # There are 21 operators with numbers between 3 and 90
         # https://digitransit.fi/en/developers/apis/4-realtime-api/vehicle-positions/#operators
-        event.vehicle.operator += i * 100
+        event.vehicle.operator += scheduler_index * 100
 
         return event_timestamp, event
 
@@ -88,14 +88,17 @@ class HSLRealtimeLatencyMarkers:
     # Use special operator for ingress latency markers
     LATENCY_MARKER_OPERATOR = 42000
 
-    def __init__(self, origin: Tuple[float, float], h3_resolution: int, h3_max_k: int):
-        self.origin = h3.geo_to_h3(*origin, h3_resolution)
+    def __init__(
+        self, h3_resolution: int, h3_max_k: int,
+    ):
+        # Use "Point Nemo" as latency marker origin since we can assume no real events come from there
+        self.origin = h3.geo_to_h3(-48.875, -123.393, h3_resolution)
         self.h3_resolution = h3_resolution
         self.h3_max_k = h3_max_k
 
-        self.coordinate_generator = SpiralingGeocellGenerator(
-            self.origin, h3_max_k
-        ).coordinates()
+        self.coordinate_generator = iter(
+            SpiralingCoordinateGenerator(self.origin, h3_max_k)
+        )
 
     def check_latency_marker(self, event: Message) -> Optional[int]:
         """
@@ -128,27 +131,24 @@ class HSLRealtimeLatencyMarkers:
                 # System errors can occur when the distance is too large
                 pass
 
-    def generate(self, timestamp: datetime) -> List[Tuple[str, datetime, Message]]:
+    def generate(self, timestamp: float) -> List[Tuple[str, float, Message]]:
+        timestamp_datetime = datetime.fromtimestamp(timestamp, tz=timezone.utc)
         return [
             *[
-                (
-                    "ingress.vehicle-position",
-                    timestamp + timedelta(milliseconds=i),
-                    event,
-                )
+                ("ingress.vehicle-position", timestamp + i / 1000, event,)
                 for i, event in enumerate(
-                    self._generate_emergency_stop_latency_markers(timestamp)
+                    self._generate_emergency_stop_latency_markers(timestamp_datetime)
                 )
             ],
             (
                 "ingress.arrival",
                 timestamp,
-                self._generate_arrival_latency_marker(timestamp),
+                self._generate_arrival_latency_marker(timestamp_datetime),
             ),
             (
                 "ingress.departure",
                 timestamp,
-                self._generate_departure_latency_marker(timestamp),
+                self._generate_departure_latency_marker(timestamp_datetime),
             ),
         ]
 

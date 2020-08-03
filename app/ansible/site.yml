@@ -29,7 +29,7 @@
     - common_path: "{{ playbook_dir }}/../common"
   roles:
     - role: ../../ansible/roles/common
-      tags: setup
+      tags: [setup, setup-zookeeper, setup-kafka, setup-processing, setup-latencytracker, setup-ui, setup-ingest]
     - role: common-build
       tags: always
 

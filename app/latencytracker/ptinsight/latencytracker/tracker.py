@@ -24,11 +24,10 @@ class LatencyTracker:
         # Needs to have the same config as the Flink consumer
         self.consumer = KafkaConsumer(**config["kafka"])
 
-        origin = (-48.875, -123.393)
         self.h3_resolution = int(config["latency_markers"]["h3_resolution"])
         h3_max_k = int(config["latency_markers"]["h3_max_k"])
         self._latency_markers = HSLRealtimeLatencyMarkers(
-            origin, self.h3_resolution, h3_max_k
+            self.h3_resolution, h3_max_k
         )
 
         self.seen_markers: Dict[int, LatencyMarker] = ExpiringDict(

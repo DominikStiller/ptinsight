@@ -1,13 +1,19 @@
 import logging
 import os
-import sys
 from concurrent.futures import wait
+
+import sys
 from concurrent.futures.thread import ThreadPoolExecutor
 
-import kafka.errors
 import yaml
+from kafka import KafkaProducer
 
-from ptinsight.ingest.ingestor import MQTTIngestor, Ingestor, MQTTRecordingIngestor
+from ptinsight.common.logger import setup_logger
+from ptinsight.ingest.ingestor import (
+    MQTTIngestor,
+    MQTTRecordingIngestor,
+    _ConsoleProducer,
+)
 from ptinsight.ingest.processors import MQTTProcessor
 
 logger = logging.getLogger(__name__)
@@ -25,17 +31,23 @@ else:
 with open(config_path) as f:
     config = yaml.safe_load(f)
 
-logging.basicConfig()
-logging.getLogger("ptinsight").setLevel(config["logging"]["level"].upper())
+setup_logger(config["logging"]["level"])
 
 # Create console/Kafka producer depending on configuration
 producer_config = config["producer"]
 producer_type = producer_config.pop("type")
-try:
-    Ingestor.setup_producer(producer_type, producer_config)
-except kafka.errors.NoBrokersAvailable:
-    logger.error("Cannot connect to Kafka bootstrap servers")
-    sys.exit(1)
+
+if "protobuf_format" in producer_config:
+    protobuf_format = producer_config.pop("protobuf_format")
+else:
+    protobuf_format = "binary"
+
+if producer_type == "kafka":
+    producer_class = KafkaProducer
+elif producer_type == "console":
+    producer_class = _ConsoleProducer
+else:
+    raise ValueError("Invalid producer type")
 
 # Find processor classes
 processors = {}
@@ -60,7 +72,9 @@ for source in config["sources"]:
     processor_config = {**source["processor"]["config"], "h3": {**config["h3"]}}
     processor = processors[processor_type](processor_config)
 
-    ingestors.append(ingestor_class(ingestor_config, processor))
+    ingestor = ingestor_class(ingestor_config, processor)
+    ingestor.set_producer(producer_class, producer_config, protobuf_format)
+    ingestors.append(ingestor)
 
 # Start all ingestors
 with ThreadPoolExecutor() as executor:

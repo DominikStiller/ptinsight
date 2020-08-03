@@ -5,6 +5,9 @@ It receives messages from sources specified in the configuration and transforms 
  event messages.
 Invalid and unwanted events are filtered out so all Kafka topics contain valid messages.
 
+This component uses the `multiprocessing` package. Therefore, some code might not behave as you expect, especially
+ when dealing with shared state. Consider this during development.
+
 
 ## Prerequisites
 * Python 3.8

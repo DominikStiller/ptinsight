@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import abc
 import functools
+from multiprocessing.managers import ValueProxy
 
 import itertools
 from datetime import datetime
@@ -26,15 +27,15 @@ class Processor(abc.ABC):
 
     @abc.abstractmethod
     def process(
-        self, source: str, payload: dict, i: int = 0
-    ) -> Optional[Tuple[str, datetime, Message]]:
+        self, source: str, payload: dict, scheduler_index: int = 0
+    ) -> Optional[Tuple[str, float, Message]]:
         """
         Filters and transforms message from the raw format and the internal event format
 
         Args:
             source: The source of the message, e.g., an MQTT topic
             payload: The payload that contains the event data
-            i: The ascending number of the scheduler in case of volume scaling
+            scheduler_index: The index of the scheduler in case of volume scaling
 
         Returns:
             A tuple of the Kafka topic, the event time and the protobuf message, or None if the message should be dismissed
@@ -49,7 +50,7 @@ class MQTTProcessor(Processor, abc.ABC):
         """Defines the topics an MQTT ingestor should subscribe to"""
         pass
 
-    def generate_latency_markers(self) -> List[Tuple[str, datetime, Message]]:
+    def generate_latency_markers(self) -> List[Tuple[str, float, Message]]:
         """
         Generates all latency markers messages
 
@@ -67,13 +68,16 @@ class HSLRealtimeProcessor(MQTTProcessor):
         self._latest_timestamp = None
         self._parser = HSLRealtimeParser()
 
-        # Use "Point Nemo" as latency marker origin since we can assume no real events come from there
-        origin = (-48.875, -123.393)
-        h3_resolution = int(config["h3"]["resolution"])
-        h3_max_k = int(config["h3"]["max_k"])
+        self.h3_resolution = int(config["h3"]["resolution"])
+        self.h3_max_k = int(config["h3"]["max_k"])
+        self._latency_markers = None
+
         self._latency_markers = HSLRealtimeLatencyMarkers(
-            origin, h3_resolution, h3_max_k
+            self.h3_resolution, self.h3_max_k
         )
+
+    def set_latest_timestamp_valueproxy(self, proxy: ValueProxy):
+        self._latest_timestamp = proxy
 
     @staticmethod
     def name():
@@ -98,8 +102,8 @@ class HSLRealtimeProcessor(MQTTProcessor):
                 return vehicle
 
     def process(
-        self, source: str, payload: dict, i: int = 0
-    ) -> Optional[Tuple[str, datetime, Message]]:
+        self, source: str, payload: dict, scheduler_index: int = 0
+    ) -> Optional[Tuple[str, float, Message]]:
         vehicle_type = self._get_vehicle_type(source)
         if not vehicle_type:
             return
@@ -107,19 +111,19 @@ class HSLRealtimeProcessor(MQTTProcessor):
         if parsed := self._parser.parse(vehicle_type, payload):
             event_type, event_timestamp, event = parsed
 
-            if i == 0:
+            if scheduler_index == 0:
                 # Only use first replay as timestamp source
-                if (
-                    not self._latest_timestamp
-                    or event_timestamp > self._latest_timestamp
-                ):
-                    self._latest_timestamp = event_timestamp
+                if event_timestamp > self._latest_timestamp.value:
+                    self._latest_timestamp.value = event_timestamp
             else:
-                if not self._latest_timestamp:
+                if self._latest_timestamp.value == -1:
                     return
                 # Adjust non-first replay payload to prevent collisions when scaling volume
                 event_timestamp, event = self._parser.adjust_payload(
-                    i, event, event_timestamp, self._latest_timestamp
+                    scheduler_index,
+                    event,
+                    event_timestamp,
+                    self._latest_timestamp.value,
                 )
 
             target_topic = (
@@ -131,8 +135,8 @@ class HSLRealtimeProcessor(MQTTProcessor):
 
             return target_topic, event_timestamp, event
 
-    def generate_latency_markers(self) -> List[Tuple[str, datetime, Message]]:
-        if not self._latest_timestamp:
+    def generate_latency_markers(self) -> List[Tuple[str, float, Message]]:
+        if self._latest_timestamp.value == -1:
             # No real records have been processed yet
             return []
-        return self._latency_markers.generate(self._latest_timestamp)
+        return self._latency_markers.generate(self._latest_timestamp.value)

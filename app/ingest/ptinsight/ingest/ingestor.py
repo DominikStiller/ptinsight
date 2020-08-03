@@ -1,24 +1,27 @@
 import abc
 import base64
-import bz2
 import functools
 import json
 import logging
+import multiprocessing
 import re
-import sched
+
+import kafka
+import sys
 import threading
-from concurrent.futures import wait
-from concurrent.futures.thread import ThreadPoolExecutor
+from multiprocessing import Process
+from multiprocessing.managers import ValueProxy
 
 import time
 from datetime import datetime
-from typing import final, Literal, Union
+from typing import final
 
-import boto3
 import paho.mqtt.client as mqtt
 from google.protobuf.message import Message
-from kafka import KafkaProducer
 from ptinsight.common import Event
+from ptinsight.common.logger import setup_logger
+from ptinsight.common.recordings import open_recording
+from ptinsight.common.scheduler import MultithreadingScheduler
 from ptinsight.common.serialize import serialize
 
 from ptinsight.ingest.processors import MQTTProcessor, Processor
@@ -29,33 +32,30 @@ logger = logging.getLogger(__name__)
 class Ingestor(abc.ABC):
     """Receives messages and publishes them to Kafka after transforming using a Processor"""
 
-    _protobuf_format = "binary"
-    _producer = None
-
     @abc.abstractmethod
     def __init__(self, config: dict, processor: Processor):
-        pass
+        self._protobuf_format = None
+        self._producer = None
 
     @abc.abstractmethod
     def start(self):
         """Starts the ingestor"""
         pass
 
-    @classmethod
     @final
-    def setup_producer(cls, producer_type: Literal["kafka", "console"], config: dict):
-        if "protobuf_format" in config:
-            Ingestor._protobuf_format = config.pop("protobuf_format")
-        if producer_type == "kafka":
-            cls._producer = KafkaProducer(**config)
-        elif producer_type == "console":
-            cls._producer = cls._ConsoleProducer()
-        else:
-            raise ValueError("Invalid producer type")
+    def set_producer(self, producer_class, producer_config, protobuf_format: str):
+        self._producer_class = producer_class
+        self._producer_config = producer_config
+        self._protobuf_format = protobuf_format
 
-    class _ConsoleProducer:
-        def send(self, topic, value):
-            print(f"{topic}: {value}")
+    @final
+    def _create_producer(self):
+        """Producers need to be created lazily to because Kafka producers does not support pickling for multiprocessing"""
+        try:
+            self._producer = self._producer_class(**self._producer_config)
+        except kafka.errors.NoBrokersAvailable:
+            logger.error("Cannot connect to Kafka bootstrap servers")
+            sys.exit(1)
 
     @final
     def _ingest(self, topic: str, event: Event):
@@ -65,7 +65,17 @@ class Ingestor(abc.ABC):
         if isinstance(value, str):
             value = value.encode()
 
-        Ingestor._producer.send(topic, value)
+        self._producer.send(topic, value)
+
+
+class _ConsoleProducer:
+    """Drop-in replacement for Kafka producer for debugging purposes"""
+
+    def __init__(self, **kwargs):
+        pass
+
+    def send(self, topic, value):
+        print(f"{topic}: {value}")
 
 
 class MQTTIngestor(Ingestor):
@@ -77,6 +87,7 @@ class MQTTIngestor(Ingestor):
         self.host = config["host"]
         self.port = int(config["port"])
         self.processor = processor
+        self.processor.set_latest_timestamp_valueproxy(multiprocessing.Value("f", -1))
 
         self.client = mqtt.Client()
         self.client.enable_logger(logger)
@@ -87,6 +98,8 @@ class MQTTIngestor(Ingestor):
 
     def start(self):
         logger.info(f"Starting MQTT ingestor({self.host}:{self.port})")
+
+        self._create_producer()
 
         _start_latency_marker_generator(
             self.config, self.processor.generate_latency_markers, self._ingest
@@ -115,11 +128,8 @@ class MQTTRecordingIngestor(Ingestor):
         self.key = config["key"]
         self.processor = processor
 
-        self.file = boto3.resource("s3").Object(self.bucket, self.key)
-        self.skip_offset_barrier = None
-
     def start(self):
-        header_body, header_lines = self._open_recording()
+        header_body, header_lines = open_recording(self.bucket, self.key)
         original_broker = next(header_lines)[8:]
         original_topics = next(header_lines)[8:]
         original_t_start = datetime.fromisoformat(next(header_lines)[12:]).replace(
@@ -131,26 +141,7 @@ class MQTTRecordingIngestor(Ingestor):
         logger.info(f"Topics: {original_topics}\n")
         logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
 
-        _start_latency_marker_generator(
-            self.config, self.processor.generate_latency_markers, self._ingest
-        )
         self._start_schedulers()
-
-    def _open_recording(self):
-        body = self.file.get()["Body"]
-        if self.key.endswith(".bz2"):
-            return body, self._bz2_iter_lines(body)
-        else:
-            return body, map(lambda l: l.decode(), body.iter_lines())
-
-    def _bz2_iter_lines(self, file):
-        bz2_file = bz2.open(file)
-        while line := bz2_file.readline():
-            line = line.decode()
-            if line.endswith("\r\n"):
-                yield line[:-2]
-            elif line.endswith("\n") or line.endswith("\r"):
-                yield line[:-1]
 
     def _start_schedulers(self):
         if "volume_scaling_factor" in self.config:
@@ -168,53 +159,73 @@ class MQTTRecordingIngestor(Ingestor):
             scaling_offset = 0
 
         logger.info(
-            f"Scaling factor: {scaling_factor}   Scaling offset: {scaling_offset} lines"
+            f"Scaling with factor {scaling_factor} and offset {scaling_offset} lines each"
         )
 
-        self.skip_offset_barrier = threading.Barrier(scaling_factor)
-        with ThreadPoolExecutor(scaling_factor) as executor:
-            wait(
-                [
-                    executor.submit(self._start_single_scheduler, i, i * scaling_offset)
-                    for i in range(scaling_factor)
-                ]
-            )
+        with multiprocessing.Manager() as manager:
+            skip_offset_barrier = manager.Barrier(scaling_factor)
+            latest_timestamp = multiprocessing.Value("f")
 
-    def _start_single_scheduler(self, i: int, offset: int):
-        _, lines = self._open_recording()
+            pool = []
+            for scheduler_index in range(scaling_factor):
+                p = Process(
+                    target=self._start_single_scheduler,
+                    args=(
+                        scheduler_index,
+                        scheduler_index * scaling_offset,
+                        skip_offset_barrier,
+                        latest_timestamp,
+                    ),
+                )
+                pool.append(p)
+                p.start()
 
-        # Skip header and partial lines caused by offset
+            multiprocessing.connection.wait(p.sentinel for p in pool)
+
+    def _start_single_scheduler(
+        self,
+        scheduler_index: int,
+        offset: int,
+        skip_offset_barrier: multiprocessing.Barrier,
+        latest_timestamp: ValueProxy,
+    ):
+        setup_logger("info")
+        self._create_producer()
+        self.processor.set_latest_timestamp_valueproxy(latest_timestamp)
+
+        _, lines = open_recording(self.bucket, self.key)
+
+        # Skip header
         for _ in range(4):
             next(lines)
 
+        # "Fast-forward" recording to offset
         for _ in range(offset):
             next(lines)
 
-        logger.info(f"Scheduler {i+1} of {self.skip_offset_barrier.parties} ready")
-        self.skip_offset_barrier.wait()
+        logger.info(
+            f"Scheduler {scheduler_index+1} of {skip_offset_barrier.parties} ready"
+        )
+        skip_offset_barrier.wait()
 
         # Scheduler is used to replay messages with original relative timing
-        scheduler = sched.scheduler(time.perf_counter, time.sleep)
-        done = threading.Event()
+        scheduler = MultithreadingScheduler()
+        scheduler.start()
 
-        # Custom run method is necessary to prevent scheduler from exiting early because no events are scheduled yet
-        def run_scheduler():
-            while not done.is_set():
-                scheduler.run()
-            # Clear queue after done is set
-            scheduler.run()
+        if scheduler_index == 0:
+            _start_latency_marker_generator(
+                self.config, self.processor.generate_latency_markers, self._ingest
+            )
 
-        # One thread reads the recording, the other publishes the messages
-        sched_thread = threading.Thread(target=run_scheduler)
-        sched_thread.start()
-        t_start = time.perf_counter()
+        # Necessary to start immediately despite "fast-forwarding"
         recording_start_offset = None
 
         message_regex = re.compile(r'(\S+) "(.+)" (\d) (\d) (\S*)')
-        for line in lines:
+        for i, line in enumerate(lines):
             # Prevent queue from growing too fast
-            if len(scheduler._queue) > 1000:
-                time.sleep(0.5)
+            # Only check every 100 iterations for performance reasons
+            if i % 100 == 0 and scheduler.is_queue_full():
+                time.sleep(0.2)
                 continue
 
             t_offset, topic, _, _, payload = message_regex.match(line).groups()
@@ -224,17 +235,17 @@ class MQTTRecordingIngestor(Ingestor):
             if recording_start_offset is None:
                 recording_start_offset = t_offset
 
-            scheduler.enterabs(
-                t_start + t_offset - recording_start_offset,
-                1,
-                functools.partial(self._process_and_ingest, topic, payload, i),
+            scheduler.schedule(
+                t_offset - recording_start_offset,
+                functools.partial(
+                    self._process_and_ingest, topic, payload, scheduler_index
+                ),
             )
 
-        done.set()
-        sched_thread.join()
+        scheduler.stop()
 
-    def _process_and_ingest(self, topic: str, payload: dict, i: int):
-        if processed := self.processor.process(topic, payload, i):
+    def _process_and_ingest(self, topic: str, payload: dict, scheduler_index: int):
+        if processed := self.processor.process(topic, payload, scheduler_index):
             target_topic, event_timestamp, details = processed
             self._ingest(
                 target_topic, _create_event(event_timestamp, details),
@@ -263,11 +274,11 @@ def _start_latency_marker_generator(config: dict, generator_fn, ingest_fn):
         t.start()
 
 
-def _create_event(event_timestamp: datetime, details: Message):
+def _create_event(event_timestamp: float, details: Message):
     event = Event()
 
     if event_timestamp:
-        event.event_timestamp.FromDatetime(event_timestamp)
+        event.event_timestamp.FromMilliseconds(int(event_timestamp * 1000))
     event.ingestion_timestamp.GetCurrentTime()
     event.details.Pack(details)
 
