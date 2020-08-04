@@ -39,7 +39,7 @@ sudo apt install -y openjdk-11-jdk
 3. Install Python 3.8 and Poetry
 ```
 sudo add-apt-repository -y ppa:deadsnakes/ppa
-sudo apt install -y python3.8
+sudo apt install -y python3.8 python3.8-venv python3.8-distutils
 wget -O - https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
 ```
 
@@ -99,7 +99,7 @@ We use common tools for consistency. Execute the commands below in the project's
 * Code style: [Google Style](https://google.github.io/styleguide/javaguide.html). Run `./gradlew spotlessJavaApply` to format all .java files.
 
 #### Python
-* Build & dependency management: [poetry](https://python-poetry.org/). Run `poetry install` to set up the environment. Use the venv from `poetry env info` as interpreter in PyCharm.
+* Build & dependency management: [poetry](https://python-poetry.org/). Run `poetry install` to set up the environment. You might have to explicitly specify the Python version before using `poetry env use python3.8`. Use the venv from `poetry env info` as interpreter in PyCharm.
 * Code style: [black](https://black.readthedocs.io/en/stable/). Run `poetry run black .` to format all .py files.
 
 #### TypeScript

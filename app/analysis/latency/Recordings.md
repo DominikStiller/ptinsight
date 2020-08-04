@@ -3,7 +3,7 @@
 Latency marker interval is always 1000 ms.
 
 
-# Setup 1
+## Setup 1
 
 Infrastructure:
 * 1x t3.nano for ingest
@@ -21,6 +21,10 @@ Flink configuration:
   * `jobmanager.memory.process.size: 1600m`
   * `taskmanager.memory.process.size: 1728m`
 
+Kafka configuration:
+* `log.retention.minutes=5`
+* `log.retention.check.interval.ms=300000` (5 minutes)
+
 
 | ID                  | Volume Scaling | Data Source                             | Commit                                   |
 | ------------------- | -------------- | --------------------------------------- | ---------------------------------------- |
@@ -37,7 +41,7 @@ Flink configuration:
 | 2020-07-23T12-19-24 | 1x             | Live                                    | 6cc3f722323cf51aba0cc05db7e2b9e11aa9a387 |
 
 
-# Setup 2
+## Setup 2
 
 Infrastructure:
 * 1x t3.nano for ingest
@@ -55,6 +59,11 @@ Flink configuration:
   * `jobmanager.memory.process.size: 1600m`
   * `taskmanager.memory.process.size: 1728m`
 
+Kafka configuration:
+* `log.retention.minutes=5`
+* `log.retention.check.interval.ms=300000` (5 minutes)
+
+
 | ID                  | Volume Scaling | Data Source                             | Commit                                   |
 | ------------------- | -------------- | --------------------------------------- | ---------------------------------------- |
 | 2020-07-23T14-19-14 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | ecb8ff7ce5941a4379e850c9fdc3837cd1841ede |
@@ -64,7 +73,7 @@ Flink configuration:
 | 2020-07-23T16-41-55 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | ecb8ff7ce5941a4379e850c9fdc3837cd1841ede |
 
 
-# Setup 3
+## Setup 3
 
 Infrastructure:
 * 1x c5.2xlarge for ingest
@@ -81,6 +90,11 @@ Flink configuration:
 * Memory:
   * `jobmanager.memory.process.size: 1600m`
   * `taskmanager.memory.process.size: 1728m`
+
+Kafka configuration:
+* `log.retention.minutes=5`
+* `log.retention.check.interval.ms=300000` (5 minutes)
+
 
 | ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment                  |
 | ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------------------------ |
@@ -90,7 +104,7 @@ Flink configuration:
 | 2020-07-24T10-18-10 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | ecb8ff7ce5941a4379e850c9fdc3837cd1841ede |                          |
 
 
-# Setup 4
+## Setup 4
 
 Infrastructure:
 * 1x c5.2xlarge for ingest
@@ -108,7 +122,11 @@ Flink configuration:
   * `jobmanager.memory.process.size: 1600m`
   * `taskmanager.memory.process.size: 1728m`
 
-Significant code changes:
+Kafka configuration:
+* `log.retention.minutes=5`
+* `log.retention.check.interval.ms=300000` (5 minutes)
+
+Significant changes:
 * Decrease payload adjustment time range from ±1 s to ±0.1 to prevent too many late data
 
 
@@ -124,7 +142,7 @@ Significant code changes:
 | 2020-07-27T15-59-57 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 993d7fef1c8f804c1114f4ecc84d6a6b613fff35 | Emergency stop streaming stops working halfway |
 
 
-# Setup 5
+## Setup 5
 
 Infrastructure:
 * 1x c5.2xlarge for ingest
@@ -142,6 +160,12 @@ Flink configuration:
   * `jobmanager.memory.flink.size: 12252m`
   * `taskmanager.memory.flink.size: 12252m`
 
+
+Kafka configuration:
+* `log.retention.minutes=5`
+* `log.retention.check.interval.ms=300000` (5 minutes)
+
+
 5 minutes between runs to drain the Kafka logs based on retention period
 
 | ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
@@ -150,3 +174,86 @@ Flink configuration:
 | 2020-07-27T18-12-59 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 993d7fef1c8f804c1114f4ecc84d6a6b613fff35 |         |
 | 2020-07-27T18-52-11 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 993d7fef1c8f804c1114f4ecc84d6a6b613fff35 |         |
 | 2020-07-27T19-32-32 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 993d7fef1c8f804c1114f4ecc84d6a6b613fff35 |         |
+
+
+## Setup 6
+
+Infrastructure:
+* 1x c5.4xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 4 partitions per topic
+* 1x t3.large for Flink master
+* 4x c5.2xlarge (4 cores x 1 threads = 4 vCPUs) for Flink workers with job parallelism 4 and 4 task slots per worker
+  * 1 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 6114m`
+  * `taskmanager.memory.flink.size: 12288m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Changes ingest from multithreading to multiprocessing for proper parallelization. Before, the scaling could not be achieved due to performance bottlenecks.
+* Increase ingest instance size so each process can have a dedicated vCPU
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-03T20-49-55 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
+| 2020-08-04T12-57-53 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
+
+
+
+## Setup 7
+
+Infrastructure:
+* 1x c5.9xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 4 partitions per topic
+* 1x t3.large for Flink master
+* 4x c5.xlarge (2 cores x 2 threads = 4 vCPUs) for Flink workers with job parallelism 4 and 4 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 2048m`
+  * `taskmanager.memory.flink.size: 6114m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Increase ingest instance size to support higher scales
+* Decrease Flink worker instance size because c5.2xlarge they had low CPU utilization (1-20% with bursts to 40% on window evaluation)
+
+Observations:
+* Flink workers still have low CPU utilization even 32x
+* Latencies follow the same pattern but vary a but more with 32x, also it seems that there are less messages written to Kafka than expected
+* Ingest CPU utilization is about 60% on all cores
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-04T13-26-08 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
+| 2020-08-04T14-07-42 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
+| 2020-08-04T14-49-19 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
+| 2020-08-04T15-21-48 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
+
+
+## General Observations
+* When ingest does not degrade performance, there is a sawtooth pattern with the period of the Kafka log retention check interval (i.e. latency increases every time logs are deleted)
+* When Kafka latency spikes, it does so for all jobs

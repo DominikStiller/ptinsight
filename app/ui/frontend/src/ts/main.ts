@@ -115,10 +115,10 @@ control
       "Streets Dark": streetsLayerDark,
     },
     {
-      "Vehicle count": vehicleCountsLayer,
+      "Vehicle distribution": vehicleCountsLayer,
       "Delay statistics": delayStatisticsLayer,
       "Flow direction": flowDirectionLayer,
-      "Final stop count": finalStopCountsLayer,
+      "Final stop distribution": finalStopCountsLayer,
       "Emergency stop": emergencyStopLayer,
     },
     {

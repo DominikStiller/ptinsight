@@ -1,9 +1,9 @@
-# ---- >> Flink Master ----------------------
+# ---- >> Master ----------------------------
 resource "aws_instance" "flink_master" {
     count = 1
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "c5.2xlarge"
+    instance_type          = "t3.medium"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_master.name
 
@@ -106,19 +106,16 @@ resource "aws_security_group" "flink_master" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
-# ---- << Flink Master ----------------------
+# ---- << Master ----------------------------
 
-# ---- >> Flink Worker ----------------------
+# ---- >> Worker ----------------------------
 resource "aws_instance" "flink_worker" {
     count = 4
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "c5.2xlarge"
+    instance_type          = "c5.xlarge"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_worker.name
-
-    cpu_core_count = 4
-    cpu_threads_per_core = 1
 
     vpc_security_group_ids = [aws_security_group.flink_worker.id]
     subnet_id              = var.subnet.id
@@ -212,4 +209,4 @@ resource "aws_security_group" "flink_worker" {
         cidr_blocks = ["0.0.0.0/0"]
     }
 }
-# ---- << Flink Worker ----------------------
+# ---- << Worker ----------------------------
