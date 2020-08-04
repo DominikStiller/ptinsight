@@ -46,6 +46,6 @@
 - name: start jobs
   become: true
   become_user: "{{ deploy_user }}"
-  command: "/opt/flink/bin/flink run --detached {{ item.dest }}"
+  command: "/opt/flink/bin/flink run --detached --parallelism {{ job_parallelism }} {{ item.dest }}"
   loop: "{{ uploaded_jars.results }}"
 

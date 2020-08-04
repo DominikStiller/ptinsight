@@ -47,9 +47,10 @@ if producer_type == "kafka":
 elif producer_type == "console":
     producer_class = _ConsoleProducer
 else:
-    raise ValueError("Invalid producer type")
+    print("Invalid producer type")
+    sys.exit(1)
 
-# Find processor classes
+# Discover processor classes
 processors = {}
 for type in [MQTTProcessor]:
     # Only finds direct subclasses
