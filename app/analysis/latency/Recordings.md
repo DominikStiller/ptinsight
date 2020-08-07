@@ -241,7 +241,7 @@ Significant changes:
 
 Observations:
 * Flink workers still have low CPU utilization even 32x
-* Latencies follow the same pattern but vary a but more with 32x, also it seems that there are less messages written to Kafka than expected
+* Latencies follow the same pattern but vary a but more with 32x, also it seems that there are less messages written to Kafka than expected with 32x
 * Ingest CPU utilization is about 60% on all cores
 
 
