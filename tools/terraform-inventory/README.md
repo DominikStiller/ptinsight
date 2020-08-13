@@ -7,7 +7,7 @@ The `terraform.tfstate` file is expected to be located in the working directory 
 Instance tags:
 * `AnsibleGroups`: a comma-separated list of Ansible groups to which the host belongs
 * `AnsibleVar_ansible_user`: the user Ansible should use to connect to the server
-* `AnsibleVar_ansible_ssh_private_key`: the private key Ansible should use to connect to the server (if not the default key, e.g. `~/.ssh/id_rsa_other`)
+* `AnsibleVar_ansible_ssh_private_key_file`: the private key Ansible should use to connect to the server (if not the default key, e.g. `~/.ssh/id_rsa_other`)
 
 
 ## Prerequisites

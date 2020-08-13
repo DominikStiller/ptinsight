@@ -26,7 +26,7 @@ resource "aws_instance" "instance" {
     tags = {
         Name = "${local.name_prefix}mqttrecorder"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_key
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_key
     }
 }
 

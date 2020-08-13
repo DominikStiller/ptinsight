@@ -1,7 +1,7 @@
 resource "aws_instance" "ingest" {
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "c5.9xlarge"
+    instance_type          = "t3.2xlarge"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.ingest.name
 
@@ -16,7 +16,7 @@ resource "aws_instance" "ingest" {
         Name = "${var.prefix}ingest"
         AnsibleGroups = "ingest"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_privatekey
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_privatekey
     }
 }
 

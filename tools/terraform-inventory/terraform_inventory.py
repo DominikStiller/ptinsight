@@ -74,11 +74,11 @@ def ssh(tfstate, args):
 
                 # Private key
                 if (
-                    "AnsibleVar_ansible_ssh_private_key"
+                    "AnsibleVar_ansible_ssh_private_key_file"
                     in sub_instance_attributes["tags"]
                 ):
                     key = sub_instance_attributes["tags"][
-                        "AnsibleVar_ansible_ssh_private_key"
+                        "AnsibleVar_ansible_ssh_private_key_file"
                     ]
                     command += f"-i {key} "
 

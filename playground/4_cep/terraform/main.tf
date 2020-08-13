@@ -26,7 +26,7 @@ resource "aws_instance" "instance" {
         Project = "eda"
         AnsibleGroups = "mosquitto,flink,simulation"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_key
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_key
     }
 }
 # ---- << Instance ------------------------------

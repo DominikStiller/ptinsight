@@ -18,7 +18,7 @@ resource "aws_instance" "flink_master" {
         Name = "${var.prefix}flink-master-${count.index}"
         AnsibleGroups = "flink_master"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_privatekey
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_privatekey
     }
 }
 
@@ -113,7 +113,7 @@ resource "aws_instance" "flink_worker" {
     count = 4
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "c5.xlarge"
+    instance_type          = "t3.large"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_worker.name
 
@@ -129,7 +129,7 @@ resource "aws_instance" "flink_worker" {
         Name = "${var.prefix}flink-worker-${count.index}"
         AnsibleGroups = "flink_worker"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_privatekey
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_privatekey
     }
 }
 

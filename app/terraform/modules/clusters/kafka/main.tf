@@ -18,7 +18,7 @@ resource "aws_instance" "kafka" {
         Name = "${var.prefix}kafka-${count.index}"
         AnsibleGroups = "kafka,zookeeper"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_privatekey
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_privatekey
     }
 }
 

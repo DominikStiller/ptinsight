@@ -16,7 +16,7 @@ resource "aws_instance" "latencytracker" {
         Name = "${var.prefix}latencytracker"
         AnsibleGroups = "latencytracker"
         AnsibleVar_ansible_user = "centos"
-        AnsibleVar_ansible_ssh_private_key = var.ssh_privatekey
+        AnsibleVar_ansible_ssh_private_key_file = var.ssh_privatekey
     }
 }
 
