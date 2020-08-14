@@ -254,6 +254,102 @@ Observations:
 | 2020-08-04T15-21-48 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 84658b11446ce76d239c47d17015a02c8a51b876 |         |
 
 
+
+## Setup 8
+
+Infrastructure:
+* 1x c5.2xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.medium for Flink master
+* 4x c5.large (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 2048m`
+  * `taskmanager.memory.flink.size: 6114m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Decrease Flink worker instance size to see scaling effects earlier without needing to use extremely large ingest instance
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-13T18-35-00 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-13T19-13-21 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-13T19-48-57 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-13T20-22-04 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-13T20-56-01 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+
+
+
+## Setup 9
+
+Infrastructure:
+* 1x c5.4xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Decrease Flink worker and increase ingest instance size to see scaling effects earlier without needing to use extremely large ingest instance
+
+
+Observations:
+* 16x: CPU utilization: Flink worker 10%-50%, ingest 60%
+* 32x: CPU utilization: Flink worker 2%-10% (delay detection) 60%-100% (others), ingest 95%
+* Amount of messages reaching Flink seems about correct (645k with 16x, 1.2m with 32x) -> ingest is no bottleneck
+* 64x: CPU utilization: ingest 100%, produces messages very slowly and Flink jobs stop quickly
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-14T08-28-55 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T09-20-02 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T09-52-49 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T10-31-35 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T11-11-09 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T12-13-21 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T13-14-40 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T13-52-30 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T14-30-08 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T15-08-27 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T15-47-53 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T16-34-22 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-14T17-24-12 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+
+
+
+## Setup 10
+Enable checkpointing and rocksdb
+
+
 ## General Observations
 * When ingest does not degrade performance, there is a sawtooth pattern with the period of the Kafka log retention check interval (i.e. latency increases every time logs are deleted)
 * When Kafka latency spikes, it does so for all jobs

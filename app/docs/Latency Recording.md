@@ -38,7 +38,7 @@ exit
 ls -l /opt/ptinsight/latencytracker/recordings
 exit
 
-scp centos@[latencytracker-ip]:/opt/ptinsight/latencytracker/recordings/[id].csv analysis/latency/recordings
+scp -i ~/.ssh/id_rsa_eda_deploy centos@[latencytracker-ip]:/opt/ptinsight/latencytracker/recordings/[id].csv analysis/latency/recordings
 ```
 
 6. Add the recording id and configuration to the [Recordings.md](analysis/latency/Recordings.md) table.

@@ -33,6 +33,14 @@
     - role: common-build
       tags: always
 
+# Not required since Python is marked as dependency in specific roles
+# However, speeds up deployment because installations can happen in parallel
+- name: setup Python
+  hosts: latencytracker, ui, ingest
+  roles:
+    - role: ../../ansible/roles/python
+      tags: [setup, setup-latencytracker, setup-ui, setup-ingest]
+
 - name: set up Zookeeper cluster
   hosts: zookeeper
   vars:
@@ -45,6 +53,7 @@
   hosts: kafka
   vars:
     - broker_id: "{{ groups['kafka'].index(inventory_hostname) }}"
+    - num_partitions: 2
   roles:
     - role: ../ansible/roles/kafka
       tags: [setup, setup-kafka]
@@ -60,7 +69,7 @@
     - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
     - is_master: true
     - build_processing: true
-    - job_parallelism: 4
+    - job_parallelism: 2
   pre_tasks:
     - name: set first job manager flag
       tags: setup, setup-processing, deploy, deploy-processing
@@ -81,6 +90,7 @@
     - deploy_user: flink
     - storage_root: "s3://{{ cloud_resources['aws_s3_bucket']['flink'][0]['bucket'] }}"
     - is_worker: true
+    - task_slots_per_worker: 2
   roles:
     - role: ../ansible/roles/flink
       tags: [setup, setup-processing]

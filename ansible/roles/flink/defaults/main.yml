@@ -3,3 +3,4 @@ is_master: false
 is_worker: false
 job_manager_address: localhost
 storage_root: file:///tmp/flink
+task_slots_per_worker: 1

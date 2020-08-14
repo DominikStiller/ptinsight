@@ -23,9 +23,12 @@ PALETTE = [
 
 
 class Plotter:
-    def __init__(self, context="notebook", save_folder: str = "plots"):
+    def __init__(
+        self, context="notebook", save_folder: str = "plots", layout: str = "tight"
+    ):
         self.context = context
         self.save_folder = save_folder
+        self.layout = layout
 
         if context == "notebook":
             sb.set(
@@ -65,7 +68,13 @@ class Plotter:
     ):
         if figsize is None:
             figsize = [self.default_figsize[0], self.default_figsize[1] * rows]
-        fig, axs = plt.subplots(rows, cols, sharex="col", figsize=figsize)
+        fig, axs = plt.subplots(
+            rows,
+            cols,
+            sharex="col",
+            figsize=figsize,
+            constrained_layout=(self.layout == "constrained"),
+        )
         if rows * cols == 1:
             axs = [axs]
         return fig, axs
@@ -98,8 +107,8 @@ class Plotter:
         plt.setp(ax_marginal_y.get_xticklabels(), visible=False)
         plt.setp(ax_marginal_y.get_yticklabels(), visible=False)
 
-        sb.despine(ax=ax_marginal_x, left=True, bottom=True)
-        sb.despine(ax=ax_marginal_y, left=False, bottom=True)
+        sb.despine(ax=ax_marginal_x, left=True)
+        sb.despine(ax=ax_marginal_y, bottom=True)
 
         return fig, ax_main, ax_marginal_x, ax_marginal_y
 
@@ -109,7 +118,8 @@ class Plotter:
             fig = plt.gcf()
         for ax in fig.axes:
             self.add_grid(ax)
-        self.apply_tight_layout(fig)
+        if self.layout == "tight":
+            self.apply_tight_layout(fig)
 
     def add_grid(self, ax: Axes):
         ax.get_xaxis().set_minor_locator(matplotlib.ticker.AutoMinorLocator())

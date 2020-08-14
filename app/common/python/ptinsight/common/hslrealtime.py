@@ -66,10 +66,7 @@ class HSLRealtimeParser:
         return event_type, event_timestamp, event
 
     def adjust_payload(
-        self,
-        scheduler_index: int,
-        event: Message,
-        latest_timestamp: float,
+        self, scheduler_index: int, event: Message, latest_timestamp: float,
     ) -> Tuple[float, Message]:
         # Set event timestamp to within 0.1 seconds of latest known timestamp
         event_timestamp = latest_timestamp + uniform(-0.1, 0.1)
