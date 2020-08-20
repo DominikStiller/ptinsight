@@ -46,7 +46,6 @@ public abstract class Job {
     if (withCheckpointing) {
       env.enableCheckpointing(checkpointingInterval, CheckpointingMode.EXACTLY_ONCE);
       env.getCheckpointConfig().setMinPauseBetweenCheckpoints(checkpointingInterval / 2);
-      env.getCheckpointConfig().enableUnalignedCheckpoints();
     }
   }
 

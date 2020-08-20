@@ -324,7 +324,8 @@ Observations:
 * 16x: CPU utilization: Flink worker 10%-50%, ingest 60%
 * 32x: CPU utilization: Flink worker 2%-10% (delay detection) 60%-100% (others), ingest 95%
 * Amount of messages reaching Flink seems about correct (645k with 16x, 1.2m with 32x) -> ingest is no bottleneck
-* 64x: CPU utilization: ingest 100%, produces messages very slowly and Flink jobs stop quickly
+* 64x with small ingest: CPU utilization: ingest 100%, produces messages very slowly and Flink jobs stop quickly
+* 64x with large ingest: CPU utilization: ingest 60%, still not full volume, but Kafka is probably bottleneck since only 2 partitions
 
 
 
@@ -343,11 +344,208 @@ Observations:
 | 2020-08-14T15-47-53 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
 | 2020-08-14T16-34-22 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
 | 2020-08-14T17-24-12 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
+| 2020-08-18T17-27-51 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.9xlarge for ingest        |
+| 2020-08-18T18-09-20 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.9xlarge for ingest        |
+| 2020-08-18T18-19-34 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.metal for ingest        |
+
 
 
 
 ## Setup 10
-Enable checkpointing and rocksdb
+Infrastructure:
+* 1x c5.9xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: unaligned, every 10 s, min. 5 s pause
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: RocksDB
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Use unaligned checkpointing and RocksDB state backend
+
+
+Observations:
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-18T08-57-37 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+| 2020-08-18T09-35-47 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+
+
+
+## Setup 11
+Infrastructure:
+* 1x c5.9xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: aligned, every 10 s, min. 5 s pause
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: RocksDB
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Use aligned checkpointing
+
+
+Observations:
+* RocksDB is much slower than memory backend
+* vehicle count job is backpressured with 16x, probably because RocksDB cannot keep up with storing state (vehicle count job cannot aggregate eagerly due to deduplication)
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-18T10-13-04 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+| 2020-08-18T10-47-20 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+| 2020-08-18T14-19-34 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+| 2020-08-18T14-53-35 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+| 2020-08-18T15-32-33 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+
+
+
+## Setup 12
+Infrastructure:
+* 1x c5.9xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: RocksDB
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Disable checkpointing but keep RocksDB state backend
+
+
+Observations:
+* 100% Flink worker CPU utilization for CEP jobs even with 2x
+* CEP jobs cannot keep up at 2x while working perfectly at this scale with memory backend
+* Much higher memory usage with RocksDB compared to memory state backend
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-18T11-33-11 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+
+
+
+## Setup 13
+Infrastructure:
+* 1x c5.9xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.large (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: RocksDB
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 6144m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Use instance with more memory for Flink workers to possibly improve RocksDB performance
+
+
+Observations:
+* RocksDB performance does not increase when increasing memory (https://ci.apache.org/projects/flink/flink-docs-release-1.11/ops/state/large_state_tuning.html#tuning-rocksdb-memory)
+* Seems to not be using more memory even when more is available
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-18T13-19-34 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 6144m`, `taskmanager.memory.managed.fraction: 0.6` |
+| 2020-08-18T12-47-40 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 6144m`, `taskmanager.memory.managed.fraction: 0.4` |
+| 2020-08-18T13-30-46 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 7169m`, `taskmanager.memory.managed.fraction: 0.7` |
+| 2020-08-18T13-53-04 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 7169m`, `taskmanager.memory.managed.fraction: 0.7`, aligned checkpointing |
+
+
+
+## Setup 14
+Infrastructure:
+* 1x c5.9xlarge for ingest
+* 1x t3.small for latencytracker
+* 3x t3.large for Kafka with 2 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: aligned, every 10 s, min. 5 s pause
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+
+Significant changes:
+* Use aligned checkpointing with memory backend
+
+
+Observations:
+* RocksDB is much slower than memory backend
+* vehicle count job is backpressured with 16x, probably because RocksDB cannot keep up with storing state (vehicle count job cannot aggregate eagerly due to deduplication)
+* Checkpointing with memory backend fails becaus jobmanager memory is insufficient, also not recommended for production
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-18T16-27-50 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 |         |
+
 
 
 ## General Observations
