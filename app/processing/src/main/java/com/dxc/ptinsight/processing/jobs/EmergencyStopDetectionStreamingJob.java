@@ -3,8 +3,8 @@ package com.dxc.ptinsight.processing.jobs;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
-import com.dxc.ptinsight.proto.egress.Patterns.EmergencyStop;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.analytics.Patterns.EmergencyStop;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.time.Instant;
 import java.util.List;
 import java.util.Map;
@@ -63,12 +63,12 @@ public class EmergencyStopDetectionStreamingJob extends Job {
             .within(Time.seconds(10));
 
     var vehiclePositionStream =
-        source("ingress.vehicle-position", VehiclePosition.class)
+        source("input.vehicle-position", VehiclePosition.class)
             .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition());
 
     CEP.pattern(vehiclePositionStream, emergencyStopPattern)
         .process(new OutputProcessFunction())
-        .addSink(sink("egress.emergency-stop-streaming"));
+        .addSink(sink("analytics.emergency-stop-streaming"));
   }
 
   private static class OutputProcessFunction

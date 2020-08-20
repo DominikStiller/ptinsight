@@ -5,12 +5,12 @@
   run_once: true
   command: "/opt/kafka/bin/kafka-topics.sh --create --zookeeper {{ zookeeper_servers | join(',') }} --replication-factor 3 --partitions {{ num_partitions }} --if-not-exists --topic {{ item }}"
   loop:
-    - ingress.arrival
-    - ingress.departure
-    - ingress.vehicle-position
-    - egress.vehicle-count
-    - egress.delay-statistics
-    - egress.flow-direction
-    - egress.final-stop-count
-    - egress.emergency-stop-table
-    - egress.emergency-stop-streaming
+    - input.arrival
+    - input.departure
+    - input.vehicle-position
+    - analytics.vehicle-count
+    - analytics.delay-statistics
+    - analytics.flow-direction
+    - analytics.final-stop-count
+    - analytics.emergency-stop-table
+    - analytics.emergency-stop-streaming

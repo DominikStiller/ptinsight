@@ -7,8 +7,8 @@ import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
 import com.dxc.ptinsight.proto.Base.VehicleType;
-import com.dxc.ptinsight.proto.egress.Patterns.EmergencyStop;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.analytics.Patterns.EmergencyStop;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
@@ -39,7 +39,7 @@ public class EmergencyStopDetectionTableJob extends Job {
 
     // Set up tables from stream
     var vehiclePositionStream =
-        source("ingress.vehicle-position", VehiclePosition.class)
+        source("input.vehicle-position", VehiclePosition.class)
             .map(new VehiclePositionTableTupleBuilderProcessFunction());
     tableEnv.createTemporaryView(
         "vehicle_position",
@@ -61,7 +61,7 @@ public class EmergencyStopDetectionTableJob extends Job {
     tableEnv
         .toAppendStream(emergencyStopTable, Row.class)
         .process(new OutputProcessFunction())
-        .addSink(sink("egress.emergency-stop-table"));
+        .addSink(sink("analytics.emergency-stop-table"));
   }
 
   private static class VehiclePositionTableTupleBuilderProcessFunction

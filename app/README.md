@@ -29,11 +29,11 @@ For general documentation, see `docs`. For component-specific documentation, see
 * `ansible`: Ansible playbook and roles to setup and deploy the PT Insight system
 * `common`: Common libraries shared between components, including protobuf definitions
 * `docs`: Detailed docs for system-wide components
-* `ingest`: Component for ingesting external events into the PT Insight system
+* `ingestion`: Component for ingesting external events into the PT Insight system
 * `latencytracker`: Component for tracking end-to-end latency of the PT Insight system
 * `processing`: Component for performing streaming analytics (Flink jobs)
 * `terraform`: Terraform configuration files for cloud infrastructure setup
-* `ui`: Component for visualizing events
+* `visualization`: Component for visualizing events
 
 
 ## Development
@@ -67,8 +67,8 @@ make setup
 make setup-zookeeper
 make setup-kafka
 make setup-processing
-make setup-ingest
-make setup-ui
+make setup-ingestion
+make setup-visualization
 make setup-latencytracker
 ```
 
@@ -79,15 +79,15 @@ make deploy
 # Alternatively for individual components:
 make deploy-kafka
 make deploy-processing
-make deploy-ingest
-make deploy-ui
+make deploy-ingestion
+make deploy-visualization
 make deploy-latencytracker
 ```
 
-5. Open the UI in your browser
+1. Open the visualization in your browser
 ```
-make show-hosts  # get UI host
-Navigate to http://ui-host:8080/
+make show-hosts  # get visualization host
+Navigate to http://visualization-host:8080/
 ```
 
 6. SSH into the servers
@@ -95,8 +95,8 @@ Navigate to http://ui-host:8080/
 ./ssh.sh kafka [0-2]
 ./ssh.sh flink_master
 ./ssh.sh flink_worker [0-3]
-./ssh.sh ingest
-./ssh.sh ui
+./ssh.sh ingestion
+./ssh.sh visualization
 ./ssh.sh latencytracker
 ```
 

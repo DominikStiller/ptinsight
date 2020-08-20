@@ -8,8 +8,8 @@ import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.TimestampValueProcessFunction;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
-import com.dxc.ptinsight.proto.egress.Counts.FinalStopCount;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.analytics.Counts.FinalStopCount;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.util.concurrent.TimeUnit;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
@@ -31,7 +31,7 @@ public class FinalStopCountJob extends Job {
   @Override
   protected void setup() {
     var vehiclePositionStream =
-        source("ingress.vehicle-position", VehiclePosition.class)
+        source("input.vehicle-position", VehiclePosition.class)
             .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
             .timeWindow(Time.minutes(5), Time.seconds(5))
             .evictor(MostRecentDeduplicationEvictor.ofAll())
@@ -49,7 +49,7 @@ public class FinalStopCountJob extends Job {
         .keyBy(GeocellKeySelector.ofTuple2())
         .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
-        .addSink(sink("egress.final-stop-count"));
+        .addSink(sink("analytics.final-stop-count"));
   }
 
   private static class OutputProcessFunction

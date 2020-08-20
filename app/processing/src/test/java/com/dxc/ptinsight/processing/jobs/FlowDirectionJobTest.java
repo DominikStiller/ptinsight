@@ -2,7 +2,7 @@ package com.dxc.ptinsight.processing.jobs;
 
 import com.dxc.ptinsight.processing.EntryPoint;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import org.apache.flink.api.common.typeinfo.BasicTypeInfo;
 import org.apache.flink.api.java.tuple.Tuple2;

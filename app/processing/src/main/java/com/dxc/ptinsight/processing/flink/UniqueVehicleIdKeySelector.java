@@ -1,7 +1,7 @@
 package com.dxc.ptinsight.processing.flink;
 
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehicleInfo;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.functions.KeySelector;
 import org.apache.flink.api.java.tuple.Tuple;

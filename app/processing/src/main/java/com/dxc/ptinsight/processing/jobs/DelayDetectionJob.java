@@ -5,8 +5,8 @@ import static com.dxc.ptinsight.proto.Base.Event;
 import com.dxc.ptinsight.Timestamps;
 import com.dxc.ptinsight.processing.flink.GeocellKeySelector;
 import com.dxc.ptinsight.processing.flink.Job;
-import com.dxc.ptinsight.proto.egress.Delays.DelayStatistics;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.Arrival;
+import com.dxc.ptinsight.proto.analytics.Delays.DelayStatistics;
+import com.dxc.ptinsight.proto.input.HslRealtime.Arrival;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
@@ -33,13 +33,13 @@ public class DelayDetectionJob extends Job {
 
   @Override
   protected void setup() {
-    source("ingress.arrival", Arrival.class)
+    source("input.arrival", Arrival.class)
         .process(new DelayCalculatorProcessFunction())
         .keyBy(GeocellKeySelector.ofTuple3())
         .timeWindow(Time.minutes(5), Time.seconds(5))
         .allowedLateness(Time.seconds(5))
         .process(new DelayStatisticsProcessFunction())
-        .addSink(sink("egress.delay-statistics"));
+        .addSink(sink("analytics.delay-statistics"));
   }
 
   protected static class DelayCalculatorProcessFunction

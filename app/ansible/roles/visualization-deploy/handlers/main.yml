@@ -1,0 +1,6 @@
+---
+- name: restart visualization service
+  become: true
+  service:
+    name: ptinsight-visualization
+    state: restarted

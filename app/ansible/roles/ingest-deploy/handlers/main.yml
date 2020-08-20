@@ -1,6 +1,0 @@
----
-- name: restart ingest service
-  become: true
-  service:
-    name: ptinsight-ingest
-    state: restarted

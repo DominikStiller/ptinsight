@@ -2,8 +2,8 @@ package com.dxc.ptinsight.processing.flink;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehicleInfo;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehicleInfo;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import org.apache.flink.api.java.tuple.Tuple2;
 import org.junit.jupiter.api.Test;
 

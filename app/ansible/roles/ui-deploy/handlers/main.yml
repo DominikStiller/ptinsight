@@ -1,6 +1,0 @@
----
-- name: restart UI service
-  become: true
-  service:
-    name: ptinsight-ui
-    state: restarted

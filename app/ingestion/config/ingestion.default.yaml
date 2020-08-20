@@ -1,0 +1,38 @@
+---
+logging:
+  level: info
+
+producer:
+  type: console
+  protobuf_format: json
+  bootstrap_servers:
+    - kafka-public-ip:9093
+
+# This is enough for multiple hundred million generations
+h3:
+  resolution: 9
+  max_k: 10000
+
+sources:
+  - type: mqtt
+    config:
+      host: mqtt.hsl.fi
+      port: 8883
+#      latency_marker_interval: 1000
+    processor:
+      type: hsl-realtime
+      config:
+        vehicle_types: bus,tram,train
+        event_types: vp
+#  - type: mqtt-recording
+#    config:
+#      bucket: mqtt-recordings
+#      key: mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2
+#      latency_marker_interval: 1000
+#      volume_scaling_factor: 1
+#      volume_scaling_offset_lines: 1000
+#    processor:
+#      type: hsl-realtime
+#      config:
+#        vehicle_types: bus,tram,train
+#        event_types: ars,dep

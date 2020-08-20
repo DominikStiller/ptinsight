@@ -2,7 +2,7 @@ package com.dxc.ptinsight.processing.flink;
 
 import com.dxc.ptinsight.Geocells;
 import com.dxc.ptinsight.processing.EntryPoint;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import org.apache.flink.api.common.functions.FlatMapFunction;
 import org.apache.flink.api.common.functions.MapFunction;
 import org.apache.flink.api.java.tuple.Tuple2;

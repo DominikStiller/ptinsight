@@ -29,17 +29,17 @@
     - common_path: "{{ playbook_dir }}/../common"
   roles:
     - role: ../../ansible/roles/common
-      tags: [setup, setup-zookeeper, setup-kafka, setup-processing, setup-latencytracker, setup-ui, setup-ingest]
+      tags: [setup, setup-zookeeper, setup-kafka, setup-processing, setup-latencytracker, setup-visualization, setup-ingestion]
     - role: common-build
       tags: always
 
 # Not required since Python is marked as dependency in specific roles
 # However, speeds up deployment because installations can happen in parallel
 - name: setup Python
-  hosts: latencytracker, ui, ingest
+  hosts: latencytracker, visualization, ingestion
   roles:
     - role: ../../ansible/roles/python
-      tags: [setup, setup-latencytracker, setup-ui, setup-ingest]
+      tags: [setup, setup-latencytracker, setup-visualization, setup-ingestion]
 
 - name: set up Zookeeper cluster
   hosts: zookeeper
@@ -107,26 +107,26 @@
     - role: latencytracker-deploy
       tags: [deploy, deploy-latencytracker]
 
-- name: set up UI cluster
-  hosts: ui
+- name: set up visualization cluster
+  hosts: visualization
   vars:
-    - source_path: "{{ playbook_dir }}/../ui"
+    - source_path: "{{ playbook_dir }}/../visualization"
     - deploy_path: /opt/ptinsight
     - deploy_user: ptinsight
   roles:
     - role: ../ansible/roles/python
-      tags: [setup, setup-ui]
-    - role: ui-deploy
-      tags: [deploy, deploy-ui]
+      tags: [setup, setup-visualization]
+    - role: visualization-deploy
+      tags: [deploy, deploy-visualization]
 
-- name: set up Ingest cluster
-  hosts: ingest
+- name: set up ingestion cluster
+  hosts: ingestion
   vars:
-    - source_path: "{{ playbook_dir }}/../ingest"
+    - source_path: "{{ playbook_dir }}/../ingestion"
     - deploy_path: /opt/ptinsight
     - deploy_user: ptinsight
   roles:
     - role: ../ansible/roles/python
-      tags: [setup, setup-ingest]
-    - role: ingest-deploy
-      tags: [deploy, deploy-ingest]
+      tags: [setup, setup-ingestion]
+    - role: ingestion-deploy
+      tags: [deploy, deploy-ingestion]

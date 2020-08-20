@@ -6,7 +6,7 @@ Latency marker interval is always 1000 ms.
 ## Setup 1
 
 Infrastructure:
-* 1x t3.nano for ingest
+* 1x t3.nano for ingestion
 * 1x t3.nano for latencytracker
 * 3x t3.small for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -44,7 +44,7 @@ Kafka configuration:
 ## Setup 2
 
 Infrastructure:
-* 1x t3.nano for ingest
+* 1x t3.nano for ingestion
 * 1x t3.nano for latencytracker
 * 3x t3.small for Kafka with 4 partitions per topic
 * 1x t3.small for Flink master
@@ -76,7 +76,7 @@ Kafka configuration:
 ## Setup 3
 
 Infrastructure:
-* 1x c5.2xlarge for ingest
+* 1x c5.2xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.small for Kafka with 4 partitions per topic
 * 1x t3.small for Flink master
@@ -107,7 +107,7 @@ Kafka configuration:
 ## Setup 4
 
 Infrastructure:
-* 1x c5.2xlarge for ingest
+* 1x c5.2xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.small for Kafka with 4 partitions per topic
 * 1x t3.small for Flink master
@@ -145,7 +145,7 @@ Significant changes:
 ## Setup 5
 
 Infrastructure:
-* 1x c5.2xlarge for ingest
+* 1x c5.2xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.small for Kafka with 4 partitions per topic
 * 1x c5.2xlarge for Flink master
@@ -179,7 +179,7 @@ Kafka configuration:
 ## Setup 6
 
 Infrastructure:
-* 1x c5.4xlarge for ingest
+* 1x c5.4xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 4 partitions per topic
 * 1x t3.large for Flink master
@@ -200,8 +200,8 @@ Kafka configuration:
 
 
 Significant changes:
-* Changes ingest from multithreading to multiprocessing for proper parallelization. Before, the scaling could not be achieved due to performance bottlenecks.
-* Increase ingest instance size so each process can have a dedicated vCPU
+* Changes ingestion from multithreading to multiprocessing for proper parallelization. Before, the scaling could not be achieved due to performance bottlenecks.
+* Increase ingestion instance size so each process can have a dedicated vCPU
 
 
 
@@ -215,7 +215,7 @@ Significant changes:
 ## Setup 7
 
 Infrastructure:
-* 1x c5.9xlarge for ingest
+* 1x c5.9xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 4 partitions per topic
 * 1x t3.large for Flink master
@@ -236,7 +236,7 @@ Kafka configuration:
 
 
 Significant changes:
-* Increase ingest instance size to support higher scales
+* Increase ingestion instance size to support higher scales
 * Decrease Flink worker instance size because c5.2xlarge they had low CPU utilization (1-20% with bursts to 40% on window evaluation)
 
 Observations:
@@ -258,7 +258,7 @@ Observations:
 ## Setup 8
 
 Infrastructure:
-* 1x c5.2xlarge for ingest
+* 1x c5.2xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.medium for Flink master
@@ -279,7 +279,7 @@ Kafka configuration:
 
 
 Significant changes:
-* Decrease Flink worker instance size to see scaling effects earlier without needing to use extremely large ingest instance
+* Decrease Flink worker instance size to see scaling effects earlier without needing to use extremely large ingestion instance
 
 
 
@@ -296,7 +296,7 @@ Significant changes:
 ## Setup 9
 
 Infrastructure:
-* 1x c5.4xlarge for ingest
+* 1x c5.4xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -317,43 +317,43 @@ Kafka configuration:
 
 
 Significant changes:
-* Decrease Flink worker and increase ingest instance size to see scaling effects earlier without needing to use extremely large ingest instance
+* Decrease Flink worker and increase ingestion instance size to see scaling effects earlier without needing to use extremely large ingestion instance
 
 
 Observations:
-* 16x: CPU utilization: Flink worker 10%-50%, ingest 60%
-* 32x: CPU utilization: Flink worker 2%-10% (delay detection) 60%-100% (others), ingest 95%
-* Amount of messages reaching Flink seems about correct (645k with 16x, 1.2m with 32x) -> ingest is no bottleneck
-* 64x with small ingest: CPU utilization: ingest 100%, produces messages very slowly and Flink jobs stop quickly
-* 64x with large ingest: CPU utilization: ingest 60%, still not full volume, but Kafka is probably bottleneck since only 2 partitions
+* 16x: CPU utilization: Flink worker 10%-50%, ingestion 60%
+* 32x: CPU utilization: Flink worker 2%-10% (delay detection) 60%-100% (others), ingestion 95%
+* Amount of messages reaching Flink seems about correct (645k with 16x, 1.2m with 32x) -> ingestion is no bottleneck
+* 64x with small ingestion: CPU utilization: ingestion 100%, produces messages very slowly and Flink jobs stop quickly
+* 64x with large ingestion: CPU utilization: ingestion 60%, still not full volume, but Kafka is probably bottleneck since only 2 partitions
 
 
 
-| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
-| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
-| 2020-08-14T08-28-55 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T09-20-02 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T09-52-49 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T10-31-35 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T11-11-09 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T12-13-21 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T13-14-40 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T13-52-30 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T14-30-08 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T15-08-27 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T15-47-53 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T16-34-22 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-14T17-24-12 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |         |
-| 2020-08-18T17-27-51 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.9xlarge for ingest        |
-| 2020-08-18T18-09-20 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.9xlarge for ingest        |
-| 2020-08-18T18-19-34 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.metal for ingest        |
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment                       |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ----------------------------- |
+| 2020-08-14T08-28-55 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T09-20-02 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T09-52-49 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T10-31-35 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T11-11-09 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T12-13-21 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T13-14-40 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T13-52-30 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T14-30-08 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T15-08-27 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T15-47-53 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T16-34-22 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-14T17-24-12 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | c19af37cab0652eb9271e4ceec43e59d1d2bf3bd |                               |
+| 2020-08-18T17-27-51 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.9xlarge for ingestion |
+| 2020-08-18T18-09-20 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.9xlarge for ingestion |
+| 2020-08-18T18-19-34 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | with c5.metal for ingestion   |
 
 
 
 
 ## Setup 10
 Infrastructure:
-* 1x c5.9xlarge for ingest
+* 1x c5.9xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -390,7 +390,7 @@ Observations:
 
 ## Setup 11
 Infrastructure:
-* 1x c5.9xlarge for ingest
+* 1x c5.9xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -432,7 +432,7 @@ Observations:
 
 ## Setup 12
 Infrastructure:
-* 1x c5.9xlarge for ingest
+* 1x c5.9xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -471,7 +471,7 @@ Observations:
 
 ## Setup 13
 Infrastructure:
-* 1x c5.9xlarge for ingest
+* 1x c5.9xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -500,18 +500,18 @@ Observations:
 * Seems to not be using more memory even when more is available
 
 
-| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
-| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
-| 2020-08-18T13-19-34 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 6144m`, `taskmanager.memory.managed.fraction: 0.6` |
-| 2020-08-18T12-47-40 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 6144m`, `taskmanager.memory.managed.fraction: 0.4` |
-| 2020-08-18T13-30-46 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 7169m`, `taskmanager.memory.managed.fraction: 0.7` |
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment                                                                                                   |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| 2020-08-18T13-19-34 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 6144m`, `taskmanager.memory.managed.fraction: 0.6`                        |
+| 2020-08-18T12-47-40 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 6144m`, `taskmanager.memory.managed.fraction: 0.4`                        |
+| 2020-08-18T13-30-46 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 7169m`, `taskmanager.memory.managed.fraction: 0.7`                        |
 | 2020-08-18T13-53-04 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 8efda848519a764e9f1c3e6132c45cdcfb81b767 | `taskmanager.memory.flink.size: 7169m`, `taskmanager.memory.managed.fraction: 0.7`, aligned checkpointing |
 
 
 
 ## Setup 14
 Infrastructure:
-* 1x c5.9xlarge for ingest
+* 1x c5.9xlarge for ingestion
 * 1x t3.small for latencytracker
 * 3x t3.large for Kafka with 2 partitions per topic
 * 1x t3.small for Flink master
@@ -549,5 +549,5 @@ Observations:
 
 
 ## General Observations
-* When ingest does not degrade performance, there is a sawtooth pattern with the period of the Kafka log retention check interval (i.e. latency increases every time logs are deleted)
+* When ingestion does not degrade performance, there is a sawtooth pattern with the period of the Kafka log retention check interval (i.e. latency increases every time logs are deleted)
 * When Kafka latency spikes, it does so for all jobs

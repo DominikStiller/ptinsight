@@ -38,10 +38,10 @@ setup-kafka:
 	$(call ansible_cmd, "setup-kafka")
 setup-processing:
 	$(call ansible_cmd, "setup-processing")
-setup-ingest:
-	$(call ansible_cmd, "setup-ingest")
-setup-ui:
-	$(call ansible_cmd, "setup-ui")
+setup-ingestion:
+	$(call ansible_cmd, "setup-ingestion")
+setup-visualization:
+	$(call ansible_cmd, "setup-visualization")
 setup-latencytracker:
 	$(call ansible_cmd, "setup-latencytracker")
 deploy:
@@ -50,9 +50,9 @@ deploy-kafka:
 	$(call ansible_cmd, "deploy-kafka")
 deploy-processing:
 	$(call ansible_cmd, "deploy-processing")
-deploy-ingest:
-	$(call ansible_cmd, "deploy-ingest")
-deploy-ui:
-	$(call ansible_cmd, "deploy-ui")
+deploy-ingestion:
+	$(call ansible_cmd, "deploy-ingestion")
+deploy-visualization:
+	$(call ansible_cmd, "deploy-visualization")
 deploy-latencytracker:
 	$(call ansible_cmd, "deploy-latencytracker")

@@ -4,7 +4,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import com.dxc.ptinsight.Timestamps;
 import com.dxc.ptinsight.processing.jobs.DelayDetectionJob.DelayCalculatorProcessFunction;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.Arrival;
+import com.dxc.ptinsight.proto.input.HslRealtime.Arrival;
 import java.time.Instant;
 import java.util.List;
 import org.apache.flink.api.java.tuple.Tuple3;

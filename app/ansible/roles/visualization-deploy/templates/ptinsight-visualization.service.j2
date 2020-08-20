@@ -1,0 +1,16 @@
+[Unit]
+Description=PT Insight Visualization
+Requires=network.target
+After=network.target
+
+[Service]
+Type=simple
+WorkingDirectory={{ deploy_path }}/visualization/backend
+ExecStart={{ deploy_path }}/visualization/backend/start.sh
+User={{ deploy_user }}
+Group={{ deploy_user }}
+Environment=FLASK_ENV=production
+
+[Install]
+WantedBy=multi-user.target
+Alias=ptinsight-visualization.service

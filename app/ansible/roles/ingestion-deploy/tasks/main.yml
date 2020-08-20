@@ -1,0 +1,87 @@
+---
+- name: create deploy directory
+  become: true
+  file:
+    path: "{{ deploy_path }}/ingestion"
+    state: directory
+    owner: "{{ deploy_user }}"
+    group: "{{ deploy_user }}"
+
+- name: build ptinsight-ingestion
+  run_once: true
+  command:
+    cmd: poetry build --format=wheel
+    chdir: "{{ source_path }}"
+  delegate_to: localhost
+
+- name: upload ptinsight-ingestion
+  become: true
+  become_user: "{{ deploy_user }}"
+  copy:
+    src: "{{ item }}"
+    dest: "{{ deploy_path }}/ingestion"
+  with_fileglob:
+    - "{{ source_path }}/dist/ptinsight_ingestion-*.whl"
+  register: python_ingestion
+  notify:
+    - restart ingestion service
+
+- name: remove virtual environment
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/ingestion/venv"
+    state: absent
+
+- name: install packages into new virtual environment
+  become: true
+  become_user: "{{ deploy_user }}"
+  pip: 
+    name: "file://{{ item.dest }}"
+    virtualenv: "{{ deploy_path }}/ingestion/venv"
+    virtualenv_command: /usr/local/bin/python3 -m venv
+  with_list: "{{ python_common.results + python_ingestion.results }}"
+
+- name: create config directory
+  become: true
+  become_user: "{{ deploy_user }}"
+  file:
+    path: "{{ deploy_path }}/ingestion/config"
+    state: directory
+
+- name: upload config
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: ingestion.yaml.j2
+    dest: "{{ deploy_path }}/ingestion/config/ingestion.yaml"
+  notify:
+    - restart ingestion service
+
+- name: upload start script
+  become: true
+  become_user: "{{ deploy_user }}"
+  template:
+    src: start.sh.j2
+    dest: "{{ deploy_path }}/ingestion/start.sh"
+    mode: a+x
+
+- name: upload ingestion service file
+  become: true
+  template:
+    src: ptinsight-ingestion.service.j2
+    dest: /usr/lib/systemd/system/ptinsight-ingestion.service
+
+- name: reload systemd
+  become: true
+  systemd:
+    daemon_reload: yes
+
+- meta: flush_handlers
+
+- name: start the ingestion service
+  become: true
+  service:
+    name: ptinsight-ingestion
+    state: started
+    enabled: yes

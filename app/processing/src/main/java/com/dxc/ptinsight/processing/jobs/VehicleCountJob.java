@@ -8,8 +8,8 @@ import com.dxc.ptinsight.processing.flink.IdentityProcessFunction;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
-import com.dxc.ptinsight.proto.egress.Counts.VehicleCount;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.analytics.Counts.VehicleCount;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
 import org.apache.flink.streaming.api.windowing.windows.TimeWindow;
@@ -36,7 +36,7 @@ public class VehicleCountJob extends Job {
     // https://ci.apache.org/projects/flink/flink-docs-release-1.10/dev/stream/operators/windows.html#consecutive-windowed-operations
     // Do not allow lateness, because evicted elements in the first window remain in the second
     // window when it is triggered again
-    source("ingress.vehicle-position", VehiclePosition.class)
+    source("input.vehicle-position", VehiclePosition.class)
         // First, key by vehicle to select only most recent position of each vehicle
         .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
         .timeWindow(Time.seconds(30), Time.seconds(5))
@@ -48,7 +48,7 @@ public class VehicleCountJob extends Job {
         .keyBy(GeocellKeySelector.ofVehiclePosition())
         .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
-        .addSink(sink("egress.vehicle-count"));
+        .addSink(sink("analytics.vehicle-count"));
   }
 
   private static class OutputProcessFunction

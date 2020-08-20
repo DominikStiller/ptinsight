@@ -2,7 +2,7 @@ package com.dxc.ptinsight.processing.flink;
 
 import com.dxc.ptinsight.GraphQLClient;
 import com.dxc.ptinsight.Timestamps;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;

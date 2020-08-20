@@ -38,16 +38,16 @@ class LatencyTracker:
 
     def start(self) -> None:
         try:
-            self.consumer.subscribe(pattern="ingress.*|egress.*")
+            self.consumer.subscribe(pattern="input.*|analytics.*")
             for message in self.consumer:
                 topic = message.topic
                 event = deserialize(message.value, self.protobuf_format)
 
                 if details := unpack_event_details(topic, event):
                     if geocell := self._latency_markers.check_latency_marker(details):
-                        if topic.startswith("ingress."):
+                        if topic.startswith("input."):
                             self._process_ingress(geocell, event)
-                        elif topic.startswith("egress."):
+                        elif topic.startswith("analytics."):
                             self._process_egress(topic, geocell, event)
 
         except NoBrokersAvailable:

@@ -5,8 +5,8 @@ import com.dxc.ptinsight.processing.flink.GeocellKeySelector;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
-import com.dxc.ptinsight.proto.egress.Flow.FlowDirection;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.analytics.Flow.FlowDirection;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.util.HashMap;
 import java.util.Map.Entry;
 import org.apache.flink.api.common.state.ValueState;
@@ -36,14 +36,14 @@ public class FlowDirectionJob extends Job {
 
   @Override
   protected void setup() {
-    source("ingress.vehicle-position", VehiclePosition.class)
+    source("input.vehicle-position", VehiclePosition.class)
         .keyBy(UniqueVehicleIdKeySelector.ofVehiclePosition())
         .process(new CellChangeDetectionProcessFunction())
         .keyBy(value -> value.f0)
         .timeWindow(Time.minutes(5), Time.seconds(5))
         .allowedLateness(Time.seconds(5))
         .process(new FindMostTraversedEdgeProcessFunction())
-        .addSink(sink("egress.flow-direction"));
+        .addSink(sink("analytics.flow-direction"));
   }
 
   protected static class CellChangeDetectionProcessFunction

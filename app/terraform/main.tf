@@ -49,8 +49,8 @@ module "flink" {
   flink_bucket = module.storage.flink_bucket
 }
 
-module "ingest" {
-  source = "./modules/clusters/ingest"
+module "ingestion" {
+  source = "./modules/clusters/ingestion"
 
   prefix = local.prefix
   vpc = module.network.vpc
@@ -60,8 +60,8 @@ module "ingest" {
   ssh_privatekey = var.ssh_privatekey
 }
 
-module "ui" {
-  source = "./modules/clusters/ui"
+module "visualization" {
+  source = "./modules/clusters/visualization"
 
   prefix = local.prefix
   vpc = module.network.vpc

@@ -1,0 +1,25 @@
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
+
+[tool.poetry]
+name = "ptinsight-visualization"
+version = "1.0"
+description = "PT Insight Visualization"
+authors = ["Dominik Stiller <dominik.stiller@hpe.com>"]
+packages = [
+    { include = "ptinsight" },
+]
+
+[tool.poetry.dependencies]
+python = "^3.8"
+ptinsight-common = {path = "../../common/python", develop=false}
+flask = "^1.1.2"
+kafka-python = "^2.0.1"
+flask-socketio = "^4.3.1"
+pyyaml = "^5.3.1"
+eventlet = "^0.25.2"
+h3 = "^3.6.3"
+
+[tool.poetry.dev-dependencies]
+black = ">=19.10b0"

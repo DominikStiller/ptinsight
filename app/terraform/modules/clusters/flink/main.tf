@@ -110,7 +110,7 @@ resource "aws_security_group" "flink_master" {
 
 # ---- >> Worker ----------------------------
 resource "aws_instance" "flink_worker" {
-    count = 4
+    count = 6
 
     ami                    = "ami-04cf43aca3e6f3de3"
     instance_type          = "t3.medium"

@@ -4,21 +4,21 @@ Apache Kafka is used as event transport and storage backbone. Every topic only c
 
 
 ## Topics
-Every topic only contains protobuf messages of a single type. Topics are prefixed with `ingress` if they are produced in `ingest`, and `egress` if they are produced in `processing`.
+Every topic only contains protobuf messages of a single type. Topics are prefixed with `input` if they are produced in `ingestion`, and `analytics` if they are produced in `processing`.
 
 All topics are replicated on all 3 hosts and have two partitions. Records are randomly assigned to a partition, i.e. no keys are used and the order of records is only preserved within a partition.
 
-| Topic                           | Description                                      | Source                | Protobuf Type                                   |
-| ------------------------------- | ------------------------------------------------ | --------------------- | ----------------------------------------------- |
-| ingress.arrival                 | Arrival of vehicle at stop                       | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Arrival         |
-| ingress.departure               | Departure of vehicle from stop                   | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.Departure       |
-| ingess.vehicle-position         | Position and speed of vehicle                    | HSL.fi MQTT           | com.dxc.ptinsight.proto.ingress.VehiclePosition |
-| egress.vehicle-count            | Number of vehicles per geocell                   | PT Insight Processing | com.dxc.ptinsight.proto.egress.VehicleCount     |
-| egress.delay-statistics         | Arrival delay statistics per cell                | PT Insight Processing | com.dxc.ptinsight.proto.egress.DelayStatistics  |
-| egress.flow-direction           | Flow direction between cells                     | PT Insight Processing | com.dxc.ptinsight.proto.egress.FlowDirection    |
-| egress.final-stop-count         | Number of vehicles per final stop cell           | PT Insight Processing | com.dxc.ptinsight.proto.egress.FinalStopCount   |
-| egress.emergency-stop-table     | High deceleration of vehicle using table API     | PT Insight Processing | com.dxc.ptinsight.proto.egress.EmergencyStop    |
-| egress.emergency-stop-streaming | High deceleration of vehicle using streaming API | PT Insight Processing | com.dxc.ptinsight.proto.egress.EmergencyStop    |
+| Topic                              | Description                                      | Source                | Protobuf Type                                     |
+| ---------------------------------- | ------------------------------------------------ | --------------------- | ------------------------------------------------- |
+| input.arrival                      | Arrival of vehicle at stop                       | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.Arrival             |
+| input.departure                    | Departure of vehicle from stop                   | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.Departure           |
+| ingess.vehicle-position            | Position and speed of vehicle                    | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.VehiclePosition     |
+| analytics.vehicle-count            | Number of vehicles per geocell                   | PT Insight Processing | com.dxc.ptinsight.proto.analytics.VehicleCount    |
+| analytics.delay-statistics         | Arrival delay statistics per cell                | PT Insight Processing | com.dxc.ptinsight.proto.analytics.DelayStatistics |
+| analytics.flow-direction           | Flow direction between cells                     | PT Insight Processing | com.dxc.ptinsight.proto.analytics.FlowDirection   |
+| analytics.final-stop-count         | Number of vehicles per final stop cell           | PT Insight Processing | com.dxc.ptinsight.proto.analytics.FinalStopCount  |
+| analytics.emergency-stop-table     | High deceleration of vehicle using table API     | PT Insight Processing | com.dxc.ptinsight.proto.analytics.EmergencyStop   |
+| analytics.emergency-stop-streaming | High deceleration of vehicle using streaming API | PT Insight Processing | com.dxc.ptinsight.proto.analytics.EmergencyStop   |
 
 
 ### Adding a new topic

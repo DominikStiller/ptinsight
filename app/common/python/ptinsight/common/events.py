@@ -16,15 +16,15 @@ from ptinsight.common import (
 
 
 _TOPIC_TO_PROTOBUF_MAPPING = {
-    "ingress.vehicle-position": VehiclePosition,
-    "ingress.arrival": Arrival,
-    "ingress.departure": Departure,
-    "egress.vehicle-count": VehicleCount,
-    "egress.delay-statistics": DelayStatistics,
-    "egress.flow-direction": FlowDirection,
-    "egress.final-stop-count": FinalStopCount,
-    "egress.emergency-stop-table": EmergencyStop,
-    "egress.emergency-stop-streaming": EmergencyStop,
+    "input.vehicle-position": VehiclePosition,
+    "input.arrival": Arrival,
+    "input.departure": Departure,
+    "analytics.vehicle-count": VehicleCount,
+    "analytics.delay-statistics": DelayStatistics,
+    "analytics.flow-direction": FlowDirection,
+    "analytics.final-stop-count": FinalStopCount,
+    "analytics.emergency-stop-table": EmergencyStop,
+    "analytics.emergency-stop-streaming": EmergencyStop,
 }
 
 

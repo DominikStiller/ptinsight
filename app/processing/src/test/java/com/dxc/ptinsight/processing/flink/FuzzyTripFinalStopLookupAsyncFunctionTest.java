@@ -5,8 +5,8 @@ import static org.mockito.Mockito.*;
 
 import com.dxc.ptinsight.GraphQLClient;
 import com.dxc.ptinsight.processing.EntryPoint;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.RouteInfo;
-import com.dxc.ptinsight.proto.ingress.HslRealtime.VehiclePosition;
+import com.dxc.ptinsight.proto.input.HslRealtime.RouteInfo;
+import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;

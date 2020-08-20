@@ -1,0 +1,6 @@
+---
+- name: restart ingestion service
+  become: true
+  service:
+    name: ptinsight-ingestion
+    state: started

@@ -8,7 +8,7 @@ from dateutil.parser import isoparse
 
 from ptinsight.common import VehicleType
 from ptinsight.common.geocells import SpiralingCoordinateGenerator
-from ptinsight.common.proto.ingress.hsl_realtime_pb2 import (
+from ptinsight.common.proto.input.hsl_realtime_pb2 import (
     VehiclePosition,
     Arrival,
     Departure,
@@ -114,7 +114,7 @@ class HSLRealtimeLatencyMarkers:
             return
 
         if hasattr(event, "vehicle") and hasattr(event.vehicle, "operator"):
-            # For ingress events, we can check for the special operator
+            # For input.* events, we can check for the special operator
             if event.vehicle.operator == self.LATENCY_MARKER_OPERATOR:
                 return cell
         else:
@@ -130,18 +130,18 @@ class HSLRealtimeLatencyMarkers:
         timestamp_datetime = datetime.fromtimestamp(timestamp, tz=timezone.utc)
         return [
             *[
-                ("ingress.vehicle-position", timestamp + i / 1000, event,)
+                ("input.vehicle-position", timestamp + i / 1000, event,)
                 for i, event in enumerate(
                     self._generate_emergency_stop_latency_markers(timestamp_datetime)
                 )
             ],
             (
-                "ingress.arrival",
+                "input.arrival",
                 timestamp,
                 self._generate_arrival_latency_marker(timestamp_datetime),
             ),
             (
-                "ingress.departure",
+                "input.departure",
                 timestamp,
                 self._generate_departure_latency_marker(timestamp_datetime),
             ),
