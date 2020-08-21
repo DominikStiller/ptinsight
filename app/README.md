@@ -84,7 +84,7 @@ make deploy-visualization
 make deploy-latencytracker
 ```
 
-1. Open the visualization in your browser
+5. Open the visualization in your browser
 ```
 make show-hosts  # get visualization host
 Navigate to http://visualization-host:8080/

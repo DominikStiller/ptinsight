@@ -47,7 +47,7 @@ class MQTTProcessor(Processor, abc.ABC):
     @property
     @abc.abstractmethod
     def topics(self):
-        """Defines the topics an MQTT ingestor should subscribe to"""
+        """Defines the topics an MQTT connector should subscribe to"""
         pass
 
     def generate_latency_markers(self) -> List[Tuple[str, float, Message]]:

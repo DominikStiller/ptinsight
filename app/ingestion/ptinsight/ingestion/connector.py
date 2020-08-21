@@ -29,7 +29,7 @@ from ptinsight.ingestion.processors import MQTTProcessor, Processor
 logger = logging.getLogger(__name__)
 
 
-class Ingestor(abc.ABC):
+class Connector(abc.ABC):
     """Receives messages and publishes them to Kafka after transforming using a Processor"""
 
     @abc.abstractmethod
@@ -39,7 +39,7 @@ class Ingestor(abc.ABC):
 
     @abc.abstractmethod
     def start(self):
-        """Starts the ingestor"""
+        """Starts the connector"""
         pass
 
     @final
@@ -78,7 +78,7 @@ class _ConsoleProducer:
         print(f"{topic}: {value}")
 
 
-class MQTTIngestor(Ingestor):
+class MQTTConnector(Connector):
     """Receives messages from an MQTT broker"""
 
     def __init__(self, config: dict, processor: MQTTProcessor):
@@ -97,7 +97,7 @@ class MQTTIngestor(Ingestor):
             self.client.tls_set()
 
     def start(self):
-        logger.info(f"Starting MQTT ingestor({self.host}:{self.port})")
+        logger.info(f"Starting MQTT connector({self.host}:{self.port})")
 
         self._create_producer()
 
@@ -118,7 +118,7 @@ class MQTTIngestor(Ingestor):
             self._ingest(target_topic, _create_event(event_timestamp, details))
 
 
-class MQTTRecordingIngestor(Ingestor):
+class MQTTRecordingConnector(Connector):
     """Receives messages from an MQTT recording located in S3"""
 
     def __init__(self, config: dict, processor: MQTTProcessor):
@@ -139,7 +139,7 @@ class MQTTRecordingIngestor(Ingestor):
 
         logger.info(f"Recorded from {original_broker} at {str(original_t_start)}")
         logger.info(f"Topics: {original_topics}\n")
-        logger.info(f"Starting MQTT recording ingestor(s3://{self.bucket}/{self.key})")
+        logger.info(f"Starting MQTT recording connector(s3://{self.bucket}/{self.key})")
 
         self._start_schedulers()
 

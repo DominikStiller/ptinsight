@@ -13,7 +13,7 @@ h3:
   resolution: 9
   max_k: 10000
 
-sources:
+connectors:
   - type: mqtt
     config:
       host: mqtt.hsl.fi

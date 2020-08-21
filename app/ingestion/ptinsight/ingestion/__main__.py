@@ -9,9 +9,9 @@ import yaml
 from kafka import KafkaProducer
 
 from ptinsight.common.logger import setup_logger
-from ptinsight.ingestion.ingestor import (
-    MQTTIngestor,
-    MQTTRecordingIngestor,
+from ptinsight.ingestion.connector import (
+    MQTTConnector,
+    MQTTRecordingConnector,
     _ConsoleProducer,
 )
 from ptinsight.ingestion.processors import MQTTProcessor
@@ -58,14 +58,14 @@ for type in [MQTTProcessor]:
     for cls in classes:
         processors[cls.name()] = cls
 
-# Load sources from config and create respective ingestors
-ingestors = []
-for source in config["sources"]:
-    ingestor_config = source["config"]
+# Load sources from config and create respective connectors
+connectors = []
+for source in config["connectors"]:
+    connector_config = source["config"]
     if source["type"] == "mqtt":
-        ingestor_class = MQTTIngestor
+        connector_class = MQTTConnector
     elif source["type"] == "mqtt-recording":
-        ingestor_class = MQTTRecordingIngestor
+        connector_class = MQTTRecordingConnector
     else:
         continue
 
@@ -73,10 +73,11 @@ for source in config["sources"]:
     processor_config = {**source["processor"]["config"], "h3": {**config["h3"]}}
     processor = processors[processor_type](processor_config)
 
-    ingestor = ingestor_class(ingestor_config, processor)
-    ingestor.set_producer(producer_class, producer_config, protobuf_format)
-    ingestors.append(ingestor)
+    connector = connector_class(connector_config, processor)
+    connector.set_producer(producer_class, producer_config, protobuf_format)
+    connectors.append(connector)
 
-# Start all ingestors
+# Start all connectors
 with ThreadPoolExecutor() as executor:
-    wait([executor.submit(ingestor.start) for ingestor in ingestors])
+    connectors[0].start()
+    # wait([executor.submit(connector.start) for connector in connectors])
