@@ -1,19 +1,19 @@
-# Event-Driven Architecture
+# Event Stream Analytics
 
 This is the repository for the bachelor's thesis project of Dominik Stiller (dominik.stiller@hpe.com). Meeting notes, presentations and formalia can be found in [this repo](https://github.dxc.com/bgloss/dhbw-eda).
 
-Goal of the project is the setup of an example application for complex event processing on real-time streams based on an event-driven architecture to gain experience with this technology.
+Goal of the project is the setup of an example application for real-time event stream analytics to gain experience with this technology.
 
 
 ## Repository Structure
 * `ansible`: Ansible roles for common platforms and applications (e.g., Java, Python, Flink)
 * `app`: The main proof of concept application "PT Insight"
-* `litreview`: A review of literature for EDA and CPE in smart cities
+* `litreview`: A review of literature for stream analytics in smart cities
 * `playground`: Testing ground for different platforms and applications
     * `1_vagrant-ansible`: Setup of an EC2 instance with an httpd using Vagrant and Ansible
     * `2_terraform-ansible`: Setup of an EC2 instance with an httpd using Terraform and Ansible
     * `3_flink-singlenode`: Flink application with input from MQTT and output to Kafka and AWS Lambda
-    * `4_cep`: Simulation and Flink application with CEP that communicate via MQTT
+    * `4_cep`: Simulation and Flink application with event processing that communicate via MQTT
 * `tools`: Useful scripts
     * `mqtt-replay`: Recording and replay of MQTT messages
     * `terraform-inventory`: Dynamically generate Ansible inventory from Terraform state
@@ -86,7 +86,7 @@ The user needs following policies attached:
 
 9. Generate an SSH key to use for EC2 instances
 ```
-ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_eda_deploy
+ssh-keygen -t rsa -b 4096 -N "" -f ~/.ssh/id_rsa_ptinsight_deploy
 ```
 
 10. Logout and login again to reload the environment
@@ -108,7 +108,5 @@ We use common tools for consistency. Execute the commands below in the project's
 
 
 ## Abbreviations
-* **CPE**: Complex Event Processing.
-* **EDA**: Event-Driven Architecture
 * **protobuf**: [Protocol Buffers](https://developers.google.com/protocol-buffers)
 

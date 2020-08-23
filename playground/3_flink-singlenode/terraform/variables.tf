@@ -1,6 +1,6 @@
 variable "ssh_key" {
     description = "SSH key for EC2 instances"
-    default = "~/.ssh/id_rsa_eda_deploy"
+    default = "~/.ssh/id_rsa_ptinsight_deploy"
 }
 
 variable "trusted_cidr" {
