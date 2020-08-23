@@ -5,9 +5,9 @@ import com.dxc.ptinsight.YamlSerializer;
 import com.dxc.ptinsight.processing.jobs.DelayDetectionJob;
 import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionStreamingJob;
 import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionTableJob;
-import com.dxc.ptinsight.processing.jobs.VehicleCountJob;
-import com.dxc.ptinsight.processing.jobs.FlowDirectionJob;
 import com.dxc.ptinsight.processing.jobs.FinalStopCountJob;
+import com.dxc.ptinsight.processing.jobs.FlowDirectionJob;
+import com.dxc.ptinsight.processing.jobs.VehicleCountJob;
 import java.io.IOException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +24,8 @@ public class EntryPoint {
     new EmergencyStopDetectionTableJob().execute();
     new EmergencyStopDetectionStreamingJob().execute();
     // Exclude these for evaluation, since their latency cannot be measured
-       new FlowDirectionJob().execute();
-       new FinalStopCountJob().execute();
+    new FlowDirectionJob().execute();
+    new FinalStopCountJob().execute();
   }
 
   public static Configuration getConfiguration() {

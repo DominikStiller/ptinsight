@@ -79,5 +79,4 @@ for source in config["connectors"]:
 
 # Start all connectors
 with ThreadPoolExecutor() as executor:
-    connectors[0].start()
-    # wait([executor.submit(connector.start) for connector in connectors])
+    wait([executor.submit(connector.start) for connector in connectors])

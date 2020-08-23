@@ -70,8 +70,7 @@ cd deploy
 ./record_and_upload.sh host port duration topics
 ```
 
-5. Analyze the recording. You might need to switch to an EC2 instance type with more memory (about 2 GB for 60
- million messages, that is one day of recording from mqtt.hsl.fi).
+5. Analyze the recording. You might need to switch to an EC2 instance type with more memory (about 2 GB for 60 million messages, that is one day of recording from mqtt.hsl.fi).
 ```
 ./ssh.sh
 cd deploy

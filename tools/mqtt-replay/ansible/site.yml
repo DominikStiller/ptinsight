@@ -20,7 +20,6 @@
         dest: /home/centos/deploy/
       loop:
         - Pipfile
-        - Pipfile.lock
 
     - name: upload application
       copy:
@@ -33,7 +32,11 @@
         - analyze.py
         - record_and_upload.sh
 
+    - name: install pipenv
+      command:
+        cmd: pip3 install --user pipenv
+
     - name: install dependencies
       command:
-        cmd: pipenv sync
+        cmd: pipenv install
         chdir: "/home/centos/deploy"

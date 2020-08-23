@@ -25,4 +25,4 @@ reapply: destroy apply
 # Ansible
 deploy:
 	ANSIBLE_HOST_KEY_CHECKING=False \
-	ansible-playbook -i ${ROOT}../terraform-inventory/terraform_inventory.py --timeout 60 ${ROOT}ansible/site.yml
+	ansible-playbook -i ${ROOT}../terraform-inventory/terraform_inventory.py ${ROOT}ansible/site.yml

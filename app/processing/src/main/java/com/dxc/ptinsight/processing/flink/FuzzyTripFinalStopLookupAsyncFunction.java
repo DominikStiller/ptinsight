@@ -75,7 +75,9 @@ public class FuzzyTripFinalStopLookupAsyncFunction
     // The time needs to be transformed to seconds for the request
     // https://digitransit.fi/en/developers/apis/1-routing-api/routes/#a-namefuzzytripaquery-a-trip-without-its-id
     var seconds = departureTime.toSecondOfDay();
-    // The timestamp comes from the window end and can therefore be off by a couply of seconds
+    // The timestamp comes from the window end instead of from the actual event, since vehicle
+    // positions in the final stop job are windowed first and deduplicated before lookup
+    // Therefore it can be off by at most the window period (5 s)
     // This might lead to incorrect results around the departure time, but the likelihood is small
     if (!timestamp.toLocalDate().equals(operatingDay)
         && departureTime.isBefore(timestamp.toLocalTime())) {
