@@ -3,7 +3,7 @@ package com.dxc.ptinsight.processing.jobs;
 import static org.junit.jupiter.api.Assertions.*;
 
 import com.dxc.ptinsight.Timestamps;
-import com.dxc.ptinsight.processing.jobs.DelayDetectionJob.DelayCalculatorProcessFunction;
+import com.dxc.ptinsight.processing.jobs.DelayDistributionJob.DelayCalculatorProcessFunction;
 import com.dxc.ptinsight.proto.input.HslRealtime.Arrival;
 import java.time.Instant;
 import java.util.List;
@@ -12,7 +12,7 @@ import org.apache.flink.streaming.api.operators.ProcessOperator;
 import org.apache.flink.streaming.util.OneInputStreamOperatorTestHarness;
 import org.junit.jupiter.api.Test;
 
-class DelayDetectionJobTest {
+class DelayDistributionJobTest {
 
   @Test
   void shouldDetectDelays() throws Exception {

@@ -5,7 +5,6 @@ import functools
 from multiprocessing.managers import ValueProxy
 
 import itertools
-from datetime import datetime
 from typing import Tuple, Optional, List
 
 import paho.mqtt.client as mqtt

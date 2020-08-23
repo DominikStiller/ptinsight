@@ -8,17 +8,17 @@ Every topic only contains protobuf messages of a single type. Topics are prefixe
 
 All topics are replicated on all 3 hosts and have two partitions. Records are randomly assigned to a partition, i.e. no keys are used and the order of records is only preserved within a partition.
 
-| Topic                              | Description                                      | Source                | Protobuf Type                                     |
-| ---------------------------------- | ------------------------------------------------ | --------------------- | ------------------------------------------------- |
-| input.arrival                      | Arrival of vehicle at stop                       | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.Arrival             |
-| input.departure                    | Departure of vehicle from stop                   | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.Departure           |
-| ingess.vehicle-position            | Position and speed of vehicle                    | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.VehiclePosition     |
-| analytics.vehicle-count            | Number of vehicles per geocell                   | PT Insight Processing | com.dxc.ptinsight.proto.analytics.VehicleCount    |
-| analytics.delay-statistics         | Arrival delay statistics per cell                | PT Insight Processing | com.dxc.ptinsight.proto.analytics.DelayStatistics |
-| analytics.flow-direction           | Flow direction between cells                     | PT Insight Processing | com.dxc.ptinsight.proto.analytics.FlowDirection   |
-| analytics.final-stop-count         | Number of vehicles per final stop cell           | PT Insight Processing | com.dxc.ptinsight.proto.analytics.FinalStopCount  |
-| analytics.emergency-stop-table     | High deceleration of vehicle using table API     | PT Insight Processing | com.dxc.ptinsight.proto.analytics.EmergencyStop   |
-| analytics.emergency-stop-streaming | High deceleration of vehicle using streaming API | PT Insight Processing | com.dxc.ptinsight.proto.analytics.EmergencyStop   |
+| Topic                                        | Description                                      | Source                | Protobuf Type                                                  |
+| -------------------------------------------- | ------------------------------------------------ | --------------------- | -------------------------------------------------------------- |
+| input.arrival                                | Arrival of vehicle at stop                       | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.Arrival                          |
+| input.departure                              | Departure of vehicle from stop                   | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.Departure                        |
+| ingess.vehicle-position                      | Position and speed of vehicle                    | HSL.fi MQTT           | com.dxc.ptinsight.proto.input.VehiclePosition                  |
+| analytics.vehicle-distribution               | Number of vehicles per geocell                   | PT Insight Processing | com.dxc.ptinsight.proto.analytics.VehicleDistributionResult    |
+| analytics.delay-distribution                 | Arrival delay statistics per cell                | PT Insight Processing | com.dxc.ptinsight.proto.analytics.DelayDistributionResult      |
+| analytics.flow-direction                     | Flow direction between cells                     | PT Insight Processing | com.dxc.ptinsight.proto.analytics.FlowDirectionResult          |
+| analytics.final-stop-distribution            | Number of vehicles per final stop cell           | PT Insight Processing | com.dxc.ptinsight.proto.analytics.FinalStopDistributionResult  |
+| analytics.emergency-stop-detection-table     | High deceleration of vehicle using table API     | PT Insight Processing | com.dxc.ptinsight.proto.analytics.EmergencyStopDetectionResult |
+| analytics.emergency-stop-detection-streaming | High deceleration of vehicle using streaming API | PT Insight Processing | com.dxc.ptinsight.proto.analytics.EmergencyStopDetectionResult |
 
 
 ### Adding a new topic

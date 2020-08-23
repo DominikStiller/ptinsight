@@ -8,9 +8,9 @@
     - input.arrival
     - input.departure
     - input.vehicle-position
-    - analytics.vehicle-count
-    - analytics.delay-statistics
+    - analytics.vehicle-distribution
+    - analytics.delay-distribution
     - analytics.flow-direction
-    - analytics.final-stop-count
-    - analytics.emergency-stop-table
-    - analytics.emergency-stop-streaming
+    - analytics.final-stop-distribution
+    - analytics.emergency-stop-detection-table
+    - analytics.emergency-stop-detection-streaming

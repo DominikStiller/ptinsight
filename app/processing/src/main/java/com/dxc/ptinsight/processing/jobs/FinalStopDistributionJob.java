@@ -8,7 +8,7 @@ import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.TimestampValueProcessFunction;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
-import com.dxc.ptinsight.proto.analytics.Counts.FinalStopCount;
+import com.dxc.ptinsight.proto.analytics.HslRealtime.FinalStopDistributionResult;
 import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.util.concurrent.TimeUnit;
 import org.apache.flink.streaming.api.datastream.AsyncDataStream;
@@ -20,12 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Find the most visited final stops of ongoing trips */
-public class FinalStopCountJob extends Job {
+public class FinalStopDistributionJob extends Job {
 
-  private static final Logger LOG = LoggerFactory.getLogger(FinalStopCountJob.class);
+  private static final Logger LOG = LoggerFactory.getLogger(FinalStopDistributionJob.class);
 
-  public FinalStopCountJob() {
-    super("Final Stop Counter");
+  public FinalStopDistributionJob() {
+    super("Final Stop Distribution");
   }
 
   @Override
@@ -49,7 +49,7 @@ public class FinalStopCountJob extends Job {
         .keyBy(GeocellKeySelector.ofTuple2())
         .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
-        .addSink(sink("analytics.final-stop-count"));
+        .addSink(sink("analytics.final-stop-distribution"));
   }
 
   private static class OutputProcessFunction
@@ -59,7 +59,8 @@ public class FinalStopCountJob extends Job {
     public void process(
         Long geocell, Context context, Iterable<Integer> elements, Collector<Event> out) {
       var count = elements.iterator().next();
-      var details = FinalStopCount.newBuilder().setGeocell(geocell).setCount(count).build();
+      var details =
+          FinalStopDistributionResult.newBuilder().setGeocell(geocell).setCount(count).build();
       out.collect(output(details, context.window()));
     }
   }

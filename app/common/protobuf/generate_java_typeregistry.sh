@@ -13,9 +13,7 @@ java_dir="$(realpath "$(dirname "$0")")/../java/src/main/java/com/dxc/ptinsight/
         if [[ $f != "Registry.java" ]]; then
             # Remove extension
             path="${f%.*}"
-            file="$(basename $path)"
-            imports+="import com.dxc.ptinsight.proto.${path/\//.};"$'\n'
-            adds+="    .add($file.getDescriptor().getMessageTypes())"$'\n'
+            adds+="    .add(com.dxc.ptinsight.proto.${path/\//.}.getDescriptor().getMessageTypes())"$'\n'
         fi
     done
     shopt -u globstar

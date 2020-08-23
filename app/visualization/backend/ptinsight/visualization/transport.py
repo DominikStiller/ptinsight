@@ -4,15 +4,7 @@ import h3
 from flask_socketio import SocketIO
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
-from ptinsight.common import (
-    Event,
-    FlowDirection,
-    FinalStopCount,
-    DelayStatistics,
-    VehicleCount,
-    EmergencyStop,
-    VehicleType,
-)
+from ptinsight.common import Event, VehicleType
 from ptinsight.common.events import unpack_event_details
 from ptinsight.common.serialize import deserialize
 
@@ -35,11 +27,11 @@ class KafkaToSocketioBridge:
         try:
             self.consumer.subscribe(
                 [
-                    "analytics.vehicle-count",
-                    "analytics.delay-statistics",
+                    "analytics.vehicle-distribution",
+                    "analytics.delay-distribution",
                     "analytics.flow-direction",
-                    "analytics.final-stop-count",
-                    "analytics.emergency-stop-streaming",
+                    "analytics.final-stop-distribution",
+                    "analytics.emergency-stop-detection-streaming",
                 ]
             )
             for message in self.consumer:
@@ -53,12 +45,12 @@ class KafkaToSocketioBridge:
     def _emit(self, topic: str, event: Event):
         details = unpack_event_details(topic, event)
 
-        if topic == "analytics.vehicle-count":
+        if topic == "analytics.vehicle-distribution":
             data = {
                 "geocell": h3.h3_to_string(details.geocell),
                 "count": details.count,
             }
-        elif topic == "analytics.delay-statistics":
+        elif topic == "analytics.delay-distribution":
             data = {
                 "geocell": h3.h3_to_string(details.geocell),
                 "p50": details.percentile50th,
@@ -70,12 +62,12 @@ class KafkaToSocketioBridge:
                 "edge": h3.h3_to_string(details.geocells_edge),
                 "count": details.count,
             }
-        elif topic == "analytics.final-stop-count":
+        elif topic == "analytics.final-stop-distribution":
             data = {
                 "geocell": h3.h3_to_string(details.geocell),
                 "count": details.count,
             }
-        elif topic == "analytics.emergency-stop-streaming":
+        elif topic == "analytics.emergency-stop-detection-streaming":
             data = {
                 "veh_type": VehicleType.Name(details.vehicle_type).lower(),
                 "lat": details.latitude,

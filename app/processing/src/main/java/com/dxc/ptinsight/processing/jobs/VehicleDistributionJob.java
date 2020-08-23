@@ -8,7 +8,7 @@ import com.dxc.ptinsight.processing.flink.IdentityProcessFunction;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.MostRecentDeduplicationEvictor;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
-import com.dxc.ptinsight.proto.analytics.Counts.VehicleCount;
+import com.dxc.ptinsight.proto.analytics.HslRealtime.VehicleDistributionResult;
 import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import org.apache.flink.streaming.api.functions.windowing.ProcessWindowFunction;
 import org.apache.flink.streaming.api.windowing.time.Time;
@@ -22,12 +22,12 @@ import org.slf4j.LoggerFactory;
  *
  * <p>If a vehicle was in multiple cells for a window, use only the last cell
  */
-public class VehicleCountJob extends Job {
+public class VehicleDistributionJob extends Job {
 
-  private static final Logger LOG = LoggerFactory.getLogger(VehicleCountJob.class);
+  private static final Logger LOG = LoggerFactory.getLogger(VehicleDistributionJob.class);
 
-  public VehicleCountJob() {
-    super("Vehicle Counter");
+  public VehicleDistributionJob() {
+    super("Vehicle Distribution");
   }
 
   @Override
@@ -48,7 +48,7 @@ public class VehicleCountJob extends Job {
         .keyBy(GeocellKeySelector.ofVehiclePosition())
         .timeWindow(Time.seconds(5))
         .aggregate(new CountAggregateFunction<>(), new OutputProcessFunction())
-        .addSink(sink("analytics.vehicle-count"));
+        .addSink(sink("analytics.vehicle-distribution"));
   }
 
   private static class OutputProcessFunction
@@ -59,7 +59,8 @@ public class VehicleCountJob extends Job {
         Long geocell, Context context, Iterable<Integer> elements, Collector<Event> out) {
       // Iterable only contains the result of the aggregate function as single element
       var count = elements.iterator().next();
-      var details = VehicleCount.newBuilder().setGeocell(geocell).setCount(count).build();
+      var details =
+          VehicleDistributionResult.newBuilder().setGeocell(geocell).setCount(count).build();
       out.collect(output(details, context.window()));
     }
   }

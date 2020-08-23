@@ -5,7 +5,7 @@ import static com.dxc.ptinsight.proto.Base.Event;
 import com.dxc.ptinsight.Timestamps;
 import com.dxc.ptinsight.processing.flink.GeocellKeySelector;
 import com.dxc.ptinsight.processing.flink.Job;
-import com.dxc.ptinsight.proto.analytics.Delays.DelayStatistics;
+import com.dxc.ptinsight.proto.analytics.HslRealtime.DelayDistributionResult;
 import com.dxc.ptinsight.proto.input.HslRealtime.Arrival;
 import java.time.Duration;
 import java.time.Instant;
@@ -23,12 +23,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /** Get statistics of arrival delays for each cell */
-public class DelayDetectionJob extends Job {
+public class DelayDistributionJob extends Job {
 
-  private static final Logger LOG = LoggerFactory.getLogger(DelayDetectionJob.class);
+  private static final Logger LOG = LoggerFactory.getLogger(DelayDistributionJob.class);
 
-  public DelayDetectionJob() {
-    super("Delay Detection");
+  public DelayDistributionJob() {
+    super("Delay Distribution");
   }
 
   @Override
@@ -39,7 +39,7 @@ public class DelayDetectionJob extends Job {
         .timeWindow(Time.minutes(5), Time.seconds(5))
         .allowedLateness(Time.seconds(5))
         .process(new DelayStatisticsProcessFunction())
-        .addSink(sink("analytics.delay-statistics"));
+        .addSink(sink("analytics.delay-distribution"));
   }
 
   protected static class DelayCalculatorProcessFunction
@@ -71,7 +71,7 @@ public class DelayDetectionJob extends Job {
       Collections.sort(sorted);
 
       var details =
-          DelayStatistics.newBuilder()
+          DelayDistributionResult.newBuilder()
               .setGeocell(key)
               .setPercentile50Th(getNthPercentile(sorted, 50))
               .setPercentile90Th(getNthPercentile(sorted, 90))

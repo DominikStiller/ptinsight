@@ -5,7 +5,7 @@ import com.dxc.ptinsight.processing.flink.GeocellKeySelector;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
-import com.dxc.ptinsight.proto.analytics.Flow.FlowDirection;
+import com.dxc.ptinsight.proto.analytics.HslRealtime.FlowDirectionResult;
 import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.util.HashMap;
 import java.util.Map.Entry;
@@ -90,7 +90,7 @@ public class FlowDirectionJob extends Job {
               targetCell -> {
                 var edge = Geocells.h3().getH3UnidirectionalEdge(key, targetCell.getKey());
                 var details =
-                    FlowDirection.newBuilder()
+                    FlowDirectionResult.newBuilder()
                         .setGeocellsEdge(edge)
                         .setCount(targetCell.getValue())
                         .build();

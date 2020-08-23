@@ -7,7 +7,7 @@ import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
 import com.dxc.ptinsight.proto.Base.VehicleType;
-import com.dxc.ptinsight.proto.analytics.Patterns.EmergencyStop;
+import com.dxc.ptinsight.proto.analytics.HslRealtime.EmergencyStopDetectionResult;
 import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.io.IOException;
 import java.time.LocalDateTime;
@@ -30,7 +30,7 @@ public class EmergencyStopDetectionTableJob extends Job {
   private static final Logger LOG = LoggerFactory.getLogger(EmergencyStopDetectionTableJob.class);
 
   public EmergencyStopDetectionTableJob() {
-    super("Emergency Stop Detection Table");
+    super("Emergency Stop Detection (Table)");
   }
 
   @Override
@@ -61,7 +61,7 @@ public class EmergencyStopDetectionTableJob extends Job {
     tableEnv
         .toAppendStream(emergencyStopTable, Row.class)
         .process(new OutputProcessFunction())
-        .addSink(sink("analytics.emergency-stop-table"));
+        .addSink(sink("analytics.emergency-stop-detection-table"));
   }
 
   private static class VehiclePositionTableTupleBuilderProcessFunction
@@ -94,7 +94,7 @@ public class EmergencyStopDetectionTableJob extends Job {
     public void processElement(Row value, Context ctx, Collector<Event> out) {
       var timestamp = ((LocalDateTime) value.getField(0)).toInstant(ZoneOffset.UTC);
       var details =
-          EmergencyStop.newBuilder()
+          EmergencyStopDetectionResult.newBuilder()
               .setLatitude((float) value.getField(1))
               .setLongitude((float) value.getField(2))
               .setSpeedDiff((float) value.getField(3))

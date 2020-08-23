@@ -19,19 +19,19 @@ function subscribe(topic: string, handler: (msg: any) => void) {
   });
 }
 
-// Vehicle counts layer
-const vehicleCountsLayer = new GeocellLayer<{
+// Vehicle distribution layer
+const vehicleDistributionLayer = new GeocellLayer<{
   count: number;
 }>(
   (data) => `Vehicles in the last 30 s: ${data.count}`,
   (data) => data.count
 ).addToLegend(legend);
-subscribe("analytics.vehicle-count", (msg: any) => {
-  vehicleCountsLayer.updateData(msg.data.geocell, msg);
+subscribe("analytics.vehicle-distribution", (msg: any) => {
+  vehicleDistributionLayer.updateData(msg.data.geocell, msg);
 });
 
-// Delay statistics layer
-const delayStatisticsLayer = new GeocellLayer<{
+// Delay distribution layer
+const delayDistributionLayer = new GeocellLayer<{
   p50: number;
   p90: number;
   p99: number;
@@ -42,9 +42,9 @@ const delayStatisticsLayer = new GeocellLayer<{
       Arrival delay in the last 5 min (99th percentile): ${data.p99} min`,
   (data) => data.p90
 ).addToLegend(legend);
-subscribe("analytics.delay-statistics", (msg: any) => {
+subscribe("analytics.delay-distribution", (msg: any) => {
   if (msg.data.p90 >= 0) {
-    delayStatisticsLayer.updateData(msg.data.geocell, msg);
+    delayDistributionLayer.updateData(msg.data.geocell, msg);
   }
 });
 
@@ -59,19 +59,19 @@ subscribe("analytics.flow-direction", (msg: any) => {
   }
 });
 
-// Final stop counts layer
-const finalStopCountsLayer = new GeocellLayer<{
+// Final stop distribution layer
+const finalStopDistributionLayer = new GeocellLayer<{
   count: number;
 }>(
   (data) => `Vehicles bound for here in the last 5 min: ${data.count}`,
   (data) => data.count
 ).addToLegend(legend);
-subscribe("analytics.final-stop-count", (msg: any) => {
-  finalStopCountsLayer.updateData(msg.data.geocell, msg);
+subscribe("analytics.final-stop-distribution", (msg: any) => {
+  finalStopDistributionLayer.updateData(msg.data.geocell, msg);
 });
 
-// Emergency stop layer
-const emergencyStopLayer = new GeopointLayer<{
+// Emergency stop detection layer
+const emergencyStopDetectionLayer = new GeopointLayer<{
   veh_type: string;
   lat: number;
   lon: number;
@@ -86,8 +86,8 @@ const emergencyStopLayer = new GeopointLayer<{
       Maximum deceleration: ${data.max_dec.toFixed(1)} m/s<sup>2</sup>`,
   (data) => -data.max_dec
 ).addToLegend(legend);
-subscribe("analytics.emergency-stop-streaming", (msg: any) => {
-  emergencyStopLayer.updateData([msg.data.lat, msg.data.lon], msg);
+subscribe("analytics.emergency-stop-detection-streaming", (msg: any) => {
+  emergencyStopDetectionLayer.updateData([msg.data.lat, msg.data.lon], msg);
 });
 
 // General maps
@@ -100,7 +100,7 @@ const map = lmap("map-container", {
   // Point Nemo (origin of latency markers)
   // center: [-48.875, -123.393],
   zoom: 11.7,
-  layers: [streetsLayerLite, vehicleCountsLayer],
+  layers: [streetsLayerLite, vehicleDistributionLayer],
 });
 
 control
@@ -115,11 +115,11 @@ control
       "Streets Dark": streetsLayerDark,
     },
     {
-      "Vehicle distribution": vehicleCountsLayer,
-      "Delay statistics": delayStatisticsLayer,
+      "Vehicle distribution": vehicleDistributionLayer,
+      "Delay distribution": delayDistributionLayer,
       "Flow direction": flowDirectionLayer,
-      "Final stop distribution": finalStopCountsLayer,
-      "Emergency stop": emergencyStopLayer,
+      "Final stop distribution": finalStopDistributionLayer,
+      "Emergency stops": emergencyStopDetectionLayer,
     },
     {
       position: "bottomright",

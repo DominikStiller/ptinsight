@@ -7,11 +7,11 @@ from ptinsight.common import (
     VehiclePosition,
     Arrival,
     Departure,
-    VehicleCount,
-    FinalStopCount,
-    DelayStatistics,
-    FlowDirection,
-    EmergencyStop,
+    VehicleDistributionResult,
+    FinalStopDistributionResult,
+    DelayDistributionResult,
+    FlowDirectionResult,
+    EmergencyStopDetectionResult,
 )
 
 
@@ -19,12 +19,12 @@ _TOPIC_TO_PROTOBUF_MAPPING = {
     "input.vehicle-position": VehiclePosition,
     "input.arrival": Arrival,
     "input.departure": Departure,
-    "analytics.vehicle-count": VehicleCount,
-    "analytics.delay-statistics": DelayStatistics,
-    "analytics.flow-direction": FlowDirection,
-    "analytics.final-stop-count": FinalStopCount,
-    "analytics.emergency-stop-table": EmergencyStop,
-    "analytics.emergency-stop-streaming": EmergencyStop,
+    "analytics.vehicle-distribution": VehicleDistributionResult,
+    "analytics.delay-distribution": DelayDistributionResult,
+    "analytics.flow-direction": FlowDirectionResult,
+    "analytics.final-stop-distribution": FinalStopDistributionResult,
+    "analytics.emergency-stop-detection-table": EmergencyStopDetectionResult,
+    "analytics.emergency-stop-detection-streaming": EmergencyStopDetectionResult,
 }
 
 

@@ -3,7 +3,7 @@ package com.dxc.ptinsight.processing.jobs;
 import com.dxc.ptinsight.processing.flink.Job;
 import com.dxc.ptinsight.processing.flink.UniqueVehicleIdKeySelector;
 import com.dxc.ptinsight.proto.Base.Event;
-import com.dxc.ptinsight.proto.analytics.Patterns.EmergencyStop;
+import com.dxc.ptinsight.proto.analytics.HslRealtime.EmergencyStopDetectionResult;
 import com.dxc.ptinsight.proto.input.HslRealtime.VehiclePosition;
 import java.util.List;
 import java.util.Map;
@@ -27,7 +27,7 @@ public class EmergencyStopDetectionStreamingJob extends Job {
       LoggerFactory.getLogger(EmergencyStopDetectionStreamingJob.class);
 
   public EmergencyStopDetectionStreamingJob() {
-    super("Emergency Stop Detection Streaming");
+    super("Emergency Stop Detection (Streaming)");
   }
 
   @Override
@@ -66,7 +66,7 @@ public class EmergencyStopDetectionStreamingJob extends Job {
 
     CEP.pattern(vehiclePositionStream, emergencyStopPattern)
         .process(new OutputProcessFunction())
-        .addSink(sink("analytics.emergency-stop-streaming"));
+        .addSink(sink("analytics.emergency-stop-detection-streaming"));
   }
 
   private static class OutputProcessFunction
@@ -82,7 +82,7 @@ public class EmergencyStopDetectionStreamingJob extends Job {
           match.get("braking").stream().mapToDouble(VehiclePosition::getAcceleration).min();
 
       var details =
-          EmergencyStop.newBuilder()
+          EmergencyStopDetectionResult.newBuilder()
               .setLatitude(stopped.getLatitude())
               .setLongitude(stopped.getLongitude())
               .setSpeedDiff(cruising.getSpeed() - stopped.getSpeed())
