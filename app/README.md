@@ -1,22 +1,25 @@
-# PT Insight - Real-Time Analysis of Public Transportation Data
+# PT Insight - Real-Time Analytics for Public Transportation Data
 
-This is a demo application for large-scale complex event processing. It will be referred to as "PT Insight" (Public Transportation Insight).
+This is a demo application for stream analytics. It will be referred to as "PT Insight" (Public Transportation Insight).
 For general documentation, see `docs`. For component-specific documentation, see their folders.
 
 
 ## Use Case
 * Ingest real-time event stream from [Helsinki Public Transportation API](https://digitransit.fi/en/developers/apis/4-realtime-api/)
-* Ingest other [data like schedules, routes, service information](https://digitransit.fi/en/developers/apis/1-routing-api/), ...
 * Analyze for following:
-    * Detect incidents/deviations from schedule and correlate with service information
-    * Detect busiest places with respect to number of arrivals
-    * Detect routes with highest speeds and accelerations
+    * Vehicle distribution across city
+    * Delay distribution across city
+    * Final stop distribution across city
+    * Flow direction patterns
+    * Emergency stops/hard braking
 * Display that information in a heatmap as overlay for a city map
 
 
 ## Requirements
-* Resiliency to failures:
-    * Requires state checkpoints
+* Correctness: results should be guaranteed to be correct through exactly-once event-time-order processing even if events arrive out of order and faults occur
+* Fault tolerance: the solution should guarantee consistent results and preserve state during faults without heavy recomputations
+* Low latency: results based on an ingested event should become available for visualization in (near) real time (a latency of a few seconds is acceptable/inevitable, depending on the job)
+* Scalability: the solution should be able handle large volumes of data without performance degradation
 
 
 ## Architecture
@@ -39,7 +42,7 @@ For general documentation, see `docs`. For component-specific documentation, see
 ## Development
 
 ### Environment Setup
-Set up your environment as described in the [top-level README](../README.md), and set up the individual components as desribed in their READMEs.
+Set up your environment as described in the [top-level README](../README.md#environment-setup), and set up the individual components as desribed in their READMEs.
 Then add your IP address block to the `trusted_cidr` variable in `terraform/variables.tf` to grant access to EC2 instances from your computer.
 
 ### Deployment

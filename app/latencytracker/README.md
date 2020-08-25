@@ -1,8 +1,8 @@
 # PT Insight: Latency Tracker
 
-The latency tracker component is responsible for tracking the end-to-end latency, i.e. the delay between the
- ingestion of an event and the time at which results based on this event become visible. The latency tracker also
-  describes partial latencies as described in the [design document](../docs/Latency%20Tracking.md). Measured latencies are stored in the `recordings/` folder.
+The latency tracker component is responsible for tracking the end-to-end latency, i.e. the delay between the ingestion of an event and the time at which results based on this event become visible. The latency tracker also describes partial latencies as described in the [design document](../docs/Latency%20Tracking.md). Measured latencies are stored in the `recordings/` folder.
+
+The latency tracker is single-threaded and is hard to parallelize. While we tried using multiprocessing, the performance was by far not sufficient. Seen markers need to be shared between processes, and Python's  multiprocessing.Manager.dict() is orders of magnitude slower than regular dicts, distorting measurements.
 
 
 ## Prerequisites

@@ -32,13 +32,19 @@ sudo systemctl start ptinsight-latencytracker
 exit
 ```
 
-5. Identify the latest recording file and download it to the analysis folder.
+5. Identify the latest recording files and download it to the analysis folder.
 ```
 ./ssh.sh latencytracker
 ls -l /opt/ptinsight/latencytracker/recordings
 exit
 
-scp -i ~/.ssh/id_rsa_ptinsight_deploy centos@[latencytracker-ip]:/opt/ptinsight/latencytracker/recordings/[id].csv analysis/latency/recordings
+scp -i ~/.ssh/id_rsa_ptinsight_deploy centos@[latencytracker-ip]:/opt/ptinsight/latencytracker/recordings/[id]_* analysis/latency/recordings
 ```
 
 6. Add the recording id and configuration to the [Recordings.md](analysis/latency/Recordings.md) table.
+
+7. You might also want to monitor the CPU load and memory usage of all components for bottlenecks.
+```
+./ssh.sh [component]
+htop
+```
