@@ -1,18 +1,14 @@
 import csv
 import os
-from datetime import datetime
 
 from ptinsight.common.latency import LatencyMarker
 
 
 class Recorder:
-    def __init__(self):
-        measurement_id = (
-            datetime.utcnow().replace(microsecond=0).isoformat().replace(":", "-")
-        )
+    def __init__(self, measurement_id: str, index: int):
         os.makedirs("recordings", exist_ok=True)
         self.file = open(
-            f"recordings/{measurement_id}.csv",
+            f"recordings/{measurement_id}_{index}.csv",
             "w",
             encoding="utf-8",
             newline="",

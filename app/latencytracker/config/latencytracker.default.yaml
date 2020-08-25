@@ -6,6 +6,7 @@ kafka:
   protobuf_format: json
   bootstrap_servers:
     - kafka-public-ip:9093
+  num_partitions_per_topic: 4
 
 latency_markers:
   h3_resolution: 9

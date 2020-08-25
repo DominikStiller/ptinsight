@@ -6,6 +6,7 @@ kafka:
   protobuf_format: binary
   bootstrap_servers:
     {{ kafka_servers | to_nice_yaml | indent(4) }}
+  num_partitions_per_topic: 4
 
 latency_markers:
   h3_resolution: 9

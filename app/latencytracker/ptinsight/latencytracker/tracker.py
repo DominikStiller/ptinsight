@@ -1,7 +1,9 @@
+from datetime import datetime
 import logging
+import multiprocessing
+from multiprocessing import Process
 from typing import Dict
 
-from expiringdict import ExpiringDict
 from kafka import KafkaConsumer
 from kafka.errors import NoBrokersAvailable
 from ptinsight.common import Event
@@ -21,25 +23,50 @@ class LatencyTracker:
             self.protobuf_format = config["kafka"].pop("protobuf_format")
         else:
             self.protobuf_format = "json"
+        self.num_partitions_per_topic = int(
+            config["kafka"].pop("num_partitions_per_topic")
+        )
+
         # Needs to have the same config as the Flink consumer
-        self.consumer = KafkaConsumer(**config["kafka"])
+        self.kafka_config = config["kafka"]
 
         self.h3_resolution = int(config["latency_markers"]["h3_resolution"])
         h3_max_k = int(config["latency_markers"]["h3_max_k"])
-        self._latency_markers = HSLRealtimeLatencyMarkers(
-            self.h3_resolution, h3_max_k
-        )
+        self._latency_markers = HSLRealtimeLatencyMarkers(self.h3_resolution, h3_max_k)
 
-        self.seen_markers: Dict[int, LatencyMarker] = ExpiringDict(
-            max_len=100000, max_age_seconds=300
+        self.seen_markers: Dict[int, LatencyMarker] = None
+        self.measurement_id = (
+            datetime.utcnow().replace(microsecond=0).isoformat().replace(":", "-")
         )
-
-        self.recorder = Recorder()
 
     def start(self) -> None:
+        with multiprocessing.Manager() as manager:
+            seen_markers = manager.dict()
+
+            pool = []
+            for i in range(self.num_partitions_per_topic):
+                p = Process(
+                    target=self._start, args=(self.measurement_id, i, seen_markers)
+                )
+                pool.append(p)
+                p.start()
+
+            multiprocessing.connection.wait(p.sentinel for p in pool)
+
+    def _start(self, measurement_id, index, seen_markers) -> None:
+        self.seen_markers = seen_markers
+        self.recorder = Recorder(measurement_id, index)
+
         try:
-            self.consumer.subscribe(pattern="input.*|analytics.*")
-            for message in self.consumer:
+            # Use unique consumer group since we want to read from the last offset
+            # Skipping to the last offset seems to not work on Linux
+            consumer = KafkaConsumer(
+                **self.kafka_config,
+                group_id=f"ptinsight-latencytracker-{measurement_id}",
+            )
+            consumer.subscribe(pattern="input.*|analytics.*")
+
+            for message in consumer:
                 topic = message.topic
                 event = deserialize(message.value, self.protobuf_format)
 
