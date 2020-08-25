@@ -60,7 +60,7 @@ class LatencyTracker:
 
     def _process_egress(self, topic: str, geocell: int, event: Event):
         if geocell in self.seen_markers:
-            job = topic[7:]
+            job = topic[10:]
             marker = self.seen_markers[geocell]
 
             # Ensure that each marker is observed only once for each job

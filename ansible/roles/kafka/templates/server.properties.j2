@@ -108,7 +108,7 @@ transaction.max.timeout.ms=3600000
 # from the end of the log.
 
 # The minimum age of a log file to be eligible for deletion due to age
-log.retention.minutes=10
+log.retention.minutes=15
 
 # A size-based retention policy for logs. Segments are pruned from the log unless the remaining
 # segments drop below log.retention.bytes. Functions independently of log.retention.hours.
@@ -119,7 +119,7 @@ log.segment.bytes=1073741824
 
 # The interval at which log segments are checked to see if they can be deleted according
 # to the retention policies
-log.retention.check.interval.minutes=10
+log.retention.check.interval.minutes=15
 
 ############################# Zookeeper #############################
 

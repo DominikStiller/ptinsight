@@ -1,7 +1,7 @@
 resource "aws_instance" "ingestion" {
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "c5.2xlarge"
+    instance_type          = "c5.24xlarge"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.ingestion.name
 

@@ -118,7 +118,7 @@ class HSLRealtimeLatencyMarkers:
             if event.vehicle.operator == self.LATENCY_MARKER_OPERATOR:
                 return cell
         else:
-            # For egress events, we need to check by geocell distance
+            # For analytics.* events, we need to check by geocell distance
             try:
                 if h3.h3_distance(self.origin, cell) <= self.h3_max_k:
                     return cell

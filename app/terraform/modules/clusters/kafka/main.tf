@@ -1,8 +1,8 @@
 resource "aws_instance" "kafka" {
-    count = 3
+    count = 4
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.large"
+    instance_type          = "m5.xlarge"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.kafka.name
 
