@@ -551,3 +551,118 @@ Observations:
 ## General Observations
 * When ingestion does not degrade performance, there is a sawtooth pattern with the period of the Kafka log retention check interval (i.e. latency increases every time logs are deleted)
 * When Kafka latency spikes, it does so for all jobs
+
+
+
+## Setup 15
+Infrastructure:
+* 1x c5.4xlarge for ingestion
+* 1x m5.large for latencytracker
+* 3x m5.xlarge for Kafka with 4 partitions per topic
+* 1x t3.small for Flink master
+* 4x m5.xlarge (2 cores x 2 threads = 4 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 0.5 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: RocksDB
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 12288m`
+  * `taskmanager.memory.managed.fraction: 0.6`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+Significant changes:
+* Use better Flink worker instance to check if RocksDB bottleneck for CEP jobs can be removed
+
+Observations:
+* CEP and RocksDB do not work well even at 1x
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-24T20-59-28 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 308e611599e0836258c9c3859d577383af62c993 |         |
+| 2020-08-24T21-09-29 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 308e611599e0836258c9c3859d577383af62c993 |         |
+
+
+
+## Setup 16
+Infrastructure:
+* 1x c5.9xlarge for ingestion
+* 1x m5.large for latencytracker
+* 3x m3.xlarge for Kafka with 4 partitions per topic
+* 1x t3.small for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 1024m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=10`
+* `log.retention.check.interval.minutes=10`
+
+Significant changes:
+* Like setup 9 but with better Kafka instances and 4 instead of 2 partitions
+
+Observations:
+* Ingestion is way too slow at 64x -> fault of 4 partitions or not using c5.metal?
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-24T21-32-22 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 308e611599e0836258c9c3859d577383af62c993 |         |
+
+
+
+## Setup 17
+Infrastructure:
+* 1x c5.24xlarge for ingestion
+* 1x m5.xlarge for latencytracker
+* 4x m5.xlarge for Kafka with 4 partitions per topic
+* 1x t3.medium for Flink master
+* 4x t3.medium (1 cores x 2 threads = 2 vCPUs) for Flink workers with job parallelism 2 and 2 task slots per worker
+  * 2 tasks per real core
+
+Flink configuration:
+* Checkpointing: disabled
+* Time characteristic: Event time, 1 s bounded out of orderness watermarking
+* State backend: Memory
+* Memory:
+  * `jobmanager.memory.flink.size: 2048m`
+  * `taskmanager.memory.flink.size: 2048m`
+
+Kafka configuration:
+* `log.retention.minutes=15`
+* `log.retention.check.interval.minutes=15`
+
+Significant changes:
+* Like setup 16 but with more and better Kafka instances, and better ingestion instance
+
+Observations:
+* Tasks from one job not all on same node
+* 32x: Flink worker 20%-70%, latencytracker 80%-90% (one core)
+* 64x: Flink worker 0%-30%, latencytracker 10% (one core), Kafka load also low -> ingestion is bottleneck, starts already at 48x
+
+
+
+| ID                  | Volume Scaling | Data Source                             | Commit                                   | Comment |
+| ------------------- | -------------- | --------------------------------------- | ---------------------------------------- | ------- |
+| 2020-08-25T11-50-37 | 1x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T12-22-47 | 2x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T12-59-34 | 4x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T13-57-07 | 8x             | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T15-10-58 | 16x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T15-46-03 | 32x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T16-19-05 | 48x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |
+| 2020-08-25T17-25-07 | 64x            | mqtt.hsl.fi/2020-06-02T10-31-46.rec.bz2 | 5db2beda702f04363c4eea22714e1bf18cb94b22 |         |

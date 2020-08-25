@@ -42,7 +42,7 @@ For general documentation, see `docs`. For component-specific documentation, see
 ## Development
 
 ### Environment Setup
-Set up your environment as described in the [top-level README](../README.md#environment-setup), and set up the individual components as desribed in their READMEs.
+Set up your environment as described in the [top-level README](../README.md), and set up the individual components as desribed in their READMEs.
 Then add your IP address block to the `trusted_cidr` variable in `terraform/variables.tf` to grant access to EC2 instances from your computer.
 
 ### Deployment
