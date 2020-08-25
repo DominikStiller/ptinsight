@@ -23,7 +23,7 @@ connectors:
       type: hsl-realtime
       config:
         vehicle_types: bus,tram,train
-        event_types: vp
+        event_types: vp,ars,dep
 #  - type: mqtt-recording
 #    config:
 #      bucket: mqtt-recordings
@@ -35,4 +35,4 @@ connectors:
 #      type: hsl-realtime
 #      config:
 #        vehicle_types: bus,tram,train
-#        event_types: ars,dep
+#        event_types: vp,ars,dep

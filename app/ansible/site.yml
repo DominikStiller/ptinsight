@@ -53,7 +53,7 @@
   hosts: kafka
   vars:
     - broker_id: "{{ groups['kafka'].index(inventory_hostname) }}"
-    - num_partitions_per_topic: 4
+    - num_partitions_per_topic: 2
   roles:
     - role: ../ansible/roles/kafka
       tags: [setup, setup-kafka]

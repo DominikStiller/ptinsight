@@ -26,7 +26,7 @@ class Processor(abc.ABC):
 
     @abc.abstractmethod
     def process(
-        self, source: str, payload: dict, scheduler_index: int = 0
+        self, source: str, payload: dict, replay_index: int = 0
     ) -> Optional[Tuple[str, float, Message]]:
         """
         Filters and transforms message from the raw format and the internal event format
@@ -34,7 +34,7 @@ class Processor(abc.ABC):
         Args:
             source: The source of the message, e.g., an MQTT topic
             payload: The payload that contains the event data
-            scheduler_index: The index of the scheduler in case of volume scaling
+            replay_index: The index of the scheduler in case of volume scaling
 
         Returns:
             A tuple of the Kafka topic, the event time and the protobuf message, or None if the message should be dismissed
@@ -101,7 +101,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
                 return vehicle
 
     def process(
-        self, source: str, payload: dict, scheduler_index: int = 0
+        self, source: str, payload: dict, replay_index: int = 0
     ) -> Optional[Tuple[str, float, Message]]:
         vehicle_type = self._get_vehicle_type(source)
         if not vehicle_type:
@@ -112,7 +112,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
 
             latest_timestamp = self._latest_timestamp.value
 
-            if scheduler_index == 0:
+            if replay_index == 0:
                 # Only use first replay as timestamp source
                 # This also eliminates the need for a lock
                 if event_timestamp > latest_timestamp:
@@ -122,7 +122,7 @@ class HSLRealtimeProcessor(MQTTProcessor):
                     return
                 # Adjust non-first replay payload to prevent collisions when scaling volume
                 event_timestamp, event = self._parser.adjust_payload(
-                    scheduler_index, event, latest_timestamp,
+                    replay_index, event, latest_timestamp,
                 )
 
             target_topic = (

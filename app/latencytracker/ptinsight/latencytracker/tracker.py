@@ -26,9 +26,7 @@ class LatencyTracker:
 
         self.h3_resolution = int(config["latency_markers"]["h3_resolution"])
         h3_max_k = int(config["latency_markers"]["h3_max_k"])
-        self._latency_markers = HSLRealtimeLatencyMarkers(
-            self.h3_resolution, h3_max_k
-        )
+        self._latency_markers = HSLRealtimeLatencyMarkers(self.h3_resolution, h3_max_k)
 
         self.seen_markers: Dict[int, LatencyMarker] = ExpiringDict(
             max_len=100000, max_age_seconds=300

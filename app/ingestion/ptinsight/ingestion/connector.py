@@ -167,12 +167,12 @@ class MQTTRecordingConnector(Connector):
             latest_timestamp = multiprocessing.Value("d")
 
             pool = []
-            for scheduler_index in range(scaling_factor):
+            for replay_index in range(scaling_factor):
                 p = Process(
-                    target=self._start_single_scheduler,
+                    target=self._start_single_replay,
                     args=(
-                        scheduler_index,
-                        scheduler_index * scaling_offset,
+                        replay_index,
+                        replay_index * scaling_offset,
                         skip_offset_barrier,
                         latest_timestamp,
                     ),
@@ -182,9 +182,9 @@ class MQTTRecordingConnector(Connector):
 
             multiprocessing.connection.wait(p.sentinel for p in pool)
 
-    def _start_single_scheduler(
+    def _start_single_replay(
         self,
-        scheduler_index: int,
+        replay_index: int,
         offset: int,
         skip_offset_barrier: multiprocessing.Barrier,
         latest_timestamp: ValueProxy,
@@ -203,16 +203,14 @@ class MQTTRecordingConnector(Connector):
         for _ in range(offset):
             next(lines)
 
-        logger.info(
-            f"Scheduler {scheduler_index+1} of {skip_offset_barrier.parties} ready"
-        )
+        logger.info(f"Replay {replay_index+1} of {skip_offset_barrier.parties} ready")
         skip_offset_barrier.wait()
 
         # Scheduler is used to replay messages with original relative timing
         scheduler = MultithreadingScheduler()
         scheduler.start()
 
-        if scheduler_index == 0:
+        if replay_index == 0:
             _start_latency_marker_generator(
                 self.config, self.processor.generate_latency_markers, self._ingest
             )
@@ -238,14 +236,14 @@ class MQTTRecordingConnector(Connector):
             scheduler.schedule(
                 t_offset - recording_start_offset,
                 functools.partial(
-                    self._process_and_ingest, topic, payload, scheduler_index
+                    self._process_and_ingest, topic, payload, replay_index
                 ),
             )
 
         scheduler.stop()
 
-    def _process_and_ingest(self, topic: str, payload: dict, scheduler_index: int):
-        if processed := self.processor.process(topic, payload, scheduler_index):
+    def _process_and_ingest(self, topic: str, payload: dict, replay_index: int):
+        if processed := self.processor.process(topic, payload, replay_index):
             target_topic, event_timestamp, details = processed
             self._ingest(
                 target_topic, _create_event(event_timestamp, details),
