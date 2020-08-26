@@ -30,7 +30,7 @@ public class EmergencyStopDetectionTableJob extends Job {
   private static final Logger LOG = LoggerFactory.getLogger(EmergencyStopDetectionTableJob.class);
 
   public EmergencyStopDetectionTableJob() {
-    super("Emergency Stop Detection (Table)");
+    super("Emergency Stop Detection (Table)", false, 0);
   }
 
   @Override

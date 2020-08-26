@@ -29,7 +29,7 @@ public abstract class Job {
   private static final Properties kafkaProps = new Properties();
 
   public Job(String name) {
-    this(name, true, 10000);
+    this(name, true, (int) Duration.ofMinutes(5).toMillis());
   }
 
   public Job(String name, boolean withCheckpointing, int checkpointingInterval) {
@@ -45,7 +45,8 @@ public abstract class Job {
 
     if (withCheckpointing) {
       env.enableCheckpointing(checkpointingInterval, CheckpointingMode.EXACTLY_ONCE);
-      env.getCheckpointConfig().setMinPauseBetweenCheckpoints(checkpointingInterval / 2);
+      env.getCheckpointConfig()
+          .setMinPauseBetweenCheckpoints((long) Math.floor(checkpointingInterval * 0.8));
     }
   }
 

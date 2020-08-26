@@ -54,7 +54,7 @@ const flowDirectionLayer = new GeoedgeLayer<{
 }>((data) => `Vehicles in the last 5 min: ${data.count}`);
 subscribe("analytics.flow-direction", (msg: any) => {
   // Keep map clean by only showing edges with more than 3 vehicles
-  if (msg.data.count > 3) {
+  if (msg.data.count > 2) {
     flowDirectionLayer.updateData(msg.data.edge, msg);
   }
 });

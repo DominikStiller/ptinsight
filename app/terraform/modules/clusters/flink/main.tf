@@ -3,7 +3,7 @@ resource "aws_instance" "flink_master" {
     count = 1
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.small"
+    instance_type          = "t3.medium"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_master.name
 
@@ -110,10 +110,10 @@ resource "aws_security_group" "flink_master" {
 
 # ---- >> Worker ----------------------------
 resource "aws_instance" "flink_worker" {
-    count = 4
+    count = 5
 
     ami                    = "ami-04cf43aca3e6f3de3"
-    instance_type          = "t3.medium"
+    instance_type          = "c5.xlarge"
     key_name               = var.keypair.key_name
     iam_instance_profile   = aws_iam_instance_profile.flink_worker.name
 

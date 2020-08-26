@@ -4,7 +4,6 @@ import com.dxc.ptinsight.Resources;
 import com.dxc.ptinsight.YamlSerializer;
 import com.dxc.ptinsight.processing.jobs.DelayDistributionJob;
 import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionStreamingJob;
-import com.dxc.ptinsight.processing.jobs.EmergencyStopDetectionTableJob;
 import com.dxc.ptinsight.processing.jobs.FinalStopDistributionJob;
 import com.dxc.ptinsight.processing.jobs.FlowDirectionJob;
 import com.dxc.ptinsight.processing.jobs.VehicleDistributionJob;
@@ -21,7 +20,7 @@ public class EntryPoint {
   public static void main(String[] args) throws Exception {
     new VehicleDistributionJob().execute();
     new DelayDistributionJob().execute();
-    new EmergencyStopDetectionTableJob().execute();
+    // new EmergencyStopDetectionTableJob().execute();
     new EmergencyStopDetectionStreamingJob().execute();
     // Exclude these for evaluation, since their latency cannot be measured
     new FlowDirectionJob().execute();

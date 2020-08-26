@@ -27,7 +27,8 @@ public class EmergencyStopDetectionStreamingJob extends Job {
       LoggerFactory.getLogger(EmergencyStopDetectionStreamingJob.class);
 
   public EmergencyStopDetectionStreamingJob() {
-    super("Emergency Stop Detection (Streaming)");
+    // Disable checkpointing since it creates too much backpressure
+    super("Emergency Stop Detection (Streaming)", false, 0);
   }
 
   @Override
