@@ -59,7 +59,7 @@ class Plotter:
                     "axes.titleweight": "bold",
                 },
             )
-            self.default_figsize = [12, 4]
+            self.default_figsize = [12, 3]
         else:
             raise Exception("Unsupported context")
 
@@ -68,6 +68,8 @@ class Plotter:
     ):
         if figsize is None:
             figsize = [self.default_figsize[0], self.default_figsize[1] * rows]
+        else:
+            figsize = [figsize[0], figsize[1] * rows]
         fig, axs = plt.subplots(
             rows,
             cols,
