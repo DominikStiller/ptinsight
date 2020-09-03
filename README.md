@@ -1,8 +1,6 @@
 # Event Stream Analytics
 
-This is the repository for the bachelor's thesis project of Dominik Stiller (dominik.stiller@hpe.com). Meeting notes, presentations and formalia can be found in [this repo](https://github.dxc.com/bgloss/dhbw-eda).
-
-Goal of the project is the setup of an example application for real-time event stream analytics to gain experience with this technology.
+This is the repository for the bachelor's thesis project of Dominik Stiller (dominik.stiller@hpe.com). Goal of the project is the setup of an example application for real-time event stream analytics to gain experience with this technology.
 
 
 ## Repository Structure
